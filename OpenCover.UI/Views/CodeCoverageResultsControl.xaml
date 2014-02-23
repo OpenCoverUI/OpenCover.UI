@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="OpenCover.UI.Views.CodeCoverageResultsControl"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:model="clr-namespace:OpenCover.Framework.Model"
+			 xmlns:sd="http://icsharpcode.net/sharpdevelop/treeview"
+			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
+			 mc:Ignorable="d"
+			 d:DesignHeight="300" d:DesignWidth="1000"
+			 Name="CodeCoverageToolWindow">
+	<UserControl.Resources>
+		<c:WidthConverter x:Key="widthConverter"/>
+		<!--TODO: Add busy indicator-->
+		<c:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
+		<c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
+	</UserControl.Resources>
+	<Grid>
+		
+		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" MouseDoubleClick="TreeViewItemDoubleClicked">
+			<ListView.View>
+				<sd:SharpGridView>
+					<GridView.Columns>
+						<GridViewColumn Header="Symbol" Width="700">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<sd:SharpTreeNodeView />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						<GridViewColumn Header="% Code Coverage" Width="150">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding SequenceCoverage}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+						<GridViewColumn Header="Visited Sequence Points" Width="150">
+							<GridViewColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding VisitedSequencePoints}" />
+								</DataTemplate>
+							</GridViewColumn.CellTemplate>
+						</GridViewColumn>
+					</GridView.Columns>
+				</sd:SharpGridView>
+			</ListView.View>
+		</sd:SharpTreeView>
+		<TextBlock Margin="10" HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource widthConverter}, ConverterParameter=100}"/>
+	</Grid>
+</UserControl>
+<!--Width="{Binding RelativeSource={RelativeSource AncestorType= {x:Type TreeView}, AncestorLevel=1}, Path=ActualWidth}"
+	
+	Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl} }, 
+						Converter={StaticResource widthConverter}, ConverterParameter=80}"-->
