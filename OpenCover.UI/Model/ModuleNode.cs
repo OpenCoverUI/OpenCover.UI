@@ -53,16 +53,11 @@ namespace OpenCover.UI.Model
 			LazyLoading = true;
 		}
 
-		public override string ToString()
-		{
-			return _module.ModuleName;
-		}
-
 		public override object Text
 		{
 			get
 			{
-				return _module.ModuleName;
+				return System.IO.Path.GetFileName(_module.FullName);
 			}
 		}
 
@@ -70,11 +65,19 @@ namespace OpenCover.UI.Model
 		{
 			Children.AddRange(_module.CoveredClasses.Select(@class => new ClassNode(@class)));
 		}
+
+		public override object Icon
+		{
+			get
+			{
+				return OpenCoverUIPackage.GetImageURL("Resources/Library.png");
+			}
+		}
 	}
 
 	public class ClassNode : SharpTreeNode
 	{
-		public Class Class{get; private set;}
+		public Class Class { get; private set; }
 
 		public decimal SequenceCoverage
 		{
@@ -106,14 +109,17 @@ namespace OpenCover.UI.Model
 			}
 		}
 
-		public override string ToString()
-		{
-			return Class.FullName;
-		}
-
 		protected override void LoadChildren()
 		{
 			Children.AddRange(Class.CoveredMethods.Select(method => new MethodNode(method)));
+		}
+
+		public override object Icon
+		{
+			get
+			{
+				return OpenCoverUIPackage.GetImageURL("Resources/Class.png");
+			}
 		}
 	}
 
@@ -146,7 +152,32 @@ namespace OpenCover.UI.Model
 		{
 			get
 			{
-				return Method.Name;
+				try
+				{
+					var methodName = Method.Name.Split(new[] { ':' })[2];
+
+					string searchText = Method.IsGetter ? "get_" : Method.IsSetter ? "set_" : null;
+
+					if (searchText != null)
+					{
+						methodName = methodName.Replace(searchText, "");
+						methodName = methodName.Substring(0, methodName.IndexOf("("));
+					}
+
+					return methodName;
+				}
+				catch
+				{
+					return Method.Name;
+				}
+			}
+		}
+
+		public override object Icon
+		{
+			get
+			{
+				return OpenCoverUIPackage.GetImageURL(String.Format("Resources/{0}", Method.IsGetter || Method.IsSetter ? "Property.png" : "Method.png"));
 			}
 		}
 	}

@@ -237,8 +237,12 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Property.png" />
     <Resource Include="Resources\busyindicator.gif" />
     <Resource Include="Resources\OpenCover.png" />
+    <Resource Include="Resources\Method.png" />
+    <Resource Include="Resources\Class.png" />
+    <Resource Include="Resources\Library.png" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>

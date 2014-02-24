@@ -45,6 +45,7 @@ namespace OpenCover.UI
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
 		private ExecuteSelectedTestsCommand _executeSelectedTestsCommand;
 		private CodeCoverageToolWindowCommand _codeCoverageToolWindowCommand;
+		public const string BASE_IMAGE_PREFIX = "/OpenCover.UI;component/";
 
 		internal static OpenCoverUIPackage Instance
 		{
@@ -74,6 +75,11 @@ namespace OpenCover.UI
 		{
 			get;
 			private set;
+		}
+
+		internal static string GetImageURL(string url)
+		{
+			return String.Format("{0}{1}", BASE_IMAGE_PREFIX, url);
 		}
 
 		/// <summary>

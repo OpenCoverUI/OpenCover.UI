@@ -16,7 +16,6 @@
 		<c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
 	</UserControl.Resources>
 	<Grid>
-		
 		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" MouseDoubleClick="TreeViewItemDoubleClicked">
 			<ListView.View>
 				<sd:SharpGridView>
