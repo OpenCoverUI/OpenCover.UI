@@ -1,7 +1,9 @@
 ﻿//
 // This source code is released under the MIT License;
 //
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TestWindow.UI;
 using System;
@@ -13,6 +15,24 @@ namespace OpenCover.UI.Helpers
 {
 	public static class IDEHelper
 	{
+		private static IVsOutputWindow _outputWindow;
+		private static IVsOutputWindowPane _pane;
+		private static EnvDTE.DTE DTE;
+
+		/// <summary>
+		/// Initializes the <see cref="IDEHelper"/> class.
+		/// </summary>
+		static IDEHelper()
+		{
+			_outputWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+
+			Guid guidGeneral = VSConstants.OutputWindowPaneGuid.GeneralPane_guid;
+			int hr = _outputWindow.CreatePane(guidGeneral, "OpenCover", 1, 1);
+			hr = _outputWindow.GetPane(guidGeneral, out _pane);
+
+			DTE = (Package.GetGlobalService(typeof(EnvDTE.DTE))) as EnvDTE.DTE;
+		}
+
 		/// <summary>
 		/// Returns selected Test cases.
 		/// </summary>
@@ -22,21 +42,29 @@ namespace OpenCover.UI.Helpers
 			// TODO: Refactor this method to make it more elegant. 
 			// Currently, it uses reflection to get the TestsTreeView.ItemsSource which is a list of all tests. It works for now!
 
+			DTE.ExecuteCommand("TestExplorer.ShowTestExplorer");
+
 			var guid = new Guid(GuidList.GuidTestExplorerToolWindowString);
 			IVsWindowFrame frame = null;
 			var toolWindow = uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fFindFirst, ref guid, out frame);
 
 			var windowFrame = frame as WindowFrame;
-			var contentPresenter = windowFrame.FrameView.Content;
-			var frameworkElement = GetPropertyValue<Object>(contentPresenter, "Content");
-			var frameworkElementContent = GetPropertyValue<Object>(frameworkElement, "Content");
-			var hasTestsGrid = GetPropertyValue<Grid>(frameworkElementContent, "HasTestsGrid");
 
-			var multipleGrid = hasTestsGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "MultipleGrid") as Grid;
-			var leftGrid = multipleGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "LeftGrid") as Grid;
-			var summaryControl = leftGrid.Children.Cast<Object>().FirstOrDefault(c => c.GetType() == typeof(SummaryControl)) as SummaryControl;
+			if (windowFrame != null)
+			{
+				var contentPresenter = windowFrame.FrameView.Content;
+				var frameworkElement = GetPropertyValue<Object>(contentPresenter, "Content");
+				var frameworkElementContent = GetPropertyValue<Object>(frameworkElement, "Content");
+				var hasTestsGrid = GetPropertyValue<Grid>(frameworkElementContent, "HasTestsGrid");
 
-			return summaryControl.TestsTreeView as TestTreeControl;
+				var multipleGrid = hasTestsGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "MultipleGrid") as Grid;
+				var leftGrid = multipleGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "LeftGrid") as Grid;
+				var summaryControl = leftGrid.Children.Cast<Object>().FirstOrDefault(c => c.GetType() == typeof(SummaryControl)) as SummaryControl;
+
+				return summaryControl.TestsTreeView as TestTreeControl;
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -83,6 +111,29 @@ namespace OpenCover.UI.Helpers
 		public static void GoToLine(EnvDTE.DTE DTE, int lineNumber)
 		{
 			DTE.ExecuteCommand("GotoLn", lineNumber.ToString());
+		}
+
+		/// <summary>
+		/// Writes to the output window.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		public static void WriteToOutputWindow(string message)
+		{
+			if (_pane != null)
+			{
+				_pane.OutputStringThreadSafe(message);
+				_pane.OutputStringThreadSafe(Environment.NewLine);
+			}
+		}
+
+		/// <summary>
+		/// Writes to output window.
+		/// </summary>
+		/// <param name="format">The string format.</param>
+		/// <param name="arguments">The arguments to formatting.</param>
+		public static void WriteToOutputWindow(string format, params object[] arguments)
+		{
+			WriteToOutputWindow(String.Format(format, arguments));
 		}
 
 		/// <summary>

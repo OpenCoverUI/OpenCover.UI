@@ -14,6 +14,12 @@
 		<!--TODO: Add busy indicator-->
 		<c:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
 		<c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
+		<Style TargetType="GridViewColumnHeader">
+			<Setter Property="FontWeight" Value="Bold" />
+		</Style>
+		<Style TargetType="TextBlock">
+			<Setter Property="Foreground" Value="Black" />
+		</Style>
 	</UserControl.Resources>
 	<Grid>
 		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" MouseDoubleClick="TreeViewItemDoubleClicked">
@@ -45,10 +51,5 @@
 				</sd:SharpGridView>
 			</ListView.View>
 		</sd:SharpTreeView>
-		<TextBlock Margin="10" HorizontalAlignment="Center" Text="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource widthConverter}, ConverterParameter=100}"/>
 	</Grid>
 </UserControl>
-<!--Width="{Binding RelativeSource={RelativeSource AncestorType= {x:Type TreeView}, AncestorLevel=1}, Path=ActualWidth}"
-	
-	Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl} }, 
-						Converter={StaticResource widthConverter}, ConverterParameter=80}"-->

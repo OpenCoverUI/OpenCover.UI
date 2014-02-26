@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace OpenCover.UI.Processors
 {
@@ -15,14 +16,17 @@ namespace OpenCover.UI.Processors
 		private OpenCoverUIPackage _package;
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
 		Dictionary<string, string> _fileList = new Dictionary<string, string>();
+		Action _buildEventHandler;
+		Action _notifySolutionOpened;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VSEventsHandler"/> class.
 		/// </summary>
 		/// <param name="package">The Visual Studio Extension Package.</param>
-		public VSEventsHandler(OpenCoverUIPackage package)
+		public VSEventsHandler(OpenCoverUIPackage package, Action notifySolutionOpened)
 		{
 			_package = package;
+			_notifySolutionOpened = notifySolutionOpened;
 
 			_package.DTE.Events.SolutionEvents.Opened += SolutionOpened;
 			_package.DTE.Events.SolutionEvents.AfterClosing += SolutionClosing;
@@ -43,17 +47,55 @@ namespace OpenCover.UI.Processors
 		}
 
 		/// <summary>
+		/// Builds the solution.
+		/// </summary>
+		/// <param name="action">The event handler.</param>
+		public void BuildSolution(Action action)
+		{
+			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
+			_buildEventHandler = action;
+
+			try
+			{
+				_package.DTE.ExecuteCommand("Build.BuildSolution");
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine(ex.Message);
+			}
+		}
+
+		/// <summary>
+		/// Called when solution is built.
+		/// </summary>
+		/// <param name="Scope">The scope.</param>
+		/// <param name="Action">The action.</param>
+		void OnBuildDone(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+		{
+			if (_buildEventHandler != null)
+			{
+				_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
+				_buildEventHandler();
+			}
+		}
+
+		/// <summary>
 		/// Event handler for Solution Opened Event
 		/// </summary>
 		private void SolutionOpened()
 		{
-			BuildFilesList();
+			Task.Factory.StartNew(() => BuildFilesList());
+			
+			if (_notifySolutionOpened != null)
+			{
+				_notifySolutionOpened();
+			}
 		}
 
 		/// <summary>
 		/// Event handler for Solution Closing Event.
 		/// </summary>
-		void SolutionClosing()
+		private void SolutionClosing()
 		{
 			_keysDictionary.Clear();
 			_fileList.Clear();

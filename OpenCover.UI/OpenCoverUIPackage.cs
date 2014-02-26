@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestWindow.Model;
 using Microsoft.VisualStudio.TestWindow.UI;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Commands;
+using OpenCover.UI.Helpers;
 using OpenCover.UI.Processors;
 using OpenCover.UI.Views;
 using System;
@@ -35,7 +36,7 @@ namespace OpenCover.UI
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	// This attribute registers a tool window exposed by this package. 
 	[ProvideToolWindow(typeof(CodeCoverageResultsToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
-		Orientation = ToolWindowOrientation.Bottom, Window = EnvDTE.Constants.vsWindowKindClassView)]
+		Orientation = ToolWindowOrientation.Bottom, Window = EnvDTE.Constants.vsWindowKindOutput)]
 	[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
 	[Guid(GuidList.GuidOpenCoverUIPkgString)]
 	public sealed class OpenCoverUIPackage : Package
@@ -87,7 +88,7 @@ namespace OpenCover.UI
 		/// </summary>
 		public OpenCoverUIPackage()
 		{
-			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
 		}
 
 		private void SetCodeCoverageResultsToolWindow()
@@ -95,7 +96,7 @@ namespace OpenCover.UI
 			// Get the instance number 0 of this tool window. This window is single instance so this instance
 			// is actually the only one.
 			// The last flag is set to true so that if the tool window does not exists it will be created.
-			CodeCoverageResultsToolWindow = this.FindToolWindow(typeof(CodeCoverageResultsToolWindow), 0, true) as CodeCoverageResultsToolWindow;
+			CodeCoverageResultsToolWindow = FindToolWindow(typeof(CodeCoverageResultsToolWindow), 0, true) as CodeCoverageResultsToolWindow;
 
 			if ((null == CodeCoverageResultsToolWindow) || (null == CodeCoverageResultsToolWindow.Frame))
 			{
@@ -119,7 +120,7 @@ namespace OpenCover.UI
 					   0,
 					   ref clsid,
 					   "Code Coverage",
-					   string.Format(CultureInfo.CurrentCulture, message, this.ToString()),
+					   string.Format(CultureInfo.CurrentCulture, message, ToString()),
 					   string.Empty,
 					   0,
 					   OLEMSGBUTTON.OLEMSGBUTTON_OK,
@@ -129,15 +130,13 @@ namespace OpenCover.UI
 					   out result));
 		}
 
-		#region Package Members
-
 		/// <summary>
 		/// Initialization of the package; this method is called right after the package is sited, so this is the place
 		/// where you can put all the initialization code that rely on services provided by VisualStudio.
 		/// </summary>
 		protected override void Initialize()
 		{
-			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
 			base.Initialize();
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
@@ -156,15 +155,19 @@ namespace OpenCover.UI
 
 			SetCodeCoverageResultsToolWindow();
 			
-			VSEventsHandler = new VSEventsHandler(this);
+			VSEventsHandler = new VSEventsHandler(this, NotifySolutionOpened);
 
 			Instance = this;
 		}
-		#endregion
 
 		internal void ShowResultsCodeCoverageResultsToolWindow()
 		{
-			this._codeCoverageToolWindowCommand.Invoke();
+			_codeCoverageToolWindowCommand.Invoke();
+		}
+
+		private void NotifySolutionOpened()
+		{
+			_executeSelectedTestsCommand.FetchTestsTreeView();
 		}
 	}
 

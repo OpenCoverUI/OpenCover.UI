@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Shell;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
@@ -83,10 +84,11 @@ namespace OpenCover.UI.Views
 
 			if (CoverageSession != null)
 			{
-				Dispatcher.Invoke(() =>
+				Dispatcher.BeginInvoke(new Action(() =>
 				{
+					IDEHelper.WriteToOutputWindow(String.Format("Updating Code Coverage Results window. Data = {0}", data.CoveredModules.Count()));
 					CodeCoverageResultsTreeView.Root = new CoverageNode(data);
-				});
+				}), null);
 			}
 		}
 

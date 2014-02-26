@@ -66,13 +66,13 @@ namespace OpenCover.UI.Processors
 					_testResultsFile = nextLine.Replace("Results File: ", "");
 				}
 
-				Debug.WriteLine(nextLine);
+				IDEHelper.WriteToOutputWindow(nextLine);
 				consoleOutputReaderBuilder.AppendLine(nextLine);
 			}
 
 			process.WaitForExit();
 
-			Debug.WriteLine(process.StandardError.ReadToEnd());
+			IDEHelper.WriteToOutputWindow(process.StandardError.ReadToEnd());
 
 			IDEHelper.OpenFile(_package.DTE, _testResultsFile);
 
@@ -102,7 +102,12 @@ namespace OpenCover.UI.Processors
 				builder.AppendFormat("\\\"{0}\\\" ", testDLL);
 			}
 
-			_openCoverResultsFile = String.Format("{0}.xml", Guid.NewGuid());
+			var solution = _package.DTE.Solution as EnvDTE.SolutionClass;
+			
+			// Create a working directory
+			var directory = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(solution.FileName), "OpenCover"));
+
+			_openCoverResultsFile = Path.Combine(directory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
 
 			var openCoverStartInfo = new ProcessStartInfo(this._openCoverPath,
 											String.Format("-target:\"{0}\" -targetargs:\"{1}/Tests:{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All",
@@ -114,10 +119,11 @@ namespace OpenCover.UI.Processors
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false,
-				CreateNoWindow = true
+				CreateNoWindow = true,
+				WorkingDirectory = directory.FullName
 			};
 
-			Debug.WriteLine(openCoverStartInfo.Arguments);
+			IDEHelper.WriteToOutputWindow(openCoverStartInfo.Arguments);
 
 			return openCoverStartInfo;
 		}
@@ -128,14 +134,25 @@ namespace OpenCover.UI.Processors
 		/// <returns>OpenCover execution results</returns>
 		public CoverageSession GetExecutionResults()
 		{
-			var serializer = new XmlSerializer(typeof(CoverageSession), new[] { typeof(Module), typeof(OpenCover.Framework.Model.File), typeof(Class) });
 			CoverageSession coverageSession = null;
-			using (var stream = System.IO.File.Open(this._openCoverResultsFile, FileMode.Open))
+
+			try
 			{
-				coverageSession = serializer.Deserialize(stream) as CoverageSession;
+				var serializer = new XmlSerializer(typeof(CoverageSession), new[] { typeof(Module), typeof(OpenCover.Framework.Model.File), typeof(Class) });
+				using (var stream = System.IO.File.Open(this._openCoverResultsFile, FileMode.Open))
+				{
+					coverageSession = serializer.Deserialize(stream) as CoverageSession;
+				}
+
+				System.IO.File.Delete(this._openCoverResultsFile);
+
+			}
+			catch (Exception ex)
+			{
+				IDEHelper.WriteToOutputWindow(ex.Message);
+				IDEHelper.WriteToOutputWindow(ex.StackTrace);
 			}
 
-			System.IO.File.Delete(this._openCoverResultsFile);
 
 			return coverageSession;
 		}
