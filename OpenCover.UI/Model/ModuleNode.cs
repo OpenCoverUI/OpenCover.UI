@@ -63,7 +63,8 @@ namespace OpenCover.UI.Model
 
 		protected override void LoadChildren()
 		{
-			Children.AddRange(_module.CoveredClasses.Select(@class => new ClassNode(@class)));
+			var namespaces = _module.CoveredClasses.Select(@class => @class.Namespace).Distinct();
+			Children.AddRange(namespaces.Select(ns => new NamespaceNode(_module, ns)));
 		}
 
 		public override object Icon
@@ -72,6 +73,66 @@ namespace OpenCover.UI.Model
 			{
 				return OpenCoverUIPackage.GetImageURL("Resources/Library.png");
 			}
+		}
+	}
+
+	public class NamespaceNode : SharpTreeNode
+	{
+		private Module _module;
+		private string _namespace;
+		decimal _visitedSequencePoints = 0;
+		decimal _numSequencePoints = 0;
+
+		public NamespaceNode(Module module, string @namespace)
+		{
+			_module = module;
+			_namespace = @namespace;
+
+			LazyLoading = true;
+			
+			foreach (var @class in _module.CoveredClasses
+							 .Where(cc => cc.Namespace == _namespace))
+			{
+				_visitedSequencePoints += @class.Summary.VisitedSequencePoints;
+				_numSequencePoints += @class.Summary.NumSequencePoints;
+			}
+		}
+
+		public override object Text
+		{
+			get
+			{
+				return _namespace;
+			}
+		}
+
+		public decimal SequenceCoverage
+		{
+			get
+			{
+				return Math.Round((_visitedSequencePoints / _numSequencePoints * 100), 2);
+			}
+		}
+
+		public string VisitedSequencePoints
+		{
+			get
+			{
+				return String.Format("{0} / {1}", _visitedSequencePoints, _numSequencePoints);
+			}
+		}
+
+		public override object Icon
+		{
+			get
+			{
+				return OpenCoverUIPackage.GetImageURL("Resources/Namespace.png");
+			}
+		}
+
+		protected override void LoadChildren()
+		{
+			Children.AddRange(_module.CoveredClasses.Where(cc => cc.Namespace == _namespace).Select(@class => new ClassNode(@class)));
 		}
 	}
 
@@ -105,7 +166,7 @@ namespace OpenCover.UI.Model
 		{
 			get
 			{
-				return Class.FullName;
+				return Class.Name;
 			}
 		}
 

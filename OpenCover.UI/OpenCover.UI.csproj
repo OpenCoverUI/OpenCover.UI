@@ -205,6 +205,7 @@
     <Resource Include="Resources\Method.png" />
     <Resource Include="Resources\Class.png" />
     <Resource Include="Resources\Library.png" />
+    <Resource Include="Resources\Namespace.png" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>

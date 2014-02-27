@@ -49,6 +49,28 @@ namespace OpenCover.Framework.Model
 			SkippedDueTo = reason;
 		}
 
+		public string Name
+		{
+			get
+			{
+				int lastIndex = FullName.LastIndexOf(".");
+				string name = lastIndex > 0 ? FullName.Substring(lastIndex + 1) : FullName;
+
+				return name;
+			}
+		}
+
+		public string Namespace
+		{
+			get
+			{
+				int lastIndex = FullName.LastIndexOf(".");
+				string @namespace = lastIndex > 0 ? FullName.Substring(0, lastIndex) : FullName;
+
+				return @namespace;
+			}
+		}
+
 		public IEnumerable<Method> CoveredMethods
 		{
 			get
