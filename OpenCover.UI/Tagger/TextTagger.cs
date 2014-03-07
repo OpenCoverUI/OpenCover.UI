@@ -47,7 +47,7 @@ namespace OpenCover.UI.Tagger
 			_searchService = searchService;
 			_type = type;
 
-			_codeCoverageResultsControl = OpenCoverUIPackage.Instance.CodeCoverageResultsControl;
+			_codeCoverageResultsControl = OpenCoverUIPackage.Instance.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
 
 			_currentSpans = GetWordSpans(_textView.TextSnapshot);
 

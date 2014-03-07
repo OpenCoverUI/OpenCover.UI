@@ -5,16 +5,21 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestWindow.UI;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Controls;
+using VSLangProj;
+using VSLangProj80;
 
 namespace OpenCover.UI.Helpers
 {
-	public static class IDEHelper
+	internal static class IDEHelper
 	{
+		private const string BASE_IMAGE_PREFIX = "/OpenCover.UI;component/";
+
 		private static IVsOutputWindow _outputWindow;
 		private static IVsOutputWindowPane _pane;
 		private static EnvDTE.DTE DTE;
@@ -34,44 +39,10 @@ namespace OpenCover.UI.Helpers
 		}
 
 		/// <summary>
-		/// Returns selected Test cases.
-		/// </summary>
-		/// <returns>Selected Test cases</returns>
-		public static TestTreeControl GetTestTreeControl(IVsUIShell uiShell)
-		{
-			// TODO: Refactor this method to make it more elegant. 
-			// Currently, it uses reflection to get the TestsTreeView.ItemsSource which is a list of all tests. It works for now!
-
-			DTE.ExecuteCommand("TestExplorer.ShowTestExplorer");
-
-			var guid = new Guid(GuidList.GuidTestExplorerToolWindowString);
-			IVsWindowFrame frame = null;
-			var toolWindow = uiShell.FindToolWindow((uint)__VSFINDTOOLWIN.FTW_fFindFirst, ref guid, out frame);
-
-			var windowFrame = frame as WindowFrame;
-
-			if (windowFrame != null)
-			{
-				var contentPresenter = windowFrame.FrameView.Content;
-				var frameworkElement = GetPropertyValue<Object>(contentPresenter, "Content");
-				var frameworkElementContent = GetPropertyValue<Object>(frameworkElement, "Content");
-				var hasTestsGrid = GetPropertyValue<Grid>(frameworkElementContent, "HasTestsGrid");
-
-				var multipleGrid = hasTestsGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "MultipleGrid") as Grid;
-				var leftGrid = multipleGrid.Children.Cast<object>().FirstOrDefault(c => c.GetType() == typeof(Grid) && ((Grid)c).Uid == "LeftGrid") as Grid;
-				var summaryControl = leftGrid.Children.Cast<Object>().FirstOrDefault(c => c.GetType() == typeof(SummaryControl)) as SummaryControl;
-
-				return summaryControl.TestsTreeView as TestTreeControl;
-			}
-
-			return null;
-		}
-
-		/// <summary>
 		/// Opens the file in Visual Studio.
 		/// </summary>
 		/// <param name="file">The file path.</param>
-		public static void OpenFile(EnvDTE.DTE DTE, string file)
+		internal static void OpenFile(EnvDTE.DTE DTE, string file)
 		{
 			try
 			{
@@ -91,7 +62,7 @@ namespace OpenCover.UI.Helpers
 		/// </summary>
 		/// <param name="DTE">The DTE.</param>
 		/// <param name="fileName">Name of the file.</param>
-		public static void CloseFile(EnvDTE.DTE DTE, string fileName)
+		internal static void CloseFile(EnvDTE.DTE DTE, string fileName)
 		{
 			foreach (EnvDTE.Document document in DTE.Documents)
 			{
@@ -108,7 +79,7 @@ namespace OpenCover.UI.Helpers
 		/// </summary>
 		/// <param name="DTE">The DTE.</param>
 		/// <param name="lineNumber">The line number.</param>
-		public static void GoToLine(EnvDTE.DTE DTE, int lineNumber)
+		internal static void GoToLine(EnvDTE.DTE DTE, int lineNumber)
 		{
 			DTE.ExecuteCommand("GotoLn", lineNumber.ToString());
 		}
@@ -117,7 +88,7 @@ namespace OpenCover.UI.Helpers
 		/// Writes to the output window.
 		/// </summary>
 		/// <param name="message">The message.</param>
-		public static void WriteToOutputWindow(string message)
+		internal static void WriteToOutputWindow(string message)
 		{
 			if (_pane != null)
 			{
@@ -131,9 +102,129 @@ namespace OpenCover.UI.Helpers
 		/// </summary>
 		/// <param name="format">The string format.</param>
 		/// <param name="arguments">The arguments to formatting.</param>
-		public static void WriteToOutputWindow(string format, params object[] arguments)
+		internal static void WriteToOutputWindow(string format, params object[] arguments)
 		{
 			WriteToOutputWindow(String.Format(format, arguments));
+		}
+
+		/// <summary>
+		/// Finds all the dlls in the project with reference to UnitTestFramework.dll
+		/// </summary>
+		/// <returns>List of all dlls which might contain tests</returns>
+		internal static IEnumerable<string> GetPotentialTestDLLs()
+		{
+			string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
+
+			foreach (EnvDTE.Project project in DTE.Solution.Projects)
+			{
+				IEnumerable<EnvDTE.Project> containingProjects = null;
+
+				if (project.Kind == EnvDTE.Constants.vsProjectKindSolutionItems)
+				{
+					containingProjects = GetProject(project);
+				}
+				else if (project.Kind == "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")
+				{
+					containingProjects = new[] { project };
+				}
+
+				if (containingProjects != null)
+				{
+					foreach (var currentProject in containingProjects)
+					{
+						var vsProject2 = currentProject.Object as VSProject2;
+						bool isTestProject = false;
+
+						if (vsProject2 != null)
+						{
+							foreach (Reference reference in vsProject2.References)
+							{
+								var referenceFile = Path.GetFileName(reference.Path);
+								if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
+								{
+									isTestProject = true;
+									break;
+								}
+							}
+
+							if (isTestProject)
+							{
+								yield return GetOutputPath(currentProject);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private static IEnumerable<EnvDTE.Project> GetProject(EnvDTE.Project parentProject)
+		{
+			foreach (EnvDTE.ProjectItem projectItem in parentProject.ProjectItems)
+			{
+				if (projectItem.Kind == EnvDTE.Constants.vsProjectItemKindSolutionItems)
+				{
+					var project = projectItem.Object as EnvDTE.Project;
+					if (project != null && project.Kind == "{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}")
+					{
+						yield return project;
+					}
+				}
+			}
+		}
+
+		internal static string GetImageURL(string url)
+		{
+			return String.Format("{0}{1}", BASE_IMAGE_PREFIX, url);
+		}
+
+		/// <summary>
+		/// Returns the output path of the project.
+		/// </summary>
+		/// <param name="project">The project.</param>
+		/// <returns>Output path</returns>
+		internal static string GetOutputPath(EnvDTE.Project project)
+		{
+			string outputPath = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null
+				? project.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString() : null;
+
+			if (outputPath == null)
+			{
+				return null;
+			}
+
+			string absoluteOutputPath;
+			string projectFolder;
+
+			if (outputPath.StartsWith(String.Format("{0}{0}", Path.DirectorySeparatorChar)))
+			{
+				// This is the case 1: "\\server\folder"
+				absoluteOutputPath = outputPath;
+			}
+			else if (outputPath.Length >= 2 && outputPath[1] == Path.VolumeSeparatorChar)
+			{
+				// This is the case 2: "drive:\folder"
+				absoluteOutputPath = outputPath;
+			}
+			else if (outputPath.IndexOf("..\\") != -1)
+			{
+				// This is the case 3: "..\..\folder"
+				projectFolder = Path.GetDirectoryName(project.FullName);
+				while (outputPath.StartsWith("..\\"))
+				{
+					outputPath = outputPath.Substring(3);
+					projectFolder = Path.GetDirectoryName(projectFolder);
+				}
+
+				absoluteOutputPath = System.IO.Path.Combine(projectFolder, outputPath);
+			}
+			else
+			{
+				// This is the case 4: "folder"
+				projectFolder = System.IO.Path.GetDirectoryName(project.FullName);
+				absoluteOutputPath = System.IO.Path.Combine(projectFolder, outputPath);
+			}
+
+			return Path.Combine(absoluteOutputPath, project.Properties.Item("OutputFileName").Value.ToString());
 		}
 
 		/// <summary>

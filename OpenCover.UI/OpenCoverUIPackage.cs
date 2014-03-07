@@ -5,8 +5,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestWindow.Model;
-using Microsoft.VisualStudio.TestWindow.UI;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Commands;
 using OpenCover.UI.Helpers;
@@ -37,6 +35,8 @@ namespace OpenCover.UI
 	// This attribute registers a tool window exposed by this package. 
 	[ProvideToolWindow(typeof(CodeCoverageResultsToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
 		Orientation = ToolWindowOrientation.Bottom, Window = EnvDTE.Constants.vsWindowKindOutput)]
+	[ProvideToolWindow(typeof(TestExplorerToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
+		Orientation = ToolWindowOrientation.Left, Window = EnvDTE.Constants.vsWindowKindClassView)]
 	[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
 	[Guid(GuidList.GuidOpenCoverUIPkgString)]
 	public sealed class OpenCoverUIPackage : Package
@@ -44,9 +44,6 @@ namespace OpenCover.UI
 		Dictionary<string, string> fileList = new Dictionary<string, string>();
 		List<string> _openFiles = new List<string>();
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
-		private ExecuteSelectedTestsCommand _executeSelectedTestsCommand;
-		private CodeCoverageToolWindowCommand _codeCoverageToolWindowCommand;
-		public const string BASE_IMAGE_PREFIX = "/OpenCover.UI;component/";
 
 		internal static OpenCoverUIPackage Instance
 		{
@@ -66,21 +63,16 @@ namespace OpenCover.UI
 			private set;
 		}
 
-		internal CodeCoverageResultsToolWindow CodeCoverageResultsToolWindow
+		internal List<ToolWindowPane> ToolWindows
 		{
 			get;
 			private set;
 		}
 
-		internal CodeCoverageResultsControl CodeCoverageResultsControl
+		internal List<Command> Commands
 		{
 			get;
 			private set;
-		}
-
-		internal static string GetImageURL(string url)
-		{
-			return String.Format("{0}{1}", BASE_IMAGE_PREFIX, url);
 		}
 
 		/// <summary>
@@ -89,25 +81,23 @@ namespace OpenCover.UI
 		public OpenCoverUIPackage()
 		{
 			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
+			Commands = new List<Command>();
+			ToolWindows = new List<ToolWindowPane>();
 		}
 
-		private void SetCodeCoverageResultsToolWindow()
+		private void AddToolWindow<T>() where T : ToolWindowPane
 		{
-			// Get the instance number 0 of this tool window. This window is single instance so this instance
-			// is actually the only one.
-			// The last flag is set to true so that if the tool window does not exists it will be created.
-			CodeCoverageResultsToolWindow = FindToolWindow(typeof(CodeCoverageResultsToolWindow), 0, true) as CodeCoverageResultsToolWindow;
+			T toolWindow = FindToolWindow(typeof(T), 0, true) as T;
 
-			if ((null == CodeCoverageResultsToolWindow) || (null == CodeCoverageResultsToolWindow.Frame))
+			ToolWindows.Add(toolWindow);
+
+			if (toolWindow == null || toolWindow.Frame == null)
 			{
 				throw new NotSupportedException(Resources.CanNotCreateWindow);
 			}
 			else
 			{
-				CodeCoverageResultsControl = CodeCoverageResultsToolWindow.Content as CodeCoverageResultsControl;
-				var frame = CodeCoverageResultsToolWindow.Frame as IVsWindowFrame;
-				Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(frame.Show());
-				frame.Hide();
+				((IVsWindowFrame)toolWindow.Frame).ShowNoActivate();
 			}
 		}
 
@@ -139,35 +129,34 @@ namespace OpenCover.UI
 			Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
 			base.Initialize();
 
+			Instance = this;
+			DTE = (Package.GetGlobalService(typeof(EnvDTE.DTE))) as EnvDTE.DTE;
+
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 			if (null != mcs)
 			{
+				VSEventsHandler = new VSEventsHandler(this);
+
+				AddToolWindow<CodeCoverageResultsToolWindow>();
+				AddToolWindow<TestExplorerToolWindow>();
+
 				IVsUIShell uiShell = GetService(typeof(IVsUIShell)) as IVsUIShell;
-				_executeSelectedTestsCommand = new ExecuteSelectedTestsCommand(this, uiShell);
-				mcs.AddCommand(_executeSelectedTestsCommand);
 
-				_codeCoverageToolWindowCommand = new CodeCoverageToolWindowCommand(this);
-				mcs.AddCommand(_codeCoverageToolWindowCommand);
+				var executeSelectedTestsCommand = new ExecuteSelectedTestsCommand(this, uiShell);
+				mcs.AddCommand(executeSelectedTestsCommand);
+
+				var codeCoverageToolWindowCommand = new CodeCoverageToolWindowCommand(this);
+				mcs.AddCommand(codeCoverageToolWindowCommand);
+
+				var testExplorerToolWindowCommand = new TestExplorerToolWindowCommand(this);
+				mcs.AddCommand(testExplorerToolWindowCommand);
+
+
+				Commands.Add(executeSelectedTestsCommand);
+				Commands.Add(codeCoverageToolWindowCommand);
+				Commands.Add(testExplorerToolWindowCommand);
 			}
-
-			DTE = (Package.GetGlobalService(typeof(EnvDTE.DTE))) as EnvDTE.DTE;
-
-			SetCodeCoverageResultsToolWindow();
-			
-			VSEventsHandler = new VSEventsHandler(this, NotifySolutionOpened);
-
-			Instance = this;
-		}
-
-		internal void ShowResultsCodeCoverageResultsToolWindow()
-		{
-			_codeCoverageToolWindowCommand.Invoke();
-		}
-
-		private void NotifySolutionOpened()
-		{
-			_executeSelectedTestsCommand.FetchTestsTreeView();
 		}
 	}
 

@@ -70,6 +70,15 @@ namespace OpenCover.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OpenCover Test Explorer.
+        /// </summary>
+        internal static string TestExplorerToolWindowTitle {
+            get {
+                return ResourceManager.GetString("TestExplorerToolWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code Coverage Results.
         /// </summary>
         internal static string ToolWindowTitle {

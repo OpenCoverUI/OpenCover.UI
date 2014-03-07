@@ -86,7 +86,6 @@ namespace OpenCover.UI.Views
 			{
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					IDEHelper.WriteToOutputWindow(String.Format("Updating Code Coverage Results window. Data = {0}", data.CoveredModules.Count()));
 					CodeCoverageResultsTreeView.Root = new CoverageNode(data);
 				}), null);
 			}

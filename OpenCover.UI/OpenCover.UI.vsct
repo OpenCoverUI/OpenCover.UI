@@ -1,28 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
-	<!--  This is the file that defines the actual layout and type of the commands.
-				It is divided in different sections (e.g. command definition, command
-				placement, ...), with each defining a specific set of properties.
-				See the comment before each section for more details about how to
-				use it. -->
-
-	<!--  The VSCT compiler (the tool that translates this file into the binary 
-				format that VisualStudio will consume) has the ability to run a preprocessor 
-				on the vsct file; this preprocessor is (usually) the C++ preprocessor, so 
-				it is possible to define includes and macros with the same syntax used 
-				in C++ files. Using this ability of the compiler here, we include some files 
-				defining some of the constants that we will use inside the file. -->
-
 	<!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
 	<Extern href="stdidcmd.h"/>
 
 	<!--This header contains the command ids for the menus provided by the shell. -->
 	<Extern href="vsshlids.h"/>
-
-
-
-
 	<!--The Commands section is where we the commands, menus and menu groups are defined.
 			This section uses a Guid to identify the package that provides the command defined inside it. -->
 	<Commands package="guidOpenCoverUIPkg">
@@ -33,19 +15,27 @@
 		called "command set" and is used to group different command inside a logically related  
 		group; your package should define its own command set in order to avoid collisions  
 		with command ids defined by other packages. -->
-
-
 		<!-- In this section you can define new menu groups. A menu group is a container for 
 				 other menus or buttons (commands); from a visual point of view you can see the 
 				 group as the part of a menu contained between two lines. The parent of a group 
 				 must be a menu. -->
+		<Menus>
+			<Menu guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenu" type="Context">
+				<Strings>
+					<ButtonText>OpenCover</ButtonText>
+					<CommandName>OpenCover</CommandName>
+				</Strings>
+			</Menu>
+		</Menus>
 		<Groups>
-
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUIMenuGroup" priority="0x0600">
 				<Parent guid="guidTestExplorerContextMenuCmdSet" id="testExplorerContextMenu"/>
 			</Group>
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUITestWindowGroup" priority="0x0601">
 				<Parent guid="guidTestExplorerContextMenuCmdSet" id="testWindowsMenu"/>
+			</Group>
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenu"/>
 			</Group>
 		</Groups>
 		<!--Buttons section. -->
@@ -74,6 +64,19 @@
 					<ButtonText>Code Coverage Results</ButtonText>
 				</Strings>
 			</Button>
+			<Button guid="guidOpenCoverUICmdSet" id="cmdidCodeCoverageTestWindow" priority="0x0100" type="Button">
+				<Parent guid="guidOpenCoverUICmdSet" id="openCoverUITestWindowGroup"/>
+				<Strings>
+					<ButtonText>Code Coverage Test Window</ButtonText>
+				</Strings>
+			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="commandIDOpenCoverTestExplorerContextMenu" priority="1" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup" />
+				<Strings>
+					<ButtonText>Cover with OpenCover</ButtonText>
+					<CommandName>OpenCover.CoverSelectedTests</CommandName>
+				</Strings>
+			</Button>
 		</Buttons>
 		<!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
 		<Bitmaps>
@@ -96,6 +99,7 @@
 			<IDSymbol name="openCoverUITestWindowGroup" value="0x1030"/>
 			<IDSymbol name="cmdidOpenCoverRun" value="0x0100" />
 			<IDSymbol name="cmdidCodeCoverageResults" value="0x0101" />
+			<IDSymbol name="cmdidCodeCoverageTestWindow" value="0x0102" />
 		</GuidSymbol>
 		<GuidSymbol name="guidTestExplorerContextMenuCmdSet" value="{1E198C22-5980-4E7E-92F3-F73168D1FB63}">
 			<IDSymbol name="testExplorerContextMenu" value="0x0002"/>
@@ -104,6 +108,10 @@
 		<GuidSymbol name="guidIcon" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590fc}" >
 			<IDSymbol name="icon1" value="1" />
 		</GuidSymbol>
+		<GuidSymbol name="GuidOpenCoverTestExplorerContextMenuCommandSet" value="{81F1321F-B605-47F6-AD43-FB2EC4891225}">
+			<IDSymbol name="OpenCoverTestExplorerContextMenu" value="0x1000"/>
+			<IDSymbol name="OpenCoverTestExplorerContextMenuGroup" value="0x1100"/>
+			<IDSymbol name="commandIDOpenCoverTestExplorerContextMenu" value="0x1200"/>
+		</GuidSymbol>
 	</Symbols>
-
 </CommandTable>

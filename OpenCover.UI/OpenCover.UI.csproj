@@ -52,6 +52,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Microsoft.VisualStudio.Platform.WindowManagement.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
@@ -62,9 +63,6 @@
     <Reference Include="Microsoft.VisualStudio.Shell.ViewManager, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\Microsoft.VisualStudio.Shell.ViewManager.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.TestWindow.Core">
-      <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestWindow.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Text.Data, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -88,9 +86,17 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="VSLangProj80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="System.Xaml" />
   </ItemGroup>
@@ -136,10 +142,30 @@
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
+    <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Model\BranchPoint.cs" />
+    <Compile Include="Model\Class.cs" />
+    <Compile Include="Model\CoverageSession.cs" />
+    <Compile Include="Model\File.cs" />
+    <Compile Include="Model\InstrumentationPoint.cs" />
+    <Compile Include="Model\Method.cs" />
+    <Compile Include="Model\Module.cs" />
+    <Compile Include="Model\ModuleNode.cs" />
+    <Compile Include="Model\SequencePoint.cs" />
+    <Compile Include="Model\SkippedEntity.cs" />
+    <Compile Include="Model\SkippedMethod.cs" />
+    <Compile Include="Model\Summary.cs" />
+    <Compile Include="Model\Test\TestClass.cs" />
+    <Compile Include="Model\Test\TestClass.partial.cs" />
+    <Compile Include="Model\Test\TestClassContainer.cs" />
+    <Compile Include="Model\Test\TestExecutionStatus.cs" />
+    <Compile Include="Model\Test\TestMethod.cs" />
+    <Compile Include="Model\Test\TestMethod.partial.cs" />
+    <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
-    <Compile Include="Model\ModuleNode.cs" />
+    <Compile Include="Processors\Discoverer.cs" />
     <Compile Include="Processors\VSEventsHandler.cs" />
     <Compile Include="Tagger\TextBackground.cs" />
     <Compile Include="Tagger\TextTagger.cs" />
@@ -149,18 +175,6 @@
     </Compile>
     <Compile Include="Views\CodeCoverageResultsToolWindow.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="Model\BranchPoint.cs" />
-    <Compile Include="Model\Class.cs" />
-    <Compile Include="Model\CoverageSession.cs" />
-    <Compile Include="Model\File.cs" />
-    <Compile Include="Model\InstrumentationPoint.cs" />
-    <Compile Include="Model\Method.cs" />
-    <Compile Include="Model\Module.cs" />
-    <Compile Include="Model\SequencePoint.cs" />
-    <Compile Include="Model\SkippedEntity.cs" />
-    <Compile Include="Model\SkippedMethod.cs" />
-    <Compile Include="Model\Summary.cs" />
-    <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Processors\TestExecutor.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -171,6 +185,10 @@
     <Compile Include="OpenCoverUIPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
+    <Compile Include="Views\TestExplorerControl.xaml.cs">
+      <DependentUpon>TestExplorerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TestExplorerToolWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -213,6 +231,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\TestExplorerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenCover.UI.TestDiscoverer\OpenCover.UI.TestDiscoverer.csproj">
+      <Project>{35a80560-72a2-40ee-a73d-35df58ebab13}</Project>
+      <Name>OpenCover.UI.TestDiscoverer</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

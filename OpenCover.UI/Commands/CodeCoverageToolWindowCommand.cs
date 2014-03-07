@@ -2,7 +2,9 @@
 // This source code is released under the MIT License;
 //
 using Microsoft.VisualStudio.Shell.Interop;
+using OpenCover.UI.Views;
 using System.ComponentModel.Design;
+using System.Linq;
 
 namespace OpenCover.UI.Commands
 {
@@ -28,7 +30,7 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		protected override void OnExecute()
 		{
-			var frame = _package.CodeCoverageResultsToolWindow.Frame as IVsWindowFrame;
+			var frame = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().Frame as IVsWindowFrame;
 			if (frame != null)
 			{
 				frame.Show();

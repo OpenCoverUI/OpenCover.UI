@@ -2,10 +2,10 @@
 // This source code is released under the MIT License;
 //
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TestWindow.Model;
-using Microsoft.VisualStudio.TestWindow.UI;
 using OpenCover.UI.Helpers;
+using OpenCover.UI.Model.Test;
 using OpenCover.UI.Processors;
+using OpenCover.UI.Views;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -23,50 +23,40 @@ namespace OpenCover.UI.Commands
 	{
 		private OpenCoverUIPackage _package;
 		private IVsUIShell _uiShell;
-		private TestTreeControl _testTreeControl;
-		private IEnumerable<Test> _selectedTests;
+		private IEnumerable<TestMethod> _selectedTests;
+		private TestExplorerControl _testExplorerControl;
+
+		public bool IsRunningCodeCoverage
+		{
+			get;
+			private set;
+		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ExecuteSelectedTestsCommand"/> class.
 		/// </summary>
 		/// <param name="package">The Visual Studio Extension Package.</param>
 		public ExecuteSelectedTestsCommand(OpenCoverUIPackage package, IVsUIShell uiShell)
-			: base(package, new CommandID(GuidList.GuidOpenCoverUICmdSet, (int)PkgCmdIDList.CmdidCoverWithOpenCover))
+			: base(package, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, (int)PkgCmdIDList.CommandIDOpenCoverTestExplorerRunTestWithOpenCover))
 		{
 			_package = package;
 			_uiShell = uiShell;
 
-			FetchTestsTreeView();
+			// FetchTestsTreeView();
 
 			base.Enabled = false;
+
+			_testExplorerControl = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl;
+			_testExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
 		}
 
 		/// <summary>
-		/// Fetches the TestsTreeView control.
+		/// Event handler for TestExplorerControl.TestDiscoveryFinished.
 		/// </summary>
-		public void FetchTestsTreeView()
+		void OnTestDiscoveryFinished()
 		{
-			if (_testTreeControl == null)
-			{
-				_testTreeControl = IDEHelper.GetTestTreeControl(_uiShell);
-				if (_testTreeControl != null)
-				{
-					_testTreeControl.LayoutUpdated += EnableDisableCommand;
-				} 
-			}
-		}
-
-		/// <summary>
-		/// Enables the disable command.
-		/// </summary>
-		/// <param name="sender">The sender.</param>
-		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-		private void EnableDisableCommand(object sender, EventArgs e)
-		{
-			// TODO: This event handler gets called multiple times. Need to find a better way to enable/disable the command
-			var items = _testTreeControl.ItemsSource as TestGroupCollection;
-
-			if (items.Count > 0)
+			var hasTests = _testExplorerControl.TestsTreeView.Root != null && _testExplorerControl.TestsTreeView.Root.Children.Any();
+			if (hasTests)
 			{
 				Enabled = true;
 			}
@@ -81,22 +71,18 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		protected override void OnExecute()
 		{
-			if (_testTreeControl == null)
-			{
-				_testTreeControl = IDEHelper.GetTestTreeControl(_uiShell);
-				if (_testTreeControl != null)
-				{
-					_testTreeControl.LayoutUpdated += EnableDisableCommand;
-				}
-			}
-
-			var testGroupCollection = _testTreeControl.ItemsSource as TestGroupCollection;
+			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
+			var testsItemSource = (testGroupCollection as TestClassContainer).Classes;
 
 			// Need to select all tests which are under the selected group.
-			var testsInSelectedGroup = testGroupCollection.Where(tg => tg.IsSelected).SelectMany(tg => tg.Tests);
+			var testsInSelectedGroup = testGroupCollection.Children.Where(tg => tg.IsSelected).SelectMany(tg =>
+										{
+											var testClass = tg as TestClass;
+											return testsItemSource.Where(tc => tc == testClass).SelectMany(tc => tc.TestMethods);
+										});
 
 			// Need to select only those tests which are selected under not selected groups.
-			var testsInNotSelectedGroup = testGroupCollection.Where(tg => !tg.IsSelected).SelectMany(tg => tg.Tests.Where(test => test.IsSelected));
+			var testsInNotSelectedGroup = testGroupCollection.Children.Where(tg => !tg.IsSelected).SelectMany(tg => tg.Children.Where(test => test.IsSelected)).Cast<TestMethod>();
 
 			// Union of both tests is our selected tests
 			_selectedTests = testsInNotSelectedGroup.Union(testsInSelectedGroup);
@@ -104,13 +90,14 @@ namespace OpenCover.UI.Commands
 			if (_selectedTests.Any())
 			{
 				// show tool window which shows the progress.
-				_package.ShowResultsCodeCoverageResultsToolWindow();
+				ShowCodeCoverageResultsToolWindow();
 
 				Enabled = false;
 
 				MessageBox.Show("Please wait while we collect code coverage results. The results will be shown in 'Code Coverage Results' window!", "Code Coverage", MessageBoxButton.OK, MessageBoxImage.Information);
 
-				_package.VSEventsHandler.BuildSolution(RunOpenCover);
+				_package.VSEventsHandler.BuildDone += RunOpenCover;
+				_package.VSEventsHandler.BuildSolution();
 			}
 			else
 			{
@@ -131,15 +118,20 @@ namespace OpenCover.UI.Commands
 					Tuple<string, string> files = testExecutor.Execute();
 					var finalResults = testExecutor.GetExecutionResults();
 
-					IDEHelper.WriteToOutputWindow(String.Format("Updating Code Coverage Results window. Data = {0}", finalResults.CoveredModules.Count()));
-
-					_package.CodeCoverageResultsControl.UpdateCoverageResults(finalResults);
+					_package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl.UpdateCoverageResults(finalResults);
 
 					// if the tool window is hidden, show it again.
-					_package.ShowResultsCodeCoverageResultsToolWindow();
+					ShowCodeCoverageResultsToolWindow();
 
-					Enabled = true; 
+					Enabled = true;
 				});
+
+			_package.VSEventsHandler.BuildDone -= RunOpenCover;
+		}
+
+		private void ShowCodeCoverageResultsToolWindow()
+		{
+			_package.Commands.OfType<CodeCoverageToolWindowCommand>().First().Invoke();
 		}
 	}
 }

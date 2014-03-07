@@ -3,8 +3,13 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
+using VSLangProj;
+using VSLangProj80;
+using OpenCover.UI.Views;
+using OpenCover.UI.Helpers;
 
 namespace OpenCover.UI.Processors
 {
@@ -15,21 +20,19 @@ namespace OpenCover.UI.Processors
 	{
 		private OpenCoverUIPackage _package;
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
-		Dictionary<string, string> _fileList = new Dictionary<string, string>();
-		Action _buildEventHandler;
-		Action _notifySolutionOpened;
+		private Dictionary<string, string> _fileList = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VSEventsHandler"/> class.
 		/// </summary>
 		/// <param name="package">The Visual Studio Extension Package.</param>
-		public VSEventsHandler(OpenCoverUIPackage package, Action notifySolutionOpened)
+		public VSEventsHandler(OpenCoverUIPackage package)
 		{
 			_package = package;
-			_notifySolutionOpened = notifySolutionOpened;
 
-			_package.DTE.Events.SolutionEvents.Opened += SolutionOpened;
-			_package.DTE.Events.SolutionEvents.AfterClosing += SolutionClosing;
+			_package.DTE.Events.SolutionEvents.Opened += OnSolutionOpened;
+			_package.DTE.Events.SolutionEvents.AfterClosing += OnSolutionClosing;
+			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
 		}
 
 		/// <summary>
@@ -46,17 +49,19 @@ namespace OpenCover.UI.Processors
 			}
 		}
 
+		public event Action BuildDone;
+		public event Action SolutionOpened;
+		public event Action SolutionClosing;
+
 		/// <summary>
 		/// Builds the solution.
 		/// </summary>
 		/// <param name="action">The event handler.</param>
-		public void BuildSolution(Action action)
+		public void BuildSolution()
 		{
-			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
-			_buildEventHandler = action;
-
 			try
 			{
+				_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
 				_package.DTE.ExecuteCommand("Build.BuildSolution");
 			}
 			catch (Exception ex)
@@ -72,34 +77,40 @@ namespace OpenCover.UI.Processors
 		/// <param name="Action">The action.</param>
 		void OnBuildDone(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			if (_buildEventHandler != null)
+			if (BuildDone != null)
 			{
-				_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
-				_buildEventHandler();
+				BuildDone();
 			}
+
+			_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
 		}
 
 		/// <summary>
 		/// Event handler for Solution Opened Event
 		/// </summary>
-		private void SolutionOpened()
+		private void OnSolutionOpened()
 		{
 			Task.Factory.StartNew(() => BuildFilesList());
-			
-			if (_notifySolutionOpened != null)
+
+			if (SolutionOpened != null)
 			{
-				_notifySolutionOpened();
+				SolutionOpened();
 			}
 		}
 
 		/// <summary>
 		/// Event handler for Solution Closing Event.
 		/// </summary>
-		private void SolutionClosing()
+		private void OnSolutionClosing()
 		{
 			_keysDictionary.Clear();
 			_fileList.Clear();
-			_package.CodeCoverageResultsControl.ClearTreeView();
+			_package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl.ClearTreeView();
+
+			if (SolutionClosing != null)
+			{
+				SolutionClosing();
+			}
 		}
 
 		/// <summary>
@@ -145,7 +156,7 @@ namespace OpenCover.UI.Processors
 					}
 					else
 					{
-						projectFullPath = GetOutputPath(item.ContainingProject);
+						projectFullPath = IDEHelper.GetOutputPath(item.ContainingProject);
 						_keysDictionary.Add(item.ContainingProject.Name, projectFullPath);
 					}
 
@@ -161,56 +172,6 @@ namespace OpenCover.UI.Processors
 				}
 			}
 
-		}
-
-		/// <summary>
-		/// Returns the output path of the project.
-		/// </summary>
-		/// <param name="project">The project.</param>
-		/// <returns>Output path</returns>
-		private static string GetOutputPath(EnvDTE.Project project)
-		{
-			string outputPath = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null
-				? project.ConfigurationManager.ActiveConfiguration.Properties.Item("OutputPath").Value.ToString() : null;
-
-			if (outputPath == null)
-			{
-				return null;
-			}
-
-			string absoluteOutputPath;
-			string projectFolder;
-
-			if (outputPath.StartsWith(String.Format("{0}{0}", Path.DirectorySeparatorChar)))
-			{
-				// This is the case 1: "\\server\folder"
-				absoluteOutputPath = outputPath;
-			}
-			else if (outputPath.Length >= 2 && outputPath[1] == Path.VolumeSeparatorChar)
-			{
-				// This is the case 2: "drive:\folder"
-				absoluteOutputPath = outputPath;
-			}
-			else if (outputPath.IndexOf("..\\") != -1)
-			{
-				// This is the case 3: "..\..\folder"
-				projectFolder = Path.GetDirectoryName(project.FullName);
-				while (outputPath.StartsWith("..\\"))
-				{
-					outputPath = outputPath.Substring(3);
-					projectFolder = Path.GetDirectoryName(projectFolder);
-				}
-
-				absoluteOutputPath = System.IO.Path.Combine(projectFolder, outputPath);
-			}
-			else
-			{
-				// This is the case 4: "folder"
-				projectFolder = System.IO.Path.GetDirectoryName(project.FullName);
-				absoluteOutputPath = System.IO.Path.Combine(projectFolder, outputPath);
-			}
-
-			return Path.Combine(absoluteOutputPath, project.Properties.Item("OutputFileName").Value.ToString());
 		}
 	}
 }

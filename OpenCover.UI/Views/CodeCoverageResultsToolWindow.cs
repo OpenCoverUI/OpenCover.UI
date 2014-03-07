@@ -26,7 +26,12 @@ namespace OpenCover.UI.Views
 	[Guid("47dfb4eb-7c9f-45a8-938e-90fde05d0387")]
 	public class CodeCoverageResultsToolWindow : ToolWindowPane
 	{
-		CodeCoverageResultsControl _codeCoverageResultsControl;
+		internal CodeCoverageResultsControl CodeCoverageResultsControl
+		{
+			get;
+			private set;
+		}
+
 		/// <summary>
 		/// Standard constructor for the tool window.
 		/// </summary>
@@ -46,9 +51,9 @@ namespace OpenCover.UI.Views
 			// This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
 			// we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
 			// the object returned by the Content property.
-			_codeCoverageResultsControl = new CodeCoverageResultsControl();
+			CodeCoverageResultsControl = new CodeCoverageResultsControl();
 
-			base.Content = _codeCoverageResultsControl;
+			base.Content = CodeCoverageResultsControl;
 		}
 
 		/// <summary>
@@ -56,7 +61,7 @@ namespace OpenCover.UI.Views
 		/// </summary>
 		public override void OnToolWindowCreated()
 		{
-			_codeCoverageResultsControl.Package = Package as OpenCoverUIPackage;
+			CodeCoverageResultsControl.Package = Package as OpenCoverUIPackage;
 		}
 	}
 }
