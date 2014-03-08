@@ -41,17 +41,22 @@ namespace OpenCover.UI.Views
 			{
 				var potentialTestDLLs = IDEHelper.GetPotentialTestDLLs();
 				var testDiscoverer = new Discoverer(potentialTestDLLs);
-				var tests = testDiscoverer.Discover();
 
-				Dispatcher.BeginInvoke(new Action(() =>
+				testDiscoverer.Discover((tests) =>
 				{
-					TestsTreeView.Root = new TestClassContainer(tests.OrderBy(test => test.Name));
-
-					if (TestDiscoveryFinished != null)
+					if (tests != null)
 					{
-						TestDiscoveryFinished();
+						Dispatcher.BeginInvoke(new Action(() =>
+						{
+							TestsTreeView.Root = new TestClassContainer(tests.OrderBy(test => test.Name));
+
+							if (TestDiscoveryFinished != null)
+							{
+								TestDiscoveryFinished();
+							}
+						}));
 					}
-				}));
+				});
 			}));
 		}
 
@@ -65,7 +70,7 @@ namespace OpenCover.UI.Views
 			OleMenuCommandService mcs = this._parent.mcs;
 			if (null != mcs)
 			{
-				CommandID menuID = new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, 
+				CommandID menuID = new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
 												PkgCmdIDList.CommandIDOpenCoverTestExplorerContextMenu);
 				Point p = this.PointToScreen(e.GetPosition(this));
 				mcs.ShowContextMenu(menuID, (int)p.X, (int)p.Y);

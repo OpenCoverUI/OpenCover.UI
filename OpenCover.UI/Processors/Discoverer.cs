@@ -39,7 +39,7 @@ namespace OpenCover.UI.Processors
 		/// Discovers all tests in the selected assemblies.
 		/// </summary>
 		/// <returns></returns>
-		public List<TestClass> Discover()
+		public void Discover(Action<List<TestClass>> discoveryDone)
 		{
 			List<TestClass> tests = new List<TestClass>();
 
@@ -57,16 +57,29 @@ namespace OpenCover.UI.Processors
 						builder.AppendFormat("\"{0}\" ", dll);
 					}
 
+					if (builder.Length == 0)
+					{
+						return;
+					}
+
 					string pipeGuid = Guid.NewGuid().ToString();
-					var pipeServer = new NamedPipeServerStream(pipeGuid, PipeDirection.InOut);
+					var pipeServer = new NamedPipeServerStream(pipeGuid, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
 					Process.Start(new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, builder.ToString())));
 
-					pipeServer.WaitForConnection();
+					pipeServer.BeginWaitForConnection(res =>
+					{
+						if (res.IsCompleted)
+						{
+							pipeServer.EndWaitForConnection(res);
 
-					tests.AddRange(ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer));
+							tests.AddRange(ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer));
+							tests.ForEach(testClass => testClass.UpdateChildren());
 
-					tests.ForEach(testClass => testClass.UpdateChildren());
+							IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
+							discoveryDone(tests);
+						}
+					}, null);
 				}
 				else
 				{
@@ -74,12 +87,7 @@ namespace OpenCover.UI.Processors
 				}
 			}
 
-			if (tests != null)
-			{
-				IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
-			}
-
-			return tests;
+			return;
 		}
 
 		public T ReadObject<T>(Stream stream)

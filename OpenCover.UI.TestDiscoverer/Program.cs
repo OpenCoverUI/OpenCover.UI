@@ -19,11 +19,6 @@ namespace OpenCover.UI.TestDiscoverer
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("{0}\n{1}", args[0], args[1]);
-			Console.WriteLine(args[1].Length);
-
-			//Debugger.Launch();
-
 			try
 			{
 				if (args.Length > 1)
