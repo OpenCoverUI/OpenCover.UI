@@ -59,7 +59,7 @@
     <Compile Include="..\OpenCover.UI\Model\Test\TestMethod.cs">
       <Link>Test\TestMethod.cs</Link>
     </Compile>
-    <Compile Include="Discoverer.cs" />
+    <Compile Include="Discoverer.cs" />   
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
