@@ -34,8 +34,6 @@ namespace OpenCover.UI.TestDiscoverer
 		/// <returns>Loaded assembly</returns>
 		private static Assembly LoadAssembly(string dll)
 		{
-			var testDiscovererAppDomain = AppDomain.CreateDomain("OpenCoverTestDiscoverer");
-
 			Assembly assembly = Assembly.ReflectionOnlyLoadFrom(dll);
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(dll));
 

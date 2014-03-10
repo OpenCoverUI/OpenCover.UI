@@ -60,7 +60,6 @@
       <Link>Test\TestMethod.cs</Link>
     </Compile>
     <Compile Include="Discoverer.cs" />
-    <Compile Include="JavaScriptSerializer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

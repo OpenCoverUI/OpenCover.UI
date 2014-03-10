@@ -1,16 +1,7 @@
-﻿using OpenCover.UI.Model.Test;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
 namespace OpenCover.UI.TestDiscoverer
@@ -23,8 +14,6 @@ namespace OpenCover.UI.TestDiscoverer
 			{
 				if (args.Length > 1)
 				{
-					// var pipe = GetPipeStream(args[0]);
-
 					NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", args[0], PipeDirection.InOut);
 					pipeClient.Connect();
 
@@ -60,7 +49,6 @@ namespace OpenCover.UI.TestDiscoverer
 
 		private static void Write(Stream stream, string json)
 		{
-			//Debugger.Launch();
 			var writer = new StreamWriter(stream);
 			writer.Write(json);
 			writer.Flush();

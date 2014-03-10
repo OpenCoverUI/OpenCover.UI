@@ -19,8 +19,6 @@ namespace OpenCover.UI.Processors
 	public class VSEventsHandler
 	{
 		private OpenCoverUIPackage _package;
-		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
-		private Dictionary<string, string> _fileList = new Dictionary<string, string>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VSEventsHandler"/> class.
@@ -33,20 +31,6 @@ namespace OpenCover.UI.Processors
 			_package.DTE.Events.SolutionEvents.Opened += OnSolutionOpened;
 			_package.DTE.Events.SolutionEvents.AfterClosing += OnSolutionClosing;
 			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
-		}
-
-		/// <summary>
-		/// Gets the files in solution.
-		/// </summary>
-		/// <value>
-		/// The files in solution.
-		/// </value>
-		public Dictionary<string, string> FilesInSolution
-		{
-			get
-			{
-				return _fileList;
-			}
 		}
 
 		public event Action BuildDone;
@@ -90,8 +74,6 @@ namespace OpenCover.UI.Processors
 		/// </summary>
 		private void OnSolutionOpened()
 		{
-			Task.Factory.StartNew(() => BuildFilesList());
-
 			if (SolutionOpened != null)
 			{
 				SolutionOpened();
@@ -103,75 +85,12 @@ namespace OpenCover.UI.Processors
 		/// </summary>
 		private void OnSolutionClosing()
 		{
-			_keysDictionary.Clear();
-			_fileList.Clear();
 			_package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl.ClearTreeView();
 
 			if (SolutionClosing != null)
 			{
 				SolutionClosing();
 			}
-		}
-
-		/// <summary>
-		/// Builds the list containing all files present in the solution.
-		/// </summary>
-		private void BuildFilesList()
-		{
-			foreach (EnvDTE.Project project in _package.DTE.Solution.Projects)
-			{
-				this.AddProjectItems(project.ProjectItems);
-			}
-		}
-
-		/// <summary>
-		/// Adds files in current project to the Files list.
-		/// </summary>
-		/// <param name="projectItem">The project item.</param>
-		private void AddProjectItems(EnvDTE.ProjectItems projectItem)
-		{
-			foreach (EnvDTE.ProjectItem item in projectItem)
-			{
-				if (item.Kind == EnvDTE.Constants.vsProjectItemKindPhysicalFolder ||
-					item.Kind == EnvDTE.Constants.vsProjectItemKindVirtualFolder)
-				{
-					if (item.ProjectItems != null)
-					{
-						AddProjectItems(item.ProjectItems);
-					}
-				}
-				else if (item.Kind == EnvDTE.Constants.vsProjectItemKindSolutionItems)
-				{
-					if (item.SubProject != null && item.SubProject.ProjectItems != null)
-					{
-						AddProjectItems(item.SubProject.ProjectItems);
-					}
-				}
-				else
-				{
-					string projectFullPath = null;
-					if (_keysDictionary.ContainsKey(item.ContainingProject.Name))
-					{
-						projectFullPath = _keysDictionary[item.ContainingProject.Name];
-					}
-					else
-					{
-						projectFullPath = IDEHelper.GetOutputPath(item.ContainingProject);
-						_keysDictionary.Add(item.ContainingProject.Name, projectFullPath);
-					}
-
-					if (item.Properties != null && item.Properties.Item("FullPath") != null)
-					{
-						string fullPath = item.Properties.Item("FullPath").Value.ToString().ToLower();
-
-						if (!_fileList.ContainsKey(fullPath))
-						{
-							_fileList.Add(fullPath, projectFullPath);
-						}
-					}
-				}
-			}
-
 		}
 	}
 }

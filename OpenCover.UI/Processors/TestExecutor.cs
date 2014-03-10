@@ -114,15 +114,6 @@ namespace OpenCover.UI.Processors
 		/// <returns>Open Cover process start information</returns>
 		private ProcessStartInfo GetOpenCoverProcessInfo()
 		{
-			//var selectedTestDetails = _selectedTests.Join(_package.VSEventsHandler.FilesInSolution,
-			//												test => test.FilePath.ToLower(),
-			//												fl => fl.Key,
-			//												(test, fl) => new
-			//												{
-			//													Test = test,
-			//													DLL = fl.Value
-			//												});
-
 			var selectedUnitTests = String.Join(",", _selectedTests.Select(t => t.FullyQualifiedName));
 			var builder = new StringBuilder();
 

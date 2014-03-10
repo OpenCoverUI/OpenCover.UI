@@ -41,8 +41,6 @@ namespace OpenCover.UI.Processors
 		/// <returns></returns>
 		public void Discover(Action<List<TestClass>> discoveryDone)
 		{
-			List<TestClass> tests = new List<TestClass>();
-
 			if (_dlls != null)
 			{
 				var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -62,24 +60,7 @@ namespace OpenCover.UI.Processors
 						return;
 					}
 
-					string pipeGuid = Guid.NewGuid().ToString();
-					var pipeServer = new NamedPipeServerStream(pipeGuid, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
-					Process.Start(new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, builder.ToString())));
-
-					pipeServer.BeginWaitForConnection(res =>
-					{
-						if (res.IsCompleted)
-						{
-							pipeServer.EndWaitForConnection(res);
-
-							tests.AddRange(ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer));
-							tests.ForEach(testClass => testClass.UpdateChildren());
-
-							IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
-							discoveryDone(tests);
-						}
-					}, null);
+					StartTestDiscovery(discoveryDone, testDiscovererPath, builder.ToString());
 				}
 				else
 				{
@@ -88,6 +69,35 @@ namespace OpenCover.UI.Processors
 			}
 
 			return;
+		}
+
+		/// <summary>
+		/// Starts the test discovery by starting the process OpenCover.UI.TestDiscoverer.exe.
+		/// </summary>
+		/// <param name="discoveryDone">The delegate that needs to be called after test discovery is done.</param>
+		/// <param name="testDiscovererPath">The test discoverer path.</param>
+		/// <param name="tests">The tests.</param>
+		private void StartTestDiscovery(Action<List<TestClass>> discoveryDone, string testDiscovererPath, String testsDLLs)
+		{
+			List<TestClass> tests = new List<TestClass>();
+			string pipeGuid = Guid.NewGuid().ToString();
+			var pipeServer = new NamedPipeServerStream(pipeGuid, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+			pipeServer.BeginWaitForConnection(res =>
+			{
+				if (res.IsCompleted)
+				{
+					pipeServer.EndWaitForConnection(res);
+
+					tests.AddRange(ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer));
+					tests.ForEach(testClass => testClass.UpdateChildren());
+
+					IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
+					discoveryDone(tests);
+				}
+			}, null);
+
+			Process.Start(new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, testsDLLs)));
 		}
 
 		public T ReadObject<T>(Stream stream)
