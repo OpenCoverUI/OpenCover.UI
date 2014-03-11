@@ -19,10 +19,7 @@ namespace OpenCover.UI.Model.Test
 		{
 			get
 			{
-				int lastIndex = Name.LastIndexOf(".");
-				string name = lastIndex > 0 ? Name.Substring(lastIndex + 1) : Name;
-
-				return String.Format("{0} ({1})", name, TestMethods.Length);
+				return String.Format("{0} ({1})", Name, TestMethods.Length);
 			}
 		}
 
@@ -39,7 +36,10 @@ namespace OpenCover.UI.Model.Test
 		/// </summary>
 		protected override void LoadChildren()
 		{
-			Children.AddRange(TestMethods);
+			if (TestMethods != null && TestMethods.Length > 0)
+			{
+				Children.AddRange(TestMethods); 
+			}
 		}
 
 		/// <summary>

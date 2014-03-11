@@ -22,24 +22,6 @@ namespace OpenCover.UI.Model.Test
 		public string Name { get; set; }
 
 		/// <summary>
-		/// Gets or sets the test execution status.
-		/// </summary>
-		/// <value>
-		/// The execution status.
-		/// </value>
-		[DataMember]
-		public TestExecutionStatus ExecutionStatus { get; set; }
-
-		/// <summary>
-		/// Gets or sets the class that this method belongs to.
-		/// </summary>
-		/// <value>
-		/// The class.
-		/// </value>
-		[DataMember]
-		public TestClass Class { get; set; }
-
-		/// <summary>
 		/// Gets or sets the trait (TestCategory in MSTest.
 		/// </summary>
 		/// <value>

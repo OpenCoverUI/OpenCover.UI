@@ -42,21 +42,40 @@ namespace OpenCover.UI.Views
 				var potentialTestDLLs = IDEHelper.GetPotentialTestDLLs();
 				var testDiscoverer = new Discoverer(potentialTestDLLs);
 
-				testDiscoverer.Discover((tests) =>
-				{
-					if (tests != null)
-					{
-						Dispatcher.BeginInvoke(new Action(() =>
-						{
-							TestsTreeView.Root = new TestClassContainer(tests.OrderBy(test => test.Name));
+				testDiscoverer.Discover(UpdateTreeView);
+			}));
+		}
 
-							if (TestDiscoveryFinished != null)
-							{
-								TestDiscoveryFinished();
-							}
-						}));
+		/// <summary>
+		/// Updates the TreeView by adding .
+		/// </summary>
+		/// <param name="tests">The tests.</param>
+		private void UpdateTreeView(List<TestClass> tests)
+		{
+			if (tests != null)
+			{
+				ClearTestsTreeViewChildren();
+
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					TestsTreeView.Root = new TestClassContainer(tests.OrderBy(test => test.Name));
+
+					if (TestDiscoveryFinished != null)
+					{
+						TestDiscoveryFinished();
 					}
-				});
+				}));
+			}
+		}
+
+		private void ClearTestsTreeViewChildren()
+		{
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				if (TestsTreeView.Root != null && TestsTreeView.Root.Children != null)
+				{
+					TestsTreeView.Root.Children.Clear();
+				}
 			}));
 		}
 

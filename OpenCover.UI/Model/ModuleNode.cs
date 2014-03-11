@@ -24,7 +24,10 @@ namespace OpenCover.UI.Model
 
 		protected override void LoadChildren()
 		{
-			Children.AddRange(_coverageSession.CoveredModules.Select(module => new ModuleNode(module)));
+			if (_coverageSession.CoveredModules != null)
+			{
+				Children.AddRange(_coverageSession.CoveredModules.Select(module => new ModuleNode(module))); 
+			}
 		}
 	}
 

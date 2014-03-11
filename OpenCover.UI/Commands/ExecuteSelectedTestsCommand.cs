@@ -21,6 +21,10 @@ namespace OpenCover.UI.Commands
 	/// </summary>
 	public class ExecuteSelectedTestsCommand : Command
 	{
+		private const string CODE_COVERAGE_RESULTS_MESSAGE = "Please wait while we collect code coverage results. The results will be shown in 'Code Coverage Results' window!";
+		private const string CODE_COVERAGE_RESULTS_WINDOW_TITLE = "Code Coverage";
+		private const string CODE_COVERAGE_SELECT_TESTS_MESSAGE = "Please select a test to run";
+
 		private OpenCoverUIPackage _package;
 		private IVsUIShell _uiShell;
 		private IEnumerable<TestMethod> _selectedTests;
@@ -70,19 +74,26 @@ namespace OpenCover.UI.Commands
 		/// Called when the command is executed.
 		/// </summary>
 		protected override void OnExecute()
-		{
+		 {
 			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
 			var testsItemSource = (testGroupCollection as TestClassContainer).Classes;
 
 			// Need to select all tests which are under the selected group.
-			var testsInSelectedGroup = testGroupCollection.Children.Where(tg => tg.IsSelected).SelectMany(tg =>
-										{
-											var testClass = tg as TestClass;
-											return testsItemSource.Where(tc => tc == testClass).SelectMany(tc => tc.TestMethods);
-										});
+			var testsInSelectedGroup = testGroupCollection.Children
+											.Where(tg => tg.IsSelected)
+											.SelectMany(tg =>
+											{
+												var testClass = tg as TestClass;
+												return testsItemSource
+													.Where(tc => tc == testClass)
+													.SelectMany(tc => tc.TestMethods);
+											});
 
 			// Need to select only those tests which are selected under not selected groups.
-			var testsInNotSelectedGroup = testGroupCollection.Children.Where(tg => !tg.IsSelected).SelectMany(tg => tg.Children.Where(test => test.IsSelected)).Cast<TestMethod>();
+			var testsInNotSelectedGroup = testGroupCollection.Children
+															.Where(tg => !tg.IsSelected)
+															.SelectMany(tg => tg.Children.Where(test => test.IsSelected))
+															.Cast<TestMethod>();
 
 			// Union of both tests is our selected tests
 			_selectedTests = testsInNotSelectedGroup.Union(testsInSelectedGroup);
@@ -94,14 +105,20 @@ namespace OpenCover.UI.Commands
 
 				Enabled = false;
 
-				MessageBox.Show("Please wait while we collect code coverage results. The results will be shown in 'Code Coverage Results' window!", "Code Coverage", MessageBoxButton.OK, MessageBoxImage.Information);
+				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_MESSAGE, 
+								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
+								MessageBoxButton.OK, 
+								MessageBoxImage.Information);
 
 				_package.VSEventsHandler.BuildDone += RunOpenCover;
 				_package.VSEventsHandler.BuildSolution();
 			}
 			else
 			{
-				MessageBox.Show("Please select a test to run", "Code Coverage", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_TESTS_MESSAGE, 
+								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE, 
+								MessageBoxButton.OK, 
+								MessageBoxImage.Error);
 			}
 		}
 

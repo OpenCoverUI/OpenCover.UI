@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.TreeView;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenCover.UI.Model.Test
 {
@@ -19,7 +20,12 @@ namespace OpenCover.UI.Model.Test
 
 		protected override void LoadChildren()
 		{
-			Children.AddRange(Classes);
+			if (Classes != null)
+			{
+				Children.AddRange(Classes); 
+			}
+
+			// Children.AddRange(Classes.SelectMany(c => c.TestMethods).GroupBy(tm => tm.Trait).Select(tr => new { Trait = tr.Key, Methods = tr}));
 		}
 	}
 }
