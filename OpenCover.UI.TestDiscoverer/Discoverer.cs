@@ -134,16 +134,30 @@ namespace OpenCover.UI.TestDiscoverer
 			foreach (var method in type.GetMethods())
 			{
 				bool isTestMethod = false;
+				string trait = null;
 
 				try
 				{
-					isTestMethod = method.GetCustomAttributesData().Any(attribute => attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName);
+					foreach (var attribute in method.GetCustomAttributesData())
+					{
+						if (attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName)
+						{
+							isTestMethod = true;
+						}
+						else if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
+						{
+							if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
+							{
+								trait = attribute.ConstructorArguments[0].Value.ToString();
+							}
+						}
+					}
 				}
 				catch { }
 
 				if (isTestMethod)
 				{
-					tests.Add(new TestMethod { Name = method.Name});
+					tests.Add(new TestMethod { Name = method.Name, Trait = trait });
 				}
 			}
 

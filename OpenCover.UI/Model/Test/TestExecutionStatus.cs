@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenCover.UI.Model.Test
 {
-	public enum TestExecutionStatus
+	internal enum TestExecutionStatus
 	{
 		NotRun = 0,
 		Successful = 1,

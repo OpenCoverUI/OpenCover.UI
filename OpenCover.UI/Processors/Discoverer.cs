@@ -89,7 +89,12 @@ namespace OpenCover.UI.Processors
 				{
 					pipeServer.EndWaitForConnection(res);
 
-					tests.AddRange(ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer));
+					var newTests = ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer);
+					if (newTests != null && newTests.Length > 0)
+					{
+						tests.AddRange(newTests); 
+					}
+
 					tests.ForEach(testClass => testClass.UpdateChildren());
 
 					IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));

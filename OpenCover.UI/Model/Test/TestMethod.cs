@@ -39,6 +39,15 @@ namespace OpenCover.UI.Model.Test
 		[DataMember]
 		public TestClass Class { get; set; }
 
+		/// <summary>
+		/// Gets or sets the trait (TestCategory in MSTest.
+		/// </summary>
+		/// <value>
+		/// The trait.
+		/// </value>
+		[DataMember]
+		public string Trait { get; set; }
+
 		public string FullyQualifiedName
 		{ 
 			get
