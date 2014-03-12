@@ -26,6 +26,13 @@
 					<CommandName>OpenCover</CommandName>
 				</Strings>
 			</Menu>
+			<Menu guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenu" type="Menu">
+				<Parent guid="guidTestExplorerContextMenuCmdSet" id="testMenu"/>
+				<Strings>
+					<ButtonText>OpenCover</ButtonText>
+					<CommandName>OpenCover.Windows</CommandName>
+				</Strings>
+			</Menu>
 		</Menus>
 		<Groups>
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUIMenuGroup" priority="0x0600">
@@ -36,6 +43,9 @@
 			</Group>
 			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenu"/>
+			</Group>
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenu"/>
 			</Group>
 		</Groups>
 		<!--Buttons section. -->
@@ -61,19 +71,28 @@
 				<Parent guid="guidOpenCoverUICmdSet" id="openCoverUITestWindowGroup"/>
 				<Icon guid="guidIcon" id="icon1" />
 				<Strings>
-					<ButtonText>Code Coverage Results</ButtonText>
+					<ButtonText>OpenCover Results</ButtonText>
 				</Strings>
 			</Button>
 			<Button guid="guidOpenCoverUICmdSet" id="cmdidCodeCoverageTestWindow" priority="0x0100" type="Button">
 				<Parent guid="guidOpenCoverUICmdSet" id="openCoverUITestWindowGroup"/>
+				<Icon guid="guidIcon" id="icon1" />
 				<Strings>
-					<ButtonText>Code Coverage Test Window</ButtonText>
+					<ButtonText>OpenCover Test Explorer</ButtonText>
 				</Strings>
 			</Button>
 			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="commandIDOpenCoverTestExplorerContextMenu" priority="1" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup" />
+				<Icon guid="guidIcon" id="icon1" />
 				<Strings>
 					<ButtonText>Cover with OpenCover</ButtonText>
+					<CommandName>OpenCover.CoverSelectedTests</CommandName>
+				</Strings>
+			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenu" priority="1" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup" />
+				<Strings>
+					<ButtonText>Test Button Text</ButtonText>
 					<CommandName>OpenCover.CoverSelectedTests</CommandName>
 				</Strings>
 			</Button>
@@ -104,6 +123,7 @@
 		<GuidSymbol name="guidTestExplorerContextMenuCmdSet" value="{1E198C22-5980-4E7E-92F3-F73168D1FB63}">
 			<IDSymbol name="testExplorerContextMenu" value="0x0002"/>
 			<IDSymbol name="testWindowsMenu" value="0x0010"/>
+			<IDSymbol name="testMenu" value="0x0001"/>
 		</GuidSymbol>
 		<GuidSymbol name="guidIcon" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590fc}" >
 			<IDSymbol name="icon1" value="1" />
@@ -112,6 +132,8 @@
 			<IDSymbol name="OpenCoverTestExplorerContextMenu" value="0x1000"/>
 			<IDSymbol name="OpenCoverTestExplorerContextMenuGroup" value="0x1100"/>
 			<IDSymbol name="commandIDOpenCoverTestExplorerContextMenu" value="0x1200"/>
+			<IDSymbol name="OpenCoverTestMenu" value="0x1300"/>
+			<IDSymbol name="OpenCoverTestMenuGroup" value="0x1400"/>
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

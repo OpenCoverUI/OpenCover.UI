@@ -92,7 +92,7 @@ namespace OpenCover.UI.Processors
 					var newTests = ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer);
 					if (newTests != null && newTests.Length > 0)
 					{
-						tests.AddRange(newTests); 
+						tests.AddRange(newTests);
 					}
 
 					tests.ForEach(testClass => testClass.UpdateChildren());
@@ -102,7 +102,13 @@ namespace OpenCover.UI.Processors
 				}
 			}, null);
 
-			Process.Start(new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, testsDLLs)));
+			var processInfo = new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, testsDLLs))
+			{
+				CreateNoWindow = true,
+				UseShellExecute = false
+			};
+
+			Process.Start(processInfo);
 		}
 
 		public T ReadObject<T>(Stream stream)

@@ -130,7 +130,7 @@ namespace OpenCover.UI.Processors
 			_openCoverResultsFile = Path.Combine(directory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
 
 			var openCoverStartInfo = new ProcessStartInfo(this._openCoverPath,
-											String.Format("-target:\"{0}\" -targetargs:\"{1}/Tests:{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All",
+											String.Format("-target:\"{0}\" -targetargs:\"{1}/Tests:{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All -register:user",
 															this._vsTestPath,
 															builder.ToString(),
 															selectedUnitTests,
