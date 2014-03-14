@@ -79,7 +79,7 @@ namespace OpenCover.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Code Coverage Results.
+        ///   Looks up a localized string similar to OpenCover Results.
         /// </summary>
         internal static string ToolWindowTitle {
             get {

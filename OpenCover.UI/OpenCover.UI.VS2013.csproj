@@ -175,6 +175,9 @@
     <Compile Include="Tagger\TextBackground.cs" />
     <Compile Include="Tagger\TextTagger.cs" />
     <Compile Include="Tagger\TextTaggerProvider.cs" />
+    <Compile Include="Views\BusyIndicator.xaml.cs">
+      <DependentUpon>BusyIndicator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CodeCoverageResultsControl.xaml.cs">
       <DependentUpon>CodeCoverageResultsControl.xaml</DependentUpon>
     </Compile>
@@ -208,6 +211,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\license.md">
+      <Link>license.md</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -222,9 +229,13 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Refresh.png" />
     <Resource Include="Resources\Property.png" />
     <Resource Include="Resources\busyindicator.gif" />
-    <Resource Include="Resources\OpenCover.png" />
+    <Content Include="Resources\OpenCover.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="Resources\Method.png" />
     <Resource Include="Resources\Class.png" />
     <Resource Include="Resources\Library.png" />
@@ -232,6 +243,10 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\BusyIndicator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CodeCoverageResultsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

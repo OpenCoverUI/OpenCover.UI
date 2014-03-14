@@ -6,23 +6,32 @@
 			 xmlns:model="clr-namespace:OpenCover.Framework.Model"
 			 xmlns:sd="http://icsharpcode.net/sharpdevelop/treeview"
 			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
+			 xmlns:v="clr-namespace:OpenCover.UI.Views"
 			 mc:Ignorable="d"
 			 d:DesignHeight="300" d:DesignWidth="1000"
 			 Name="CodeCoverageToolWindow">
 	<UserControl.Resources>
 		<c:WidthConverter x:Key="widthConverter"/>
-		<!--TODO: Add busy indicator-->
 		<c:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
 		<c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
-		<Style TargetType="GridViewColumnHeader">
-			<Setter Property="FontWeight" Value="Bold" />
-		</Style>
-		<Style TargetType="TextBlock">
-			<Setter Property="Foreground" Value="Black" />
-		</Style>
 	</UserControl.Resources>
 	<Grid>
-		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" MouseDoubleClick="TreeViewItemDoubleClicked">
+		<Grid.RowDefinitions>
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<Canvas Grid.Row="0" Width="50" Height="50">
+				<v:BusyIndicator Visibility="{Binding IsLoading, Converter={StaticResource booleanToVisibilityConverter}, ConverterParameter=IsLoading}" />
+			</Canvas>
+			<TextBlock Grid.Row="1" FontWeight="Bold">Please wait while we collect coverage results</TextBlock>
+		</Grid>
+		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" 
+						  MouseDoubleClick="TreeViewItemDoubleClicked" Grid.Row="0" 
+						  Visibility="{Binding IsLoading, Converter={StaticResource notBooleanToVisibilityConverter}, ConverterParameter=IsLoading}">
 			<ListView.View>
 				<sd:SharpGridView>
 					<GridView.Columns>

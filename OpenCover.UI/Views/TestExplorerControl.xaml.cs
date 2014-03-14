@@ -79,11 +79,6 @@ namespace OpenCover.UI.Views
 			}));
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			DiscoverTests();
-		}
-
 		private void Grid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			OleMenuCommandService mcs = this._parent.mcs;
@@ -94,6 +89,11 @@ namespace OpenCover.UI.Views
 				Point p = this.PointToScreen(e.GetPosition(this));
 				mcs.ShowContextMenu(menuID, (int)p.X, (int)p.Y);
 			}
+		}
+
+		private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			DiscoverTests();
 		}
 	}
 }

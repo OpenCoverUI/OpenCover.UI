@@ -30,13 +30,5 @@ namespace OpenCover.UI.Model.Test
 		[DataMember]
 		public string Trait { get; set; }
 
-		public string FullyQualifiedName
-		{ 
-			get
-			{
-				return Name;
-				//return string.Format("{0}.{1}", Class.FullName, Name);
-			}
-		}
 	}
 }

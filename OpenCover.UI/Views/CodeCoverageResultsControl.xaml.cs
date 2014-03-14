@@ -7,6 +7,7 @@ using OpenCover.UI.Helpers;
 using OpenCover.UI.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,12 +17,14 @@ namespace OpenCover.UI.Views
 	/// <summary>
 	/// Interaction logic for CodeCoverageResultsControl.xaml
 	/// </summary>
-	public partial class CodeCoverageResultsControl : UserControl
+	public partial class CodeCoverageResultsControl : UserControl, INotifyPropertyChanged
 	{
 		/// <summary>
 		/// The last file selected by user to see coverage details
 		/// </summary>
 		private string _lastSelectedFile;
+
+		private bool _isLoading;
 
 		/// <summary>
 		/// This variable holds temporary information whether the current file open operation was initiated by this control (to show code coverage).
@@ -41,6 +44,28 @@ namespace OpenCover.UI.Views
 		/// The package.
 		/// </value>
 		public OpenCoverUIPackage Package { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether [is loading].
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if [is loading]; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsLoading
+		{
+			get
+			{
+				return _isLoading;
+			}
+			set
+			{
+				_isLoading = value;
+				if (PropertyChanged != null)
+				{
+					PropertyChanged(this, new PropertyChangedEventArgs("IsLoading"));
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets a value indicating whether the control initiated a File Open command. If so, it will set it to false before returning true.
@@ -87,6 +112,7 @@ namespace OpenCover.UI.Views
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
 					CodeCoverageResultsTreeView.Root = new CoverageNode(data);
+					IsLoading = false;
 				}), null);
 			}
 		}
@@ -98,7 +124,7 @@ namespace OpenCover.UI.Views
 		{
 			if (CodeCoverageResultsTreeView.Root != null && CodeCoverageResultsTreeView.Root.Children != null)
 			{
-				CodeCoverageResultsTreeView.Root.Children.Clear(); 
+				CodeCoverageResultsTreeView.Root.Children.Clear();
 			}
 		}
 
@@ -152,11 +178,13 @@ namespace OpenCover.UI.Views
 						IDEHelper.OpenFile(Package.DTE, file.FullPath);
 						IDEHelper.GoToLine(Package.DTE, method.SequencePoints.FirstOrDefault().StartLine);
 					}
-					catch {}
+					catch { }
 				}
 
 				e.Handled = true;
 			}
 		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
 	}
 }

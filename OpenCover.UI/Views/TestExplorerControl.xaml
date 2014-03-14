@@ -4,25 +4,26 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:sd="http://icsharpcode.net/sharpdevelop/treeview"
+			 xmlns:System="clr-namespace:System;assembly=mscorlib"
+			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
 			 xmlns:local="clr-namespace:OpenCover.UI.Model.Test"
 			 mc:Ignorable="d" 
-			 d:DesignHeight="300" d:DesignWidth="300">
+			 d:DesignHeight="300" d:DesignWidth="300" x:Name="userControl">
+	<UserControl.Resources>
+		<c:WidthConverter x:Key="widthConverter"/>
+	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="20" />
 			<RowDefinition />
-
 		</Grid.RowDefinitions >
-		<Button Click="Button_Click" Grid.Row="0">
-			<TextBlock Text="Reload"/>
-		</Button>
+		<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Image_MouseDown" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
 		<!--<TreeView x:Name="testsTreeView" Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown">
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}">
 					<Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
 					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 					<Setter Property="FontWeight" Value="Normal" />
-					
 					<Style.Triggers>
 						<Trigger Property="IsSelected"  Value="True">
 							<Setter Property="FontWeight" Value="Bold" />
@@ -41,15 +42,25 @@
 				</DataTemplate>
 			</TreeView.Resources>
 		</TreeView>-->
-		<sd:SharpTreeView x:Name="TestsTreeView" ShowRoot="False" ShowAlternation="False" ShowLines="False" ShowRootExpander="False"
-						  Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown">
+		<sd:SharpTreeView x:Name="TestsTreeView" ShowRoot="False" ShowAlternation="False" ShowRootExpander="False" HorizontalAlignment="Stretch"
+						  Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown" Foreground="Black" ShowLines="False">
 			<ListView.View>
 				<sd:SharpGridView>
+					<!--<sd:SharpGridView.ColumnHeaderContainerStyle>
+						<Style>
+							<Setter Property="FrameworkElement.Visibility"  Value="Collapsed"/>
+							<Setter Property="FrameworkElement.Width" Value="Auto" />
+							<Setter Property="FrameworkElement.HorizontalAlignment" Value="Stretch" />
+						</Style>
+					</sd:SharpGridView.ColumnHeaderContainerStyle>-->
 					<GridView.Columns>
 						<GridViewColumn>
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
-									<sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown" Margin="0 2 0 2" />
+									<StackPanel Orientation="Horizontal">
+										<sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown"
+															  Margin="0 2 0 2" HorizontalAlignment="Stretch"/>
+									</StackPanel>
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>

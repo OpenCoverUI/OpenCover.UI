@@ -21,7 +21,6 @@ namespace OpenCover.UI.Commands
 	/// </summary>
 	public class ExecuteSelectedTestsCommand : Command
 	{
-		private const string CODE_COVERAGE_RESULTS_MESSAGE = "Please wait while we collect code coverage results. The results will be shown in 'Code Coverage Results' window!";
 		private const string CODE_COVERAGE_RESULTS_WINDOW_TITLE = "Code Coverage";
 		private const string CODE_COVERAGE_SELECT_TESTS_MESSAGE = "Please select a test to run";
 
@@ -105,11 +104,6 @@ namespace OpenCover.UI.Commands
 
 				Enabled = false;
 
-				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_MESSAGE, 
-								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
-								MessageBoxButton.OK, 
-								MessageBoxImage.Information);
-
 				_package.VSEventsHandler.BuildDone += RunOpenCover;
 				_package.VSEventsHandler.BuildSolution();
 			}
@@ -131,11 +125,14 @@ namespace OpenCover.UI.Commands
 			Task.Factory.StartNew(
 				() =>
 				{
+					var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
+
+					control.IsLoading = true;
 					var testExecutor = new TestExecutor(_package, _selectedTests);
 					Tuple<string, string> files = testExecutor.Execute();
 					var finalResults = testExecutor.GetExecutionResults();
 
-					_package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl.UpdateCoverageResults(finalResults);
+					control.UpdateCoverageResults(finalResults);
 
 					// if the tool window is hidden, show it again.
 					ShowCodeCoverageResultsToolWindow();

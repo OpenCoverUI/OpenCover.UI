@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.TreeView;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace OpenCover.UI.Model.Test
 		{
 			if (TestMethods != null && TestMethods.Length > 0)
 			{
-				Children.AddRange(TestMethods); 
+				Children.AddRange(TestMethods);
 			}
 		}
 

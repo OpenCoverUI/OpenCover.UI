@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.TreeView;
+using System.Windows.Controls;
 
 namespace OpenCover.UI.Model.Test
 {
@@ -25,6 +26,20 @@ namespace OpenCover.UI.Model.Test
 			get
 			{
 				return Name;
+			}
+		}
+
+		/// <summary>
+		/// Gets the name of the fully qualified of .
+		/// </summary>
+		/// <value>
+		/// The name of the fully qualified.
+		/// </value>
+		public string FullyQualifiedName
+		{
+			get
+			{
+				return string.Format("{0}.{1}.{2}", Class.Namespace, Class.Name, Name);
 			}
 		}
 	}
