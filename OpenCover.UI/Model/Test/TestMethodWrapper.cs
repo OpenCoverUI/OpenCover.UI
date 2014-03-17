@@ -8,7 +8,7 @@ namespace OpenCover.UI.Model.Test
 	/// Represents a test class
 	/// </summary>
 	[DataContract]
-	internal partial class TestClass
+	internal partial class TestMethodWrapper
 	{
 		/// <summary>
 		/// Gets or sets the full name of a TestClass.

@@ -50,7 +50,7 @@ namespace OpenCover.UI.Views
 		/// Updates the TreeView by adding .
 		/// </summary>
 		/// <param name="tests">The tests.</param>
-		private void UpdateTreeView(List<TestClass> tests)
+		private void UpdateTreeView(List<TestMethodWrapper> tests)
 		{
 			if (tests != null)
 			{
@@ -58,7 +58,7 @@ namespace OpenCover.UI.Views
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					TestsTreeView.Root = new TestClassContainer(tests.OrderBy(test => test.Name));
+					TestsTreeView.Root = new TestMethodWrapperContainer(tests.OrderBy(test => test.Name));
 
 					if (TestDiscoveryFinished != null)
 					{

@@ -11,7 +11,7 @@ namespace OpenCover.UI.Model.Test
 		/// <value>
 		/// The class.
 		/// </value>
-		public TestClass Class { get; set; }
+		public TestMethodWrapper Class { get; set; }
 
 		/// <summary>
 		/// Gets or sets the test execution status.

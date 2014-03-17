@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OpenCover.UI.Model.Test
 {
-	internal partial class TestClass : SharpTreeNode
+	internal partial class TestMethodWrapper : SharpTreeNode
 	{
 		/// <summary>
 		/// Gets the text.
@@ -27,7 +27,7 @@ namespace OpenCover.UI.Model.Test
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestClass"/> class.
 		/// </summary>
-		public TestClass()
+		public TestMethodWrapper()
 		{
 			LazyLoading = true;
 		}

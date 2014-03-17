@@ -39,7 +39,7 @@ namespace OpenCover.UI.Processors
 		/// Discovers all tests in the selected assemblies.
 		/// </summary>
 		/// <returns></returns>
-		public void Discover(Action<List<TestClass>> discoveryDone)
+		public void Discover(Action<List<TestMethodWrapper>> discoveryDone)
 		{
 			if (_dlls != null)
 			{
@@ -77,9 +77,9 @@ namespace OpenCover.UI.Processors
 		/// <param name="discoveryDone">The delegate that needs to be called after test discovery is done.</param>
 		/// <param name="testDiscovererPath">The test discoverer path.</param>
 		/// <param name="tests">The tests.</param>
-		private void StartTestDiscovery(Action<List<TestClass>> discoveryDone, string testDiscovererPath, String testsDLLs)
+		private void StartTestDiscovery(Action<List<TestMethodWrapper>> discoveryDone, string testDiscovererPath, String testsDLLs)
 		{
-			List<TestClass> tests = new List<TestClass>();
+			List<TestMethodWrapper> tests = new List<TestMethodWrapper>();
 			string pipeGuid = Guid.NewGuid().ToString();
 			var pipeServer = new NamedPipeServerStream(pipeGuid, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
 
@@ -89,13 +89,13 @@ namespace OpenCover.UI.Processors
 				{
 					pipeServer.EndWaitForConnection(res);
 
-					var newTests = ReadObject<OpenCover.UI.Model.Test.TestClass[]>(pipeServer);
+					var newTests = ReadObject<OpenCover.UI.Model.Test.TestMethodWrapper[]>(pipeServer);
 					if (newTests != null && newTests.Length > 0)
 					{
 						tests.AddRange(newTests);
 					}
 
-					tests.ForEach(testClass => testClass.UpdateChildren());
+					tests.ForEach(TestMethodWrapper => TestMethodWrapper.UpdateChildren());
 
 					IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
 					discoveryDone(tests);
@@ -105,7 +105,7 @@ namespace OpenCover.UI.Processors
 			var processInfo = new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, testsDLLs))
 			{
 				CreateNoWindow = true,
-				UseShellExecute = false
+				UseShellExecute = false	
 			};
 
 			Process.Start(processInfo);

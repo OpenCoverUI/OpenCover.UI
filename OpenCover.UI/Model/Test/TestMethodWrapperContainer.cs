@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace OpenCover.UI.Model.Test
 {
-	internal class TestClassContainer : SharpTreeNode
+	internal class TestMethodWrapperContainer : SharpTreeNode
 	{
-		internal IEnumerable<TestClass> Classes
+		internal IEnumerable<TestMethodWrapper> Classes
 		{
 			get;
 			private set;
 		}
 
-		internal TestClassContainer(IEnumerable<TestClass> classes)
+		internal TestMethodWrapperContainer(IEnumerable<TestMethodWrapper> classes)
 		{
 			Classes = classes;
 			LazyLoading = true;

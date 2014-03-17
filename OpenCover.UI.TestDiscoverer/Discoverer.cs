@@ -2,6 +2,7 @@
 // This source code is released under the MIT License;
 //
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Mono.Cecil;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
@@ -32,22 +33,14 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="dll">The DLL.</param>
 		/// <returns>Loaded assembly</returns>
-		private static Assembly LoadAssembly(string dll)
+		private static AssemblyDefinition LoadAssembly(string dll)
 		{
-			Assembly assembly = Assembly.ReflectionOnlyLoadFrom(dll);
+			//Assembly assembly = Assembly.ReflectionOnlyLoadFrom(dll);
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(dll));
 
-			foreach (var assemblyName in assembly.GetReferencedAssemblies())
-			{
-				try
-				{
-					Assembly.ReflectionOnlyLoad(assemblyName.FullName);
-				}
-				catch
-				{
-					Assembly.ReflectionOnlyLoadFrom(Path.Combine(Path.GetDirectoryName(dll), assemblyName.Name + ".dll"));
-				}
-			}
+			//Creates an AssemblyDefinition from the "MyLibrary.dll" assembly
+			AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(dll);
+
 			return assembly;
 		}
 
@@ -55,9 +48,9 @@ namespace OpenCover.UI.TestDiscoverer
 		/// Discovers all tests in the selected assemblies.
 		/// </summary>
 		/// <returns></returns>
-		public List<TestClass> Discover()
+		public List<TestMethodWrapper> Discover()
 		{
-			List<TestClass> tests = new List<TestClass>();
+			List<TestMethodWrapper> tests = new List<TestMethodWrapper>();
 
 			if (_dlls != null)
 			{
@@ -75,13 +68,13 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="dll">The DLL.</param>
 		/// <returns>Tests in the DLL</returns>
-		private List<TestClass> DiscoverTestsInDLL(string dll)
+		private List<TestMethodWrapper> DiscoverTestsInDLL(string dll)
 		{
-			var classes = new List<TestClass>();
+			var classes = new List<TestMethodWrapper>();
 
 			if (File.Exists(dll))
 			{
-				Assembly assembly = null;
+				AssemblyDefinition assembly = null;
 				try
 				{
 					assembly = LoadAssembly(dll);
@@ -90,31 +83,31 @@ namespace OpenCover.UI.TestDiscoverer
 
 				if (assembly != null)
 				{
-					foreach (var type in assembly.GetTypes())
+					foreach (var type in assembly.MainModule.Types)
 					{
-						bool isTestClass = false;
+						bool isTestMethodWrapper = false;
 
 						try
 						{
-							var customAttributes = type.GetCustomAttributesData();
+							var customAttributes = type.CustomAttributes;
 							if (customAttributes != null)
 							{
-								isTestClass = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+								isTestMethodWrapper = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
 							}
 						}
 						catch { }
 
-						if (isTestClass)
+						if (isTestMethodWrapper)
 						{
-							var testClass = new TestClass
+							var TestMethodWrapper = new TestMethodWrapper
 							{
 								DLLPath = dll,
 								Name = type.Name,
 								Namespace = type.Namespace
 							};
 
-							testClass.TestMethods = DiscoverTestsInClass(type, testClass);
-							classes.Add(testClass);
+							TestMethodWrapper.TestMethods = DiscoverTestsInClass(type, TestMethodWrapper);
+							classes.Add(TestMethodWrapper);
 						}
 					}
 				}
@@ -128,17 +121,17 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="type">Type of the class.</param>
 		/// <returns>Tests in the class</returns>
-		private TestMethod[] DiscoverTestsInClass(Type type, TestClass @class)
+		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestMethodWrapper @class)
 		{
 			var tests = new List<TestMethod>();
-			foreach (var method in type.GetMethods())
+			foreach (var method in type.Methods)
 			{
 				bool isTestMethod = false;
 				string trait = null;
 
 				try
 				{
-					foreach (var attribute in method.GetCustomAttributesData())
+					foreach (var attribute in method.CustomAttributes)
 					{
 						if (attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName)
 						{

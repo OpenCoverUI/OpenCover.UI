@@ -75,14 +75,14 @@ namespace OpenCover.UI.Commands
 		protected override void OnExecute()
 		 {
 			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
-			var testsItemSource = (testGroupCollection as TestClassContainer).Classes;
+			var testsItemSource = (testGroupCollection as TestMethodWrapperContainer).Classes;
 
 			// Need to select all tests which are under the selected group.
 			var testsInSelectedGroup = testGroupCollection.Children
 											.Where(tg => tg.IsSelected)
 											.SelectMany(tg =>
 											{
-												var testClass = tg as TestClass;
+												var testClass = tg as TestMethodWrapper;
 												return testsItemSource
 													.Where(tc => tc == testClass)
 													.SelectMany(tc => tc.TestMethods);
