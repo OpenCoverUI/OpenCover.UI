@@ -53,11 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\OpenCover.UI\Model\Test\TestClass.cs">
+      <Link>Test\TestClass.cs</Link>
+    </Compile>
     <Compile Include="..\OpenCover.UI\Model\Test\TestMethod.cs">
       <Link>Test\TestMethod.cs</Link>
-    </Compile>
-    <Compile Include="..\OpenCover.UI\Model\Test\TestMethodWrapper.cs">
-      <Link>Test\TestMethodWrapper.cs</Link>
     </Compile>
     <Compile Include="Discoverer.cs" />
     <Compile Include="Program.cs" />

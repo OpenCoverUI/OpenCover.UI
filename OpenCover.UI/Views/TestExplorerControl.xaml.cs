@@ -20,6 +20,8 @@ namespace OpenCover.UI.Views
 	{
 		public OpenCoverUIPackage Package { get; set; }
 		TestExplorerToolWindow _parent;
+		TestMethodGroupingField _groupField;
+		List<TestClass> _tests;
 
 		public event Action TestDiscoveryFinished;
 
@@ -33,6 +35,23 @@ namespace OpenCover.UI.Views
 		{
 			Package.VSEventsHandler.BuildDone += DiscoverTests;
 			Package.VSEventsHandler.SolutionOpened += DiscoverTests;
+			cmbGroupBy.SelectionChanged += cmbGroupBy_SelectionChanged;
+		}
+
+		void cmbGroupBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			switch(cmbGroupBy.SelectedIndex)
+			{
+				case 0: _groupField = TestMethodGroupingField.Class;
+					break;
+				case 1: _groupField = TestMethodGroupingField.Trait;
+					break;
+				default:
+					_groupField = TestMethodGroupingField.Class;
+					break;
+			}
+
+			UpdateTreeView(_tests);
 		}
 
 		private void DiscoverTests()
@@ -50,15 +69,18 @@ namespace OpenCover.UI.Views
 		/// Updates the TreeView by adding .
 		/// </summary>
 		/// <param name="tests">The tests.</param>
-		private void UpdateTreeView(List<TestMethodWrapper> tests)
+		private void UpdateTreeView(List<TestClass> tests)
 		{
+			_tests = tests;
+
 			if (tests != null)
 			{
 				ClearTestsTreeViewChildren();
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					TestsTreeView.Root = new TestMethodWrapperContainer(tests.OrderBy(test => test.Name));
+					TestsTreeView.Root = new TestMethodWrapperContainer(tests.OrderBy(test => test.Name)
+											.Select(test => new TestMethodWrapper(test.Name, test.TestMethods)), _groupField);
 
 					if (TestDiscoveryFinished != null)
 					{

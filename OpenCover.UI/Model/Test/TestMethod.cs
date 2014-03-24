@@ -2,6 +2,7 @@
 // This source code is released under the MIT License;
 //
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace OpenCover.UI.Model.Test
@@ -28,7 +29,6 @@ namespace OpenCover.UI.Model.Test
 		/// The trait.
 		/// </value>
 		[DataMember]
-		public string Trait { get; set; }
-
+		public string[] Traits { get; set; }
 	}
 }

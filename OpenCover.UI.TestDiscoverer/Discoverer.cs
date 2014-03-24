@@ -48,9 +48,9 @@ namespace OpenCover.UI.TestDiscoverer
 		/// Discovers all tests in the selected assemblies.
 		/// </summary>
 		/// <returns></returns>
-		public List<TestMethodWrapper> Discover()
+		public List<TestClass> Discover()
 		{
-			List<TestMethodWrapper> tests = new List<TestMethodWrapper>();
+			List<TestClass> tests = new List<TestClass>();
 
 			if (_dlls != null)
 			{
@@ -68,9 +68,9 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="dll">The DLL.</param>
 		/// <returns>Tests in the DLL</returns>
-		private List<TestMethodWrapper> DiscoverTestsInDLL(string dll)
+		private List<TestClass> DiscoverTestsInDLL(string dll)
 		{
-			var classes = new List<TestMethodWrapper>();
+			var classes = new List<TestClass>();
 
 			if (File.Exists(dll))
 			{
@@ -85,29 +85,29 @@ namespace OpenCover.UI.TestDiscoverer
 				{
 					foreach (var type in assembly.MainModule.Types)
 					{
-						bool isTestMethodWrapper = false;
+						bool isTestClass = false;
 
 						try
 						{
 							var customAttributes = type.CustomAttributes;
 							if (customAttributes != null)
 							{
-								isTestMethodWrapper = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+								isTestClass = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
 							}
 						}
 						catch { }
 
-						if (isTestMethodWrapper)
+						if (isTestClass)
 						{
-							var TestMethodWrapper = new TestMethodWrapper
+							var TestClass = new TestClass
 							{
 								DLLPath = dll,
 								Name = type.Name,
 								Namespace = type.Namespace
 							};
 
-							TestMethodWrapper.TestMethods = DiscoverTestsInClass(type, TestMethodWrapper);
-							classes.Add(TestMethodWrapper);
+							TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+							classes.Add(TestClass);
 						}
 					}
 				}
@@ -121,13 +121,13 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="type">Type of the class.</param>
 		/// <returns>Tests in the class</returns>
-		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestMethodWrapper @class)
+		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestClass @class)
 		{
 			var tests = new List<TestMethod>();
 			foreach (var method in type.Methods)
 			{
 				bool isTestMethod = false;
-				string trait = null;
+				var trait = new List<string>();
 
 				try
 				{
@@ -137,11 +137,12 @@ namespace OpenCover.UI.TestDiscoverer
 						{
 							isTestMethod = true;
 						}
-						else if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
+
+						if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
 						{
 							if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
 							{
-								trait = attribute.ConstructorArguments[0].Value.ToString();
+								trait.Add(attribute.ConstructorArguments[0].Value.ToString());
 							}
 						}
 					}
@@ -150,7 +151,10 @@ namespace OpenCover.UI.TestDiscoverer
 
 				if (isTestMethod)
 				{
-					tests.Add(new TestMethod { Name = method.Name, Trait = trait });
+					TestMethod testMethod = new TestMethod();
+					testMethod.Name = method.Name;
+					testMethod.Traits = trait.Count > 0 ? trait.ToArray() : new[] { "No Traits" };
+					tests.Add(testMethod);
 				}
 			}
 

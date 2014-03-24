@@ -75,7 +75,7 @@ namespace OpenCover.UI.Commands
 		protected override void OnExecute()
 		 {
 			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
-			var testsItemSource = (testGroupCollection as TestMethodWrapperContainer).Classes;
+			var testsItemSource = (testGroupCollection.Children.Cast<TestMethodWrapper>());
 
 			// Need to select all tests which are under the selected group.
 			var testsInSelectedGroup = testGroupCollection.Children
@@ -95,7 +95,7 @@ namespace OpenCover.UI.Commands
 															.Cast<TestMethod>();
 
 			// Union of both tests is our selected tests
-			_selectedTests = testsInNotSelectedGroup.Union(testsInSelectedGroup);
+			_selectedTests = testsInNotSelectedGroup.Union(testsInSelectedGroup, new SelectedTestsComparer());
 
 			if (_selectedTests.Any())
 			{
@@ -148,4 +148,18 @@ namespace OpenCover.UI.Commands
 			_package.Commands.OfType<CodeCoverageToolWindowCommand>().First().Invoke();
 		}
 	}
+
+	class SelectedTestsComparer : IEqualityComparer<TestMethod>
+	{
+		public bool Equals(TestMethod x, TestMethod y)
+		{
+			return x.FullyQualifiedName == y.FullyQualifiedName;
+		}
+
+		public int GetHashCode(TestMethod obj)
+		{
+			return 1;
+		}
+	}
 }
+

@@ -1,49 +1,48 @@
-﻿using System;
+﻿using ICSharpCode.TreeView;
+using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace OpenCover.UI.Model.Test
 {
-	/// <summary>
-	/// Represents a test class
-	/// </summary>
-	[DataContract]
-	internal partial class TestMethodWrapper
+	internal class TestMethodWrapper:SharpTreeNode
 	{
-		/// <summary>
-		/// Gets or sets the full name of a TestClass.
-		/// </summary>
-		/// <value>
-		/// The full name.
-		/// </value>
-		[DataMember(Name="n")]
-		public string Name { get; set; }
+		public TestMethodWrapper(string name, IEnumerable<TestMethod> testMethods)
+		{
+			this.Name = name;
+			this.TestMethods = testMethods;
+
+			this.LazyLoading = true;
+		}
+
+		internal string Name { get; private set; }
+
+		internal IEnumerable<TestMethod> TestMethods { get; private set; }
+
+		public override object Text { get { return Name; } }
 
 		/// <summary>
-		/// Gets or sets the DLL path.
+		/// Loads the children.
 		/// </summary>
-		/// <value>
-		/// The DLL path.
-		/// </value>
-		[DataMember(Name="p")]
-		public string DLLPath { get; set; }
+		protected override void LoadChildren()
+		{
+			if (TestMethods != null && TestMethods.Any())
+			{
+				foreach (var method in TestMethods)
+				{
+					var methodToAdd = method;
 
-		/// <summary>
-		/// Gets or sets the test methods.
-		/// </summary>
-		/// <value>
-		/// The test methods.
-		/// </value>
-		[DataMember(Name="m")]
-		public TestMethod[] TestMethods { get; set; }
+					if (method.Parent != null)
+					{
+						methodToAdd = method.Clone();
+					}
 
-		/// <summary>
-		/// Gets or sets the namespace.
-		/// </summary>
-		/// <value>
-		/// The namespace.
-		/// </value>
-		[DataMember(Name="ns")]
-		public string Namespace { get; set; }
+					Children.Add(methodToAdd);
+				}
+			}
+		}
+
 	}
 }
