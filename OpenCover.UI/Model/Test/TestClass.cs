@@ -11,7 +11,7 @@ namespace OpenCover.UI.Model.Test
 	internal partial class TestClass
 	{
 		/// <summary>
-		/// Gets or sets the full name of a TestClass.
+		/// Gets or sets the full name of a Test method wrapper.
 		/// </summary>
 		/// <value>
 		/// The full name.

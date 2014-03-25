@@ -16,7 +16,6 @@ namespace OpenCover.UI.TestDiscoverer
 				{
 					NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", args[0], PipeDirection.InOut);
 					pipeClient.Connect();
-
 					Discover(args, pipeClient);
 
 					pipeClient.WaitForPipeDrain();

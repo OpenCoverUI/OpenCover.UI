@@ -17,7 +17,14 @@
 			<RowDefinition Height="20" />
 			<RowDefinition />
 		</Grid.RowDefinitions >
-		<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Image_MouseDown" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
+		<StackPanel Orientation="Horizontal">
+			<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Image_MouseDown" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
+			<TextBlock Margin="10,0">Group By: </TextBlock>
+			<ComboBox Name="cmbGroupBy" SelectedIndex="0" BorderThickness="0">
+				<ComboBoxItem >Class</ComboBoxItem>
+				<ComboBoxItem>Trait</ComboBoxItem>
+			</ComboBox>
+		</StackPanel>
 		<!--<TreeView x:Name="testsTreeView" Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown">
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}">

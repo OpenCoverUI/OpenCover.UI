@@ -161,9 +161,11 @@
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
     <Compile Include="Model\Summary.cs" />
+    <Compile Include="Model\Test\TestMethodGroupingField.cs" />
     <Compile Include="Model\Test\TestClass.cs" />
     <Compile Include="Model\Test\TestClass.partial.cs" />
-    <Compile Include="Model\Test\TestClassContainer.cs" />
+    <Compile Include="Model\Test\TestMethodWrapper.cs" />
+    <Compile Include="Model\Test\TestMethodWrapperContainer.cs" />
     <Compile Include="Model\Test\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />

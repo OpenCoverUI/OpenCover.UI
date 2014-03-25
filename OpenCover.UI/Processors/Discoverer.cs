@@ -95,7 +95,7 @@ namespace OpenCover.UI.Processors
 						tests.AddRange(newTests);
 					}
 
-					tests.ForEach(testClass => testClass.UpdateChildren());
+					tests.ForEach(TestMethodWrapper => TestMethodWrapper.UpdateChildren());
 
 					IDEHelper.WriteToOutputWindow("{0} tests found", tests.Sum(test => test.TestMethods != null ? test.TestMethods.Length : 0));
 					discoveryDone(tests);
@@ -105,7 +105,7 @@ namespace OpenCover.UI.Processors
 			var processInfo = new ProcessStartInfo(testDiscovererPath, String.Format("{0} {1}", pipeGuid, testsDLLs))
 			{
 				CreateNoWindow = true,
-				UseShellExecute = false
+				UseShellExecute = false	
 			};
 
 			Process.Start(processInfo);

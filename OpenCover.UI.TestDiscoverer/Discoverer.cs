@@ -2,6 +2,7 @@
 // This source code is released under the MIT License;
 //
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Mono.Cecil;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
@@ -32,22 +33,14 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="dll">The DLL.</param>
 		/// <returns>Loaded assembly</returns>
-		private static Assembly LoadAssembly(string dll)
+		private static AssemblyDefinition LoadAssembly(string dll)
 		{
-			Assembly assembly = Assembly.ReflectionOnlyLoadFrom(dll);
+			//Assembly assembly = Assembly.ReflectionOnlyLoadFrom(dll);
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(dll));
 
-			foreach (var assemblyName in assembly.GetReferencedAssemblies())
-			{
-				try
-				{
-					Assembly.ReflectionOnlyLoad(assemblyName.FullName);
-				}
-				catch
-				{
-					Assembly.ReflectionOnlyLoadFrom(Path.Combine(Path.GetDirectoryName(dll), assemblyName.Name + ".dll"));
-				}
-			}
+			//Creates an AssemblyDefinition from the "MyLibrary.dll" assembly
+			AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(dll);
+
 			return assembly;
 		}
 
@@ -81,7 +74,7 @@ namespace OpenCover.UI.TestDiscoverer
 
 			if (File.Exists(dll))
 			{
-				Assembly assembly = null;
+				AssemblyDefinition assembly = null;
 				try
 				{
 					assembly = LoadAssembly(dll);
@@ -90,13 +83,13 @@ namespace OpenCover.UI.TestDiscoverer
 
 				if (assembly != null)
 				{
-					foreach (var type in assembly.GetTypes())
+					foreach (var type in assembly.MainModule.Types)
 					{
 						bool isTestClass = false;
 
 						try
 						{
-							var customAttributes = type.GetCustomAttributesData();
+							var customAttributes = type.CustomAttributes;
 							if (customAttributes != null)
 							{
 								isTestClass = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
@@ -106,15 +99,15 @@ namespace OpenCover.UI.TestDiscoverer
 
 						if (isTestClass)
 						{
-							var testClass = new TestClass
+							var TestClass = new TestClass
 							{
 								DLLPath = dll,
 								Name = type.Name,
 								Namespace = type.Namespace
 							};
 
-							testClass.TestMethods = DiscoverTestsInClass(type, testClass);
-							classes.Add(testClass);
+							TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+							classes.Add(TestClass);
 						}
 					}
 				}
@@ -128,27 +121,28 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="type">Type of the class.</param>
 		/// <returns>Tests in the class</returns>
-		private TestMethod[] DiscoverTestsInClass(Type type, TestClass @class)
+		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestClass @class)
 		{
 			var tests = new List<TestMethod>();
-			foreach (var method in type.GetMethods())
+			foreach (var method in type.Methods)
 			{
 				bool isTestMethod = false;
-				string trait = null;
+				var trait = new List<string>();
 
 				try
 				{
-					foreach (var attribute in method.GetCustomAttributesData())
+					foreach (var attribute in method.CustomAttributes)
 					{
 						if (attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName)
 						{
 							isTestMethod = true;
 						}
-						else if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
+
+						if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
 						{
 							if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
 							{
-								trait = attribute.ConstructorArguments[0].Value.ToString();
+								trait.Add(attribute.ConstructorArguments[0].Value.ToString());
 							}
 						}
 					}
@@ -157,7 +151,10 @@ namespace OpenCover.UI.TestDiscoverer
 
 				if (isTestMethod)
 				{
-					tests.Add(new TestMethod { Name = method.Name, Trait = trait });
+					TestMethod testMethod = new TestMethod();
+					testMethod.Name = method.Name;
+					testMethod.Traits = trait.Count > 0 ? trait.ToArray() : new[] { "No Traits" };
+					tests.Add(testMethod);
 				}
 			}
 

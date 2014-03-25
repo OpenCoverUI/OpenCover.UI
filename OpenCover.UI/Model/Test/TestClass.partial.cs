@@ -33,17 +33,6 @@ namespace OpenCover.UI.Model.Test
 		}
 
 		/// <summary>
-		/// Loads the children.
-		/// </summary>
-		protected override void LoadChildren()
-		{
-			if (TestMethods != null && TestMethods.Length > 0)
-			{
-				Children.AddRange(TestMethods);
-			}
-		}
-
-		/// <summary>
 		/// Updates the TestMethods by setting their Class property to itself.
 		/// </summary>
 		internal void UpdateChildren()

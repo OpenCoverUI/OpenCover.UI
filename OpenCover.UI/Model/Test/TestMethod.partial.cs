@@ -42,5 +42,22 @@ namespace OpenCover.UI.Model.Test
 				return string.Format("{0}.{1}.{2}", Class.Namespace, Class.Name, Name);
 			}
 		}
+
+		/// <summary>
+		/// Clones the test method
+		/// </summary>
+		/// <returns></returns>
+		public TestMethod Clone()
+		{
+			var method = new TestMethod()
+			{
+				Name = this.Name,
+				Class = this.Class,
+				Traits = this.Traits,
+				ExecutionStatus = this.ExecutionStatus
+			};
+
+			return method;
+		}
 	}
 }

@@ -156,12 +156,12 @@
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
     <Compile Include="Model\Summary.cs" />
-    <Compile Include="Model\Test\TestClass.cs" />
-    <Compile Include="Model\Test\TestClass.partial.cs" />
-    <Compile Include="Model\Test\TestClassContainer.cs" />
     <Compile Include="Model\Test\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />
+    <Compile Include="Model\Test\TestMethodWrapper.cs" />
+    <Compile Include="Model\Test\TestMethodWrapper.partial.cs" />
+    <Compile Include="Model\Test\TestMethodWrapperContainer.cs" />
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
@@ -170,7 +170,7 @@
     <Compile Include="Tagger\TextBackground.cs" />
     <Compile Include="Tagger\TextTagger.cs" />
     <Compile Include="Tagger\TextTaggerProvider.cs" />
-	<Compile Include="Views\BusyIndicator.xaml.cs">
+    <Compile Include="Views\BusyIndicator.xaml.cs">
       <DependentUpon>BusyIndicator.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CodeCoverageResultsControl.xaml.cs">
@@ -238,7 +238,7 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-	<Page Include="Views\BusyIndicator.xaml">
+    <Page Include="Views\BusyIndicator.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
