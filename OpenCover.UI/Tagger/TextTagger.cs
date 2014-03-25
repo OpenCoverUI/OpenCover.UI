@@ -83,6 +83,19 @@ namespace OpenCover.UI.Tagger
 		}
 
 		/// <summary>
+		/// Adds the word span.
+		/// </summary>
+		/// <param name="wordSpans">The word spans.</param>
+		/// <param name="snapshot">The snapshot.</param>
+		/// <param name="startColumn">The start column.</param>
+		/// <param name="totalCharacters">The total characters.</param>
+		private void AddWordSpan(List<SnapshotSpan> wordSpans, ITextSnapshot snapshot, int startColumn, int totalCharacters)
+		{
+			var snapshotPoint = new SnapshotSpan(snapshot, new Span(startColumn, totalCharacters));
+			wordSpans.Add(snapshotPoint);
+		}
+
+		/// <summary>
 		/// Returns the word spans based on covered lines.
 		/// </summary>
 		/// <param name="snapshot">The text snapshot of file being opened.</param>
@@ -112,9 +125,10 @@ namespace OpenCover.UI.Tagger
 						var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
 						int totalCharacters = 0;
 
-						if (sequencePoint.EndLine == sequencePoint.StartLine )
+						if (sequencePoint.EndLine == sequencePoint.StartLine)
 						{
 							totalCharacters = sequencePoint.EndColumn - sequencePoint.StartColumn + 1;
+							AddWordSpan(wordSpans, snapshot, startLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters);
 						}
 						else
 						{
@@ -128,22 +142,23 @@ namespace OpenCover.UI.Tagger
 							{
 								if (selectedLine.LineNumber == sequencePointStartLine)
 								{
-									totalCharacters += selectedLine.Length - sequencePoint.StartColumn;
+									totalCharacters = selectedLine.Length - sequencePoint.StartColumn + 1;
+
+									AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters);
 								}
 								else if (selectedLine.LineNumber == sequencePointEndLine)
 								{
-									totalCharacters += selectedLine.Length - sequencePoint.EndColumn;
+									var temp = selectedLine.Length - (sequencePoint.EndColumn - 1);
+									totalCharacters = selectedLine.Length - temp;
+
+									AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, totalCharacters);
 								}
 								else
 								{
-									totalCharacters += selectedLine.Length;
+									AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, selectedLine.Length);
 								}
 							}
 						}
-
-						// Create a snapshot for each sequence point covered
-						var snapshotPoint = new SnapshotSpan(snapshot, new Span(startLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters));
-						wordSpans.Add(snapshotPoint);
 					}
 				}
 			}

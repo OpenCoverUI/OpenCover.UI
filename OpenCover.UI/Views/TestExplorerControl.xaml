@@ -18,9 +18,9 @@
 			<RowDefinition />
 		</Grid.RowDefinitions >
 		<StackPanel Orientation="Horizontal">
-			<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Image_MouseDown" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
+			<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Refresh" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
 			<TextBlock Margin="10,0">Group By: </TextBlock>
-			<ComboBox Name="cmbGroupBy" SelectedIndex="0" BorderThickness="0">
+			<ComboBox Name="cmbGroupBy" SelectedIndex="0" BorderThickness="0" SelectionChanged="GroupByChanged">
 				<ComboBoxItem >Class</ComboBoxItem>
 				<ComboBoxItem>Trait</ComboBoxItem>
 			</ComboBox>

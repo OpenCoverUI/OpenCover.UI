@@ -6,9 +6,9 @@ namespace OpenCover.UI.Model.Test
 {
 	internal class TestMethodWrapperContainer : SharpTreeNode
 	{
-		public TestMethodGroupingField groupingField { get; set; }
+		private TestMethodGroupingField _groupingField;
 
-		internal IEnumerable<TestMethodWrapper> testMethodsWrapper
+		internal IEnumerable<TestMethodWrapper> TestMethodsWrapper
 		{
 			get;
 			private set;
@@ -16,36 +16,56 @@ namespace OpenCover.UI.Model.Test
 
 		internal TestMethodWrapperContainer(IEnumerable<TestMethodWrapper> testMethodsWrapper, TestMethodGroupingField groupingField)
 		{
-			this.testMethodsWrapper = testMethodsWrapper;
+			this.TestMethodsWrapper = testMethodsWrapper;
 			this.LazyLoading = true;
-			this.groupingField = groupingField;
+			this._groupingField = groupingField;
 		}
 
 		protected override void LoadChildren()
 		{
-			switch (groupingField)
+			switch (_groupingField)
 			{
 				case TestMethodGroupingField.Class:
-					Children.AddRange(testMethodsWrapper.SelectMany(c => c.TestMethods).GroupBy(tm => tm.Class.Name).Select(tr => new TestMethodWrapper(tr.Key, tr)));
+					GroupByClass();
 					break;
 
 				case TestMethodGroupingField.Trait:
-
-					var traits = testMethodsWrapper.SelectMany(c => c.TestMethods).SelectMany(m => m.Traits).Distinct();
-
-					foreach (var trait in traits)
-					{
-						var selectedTraits = testMethodsWrapper
-												.SelectMany(c => c.TestMethods)
-												.Where(m => m.Traits != null && m.Traits.Contains(trait));
-
-						Children.Add(new TestMethodWrapper(trait, selectedTraits));
-					}
-
-					//Children.AddRange(testMethodsWrapper.SelectMany(c => c.TestMethods).GroupBy(tm => tm.Trait)
-					//.Select(tr => new TestMethodWrapper(tr.Key, tr)));
+					GroupByTraits();
 					break;
 			}
+		}
+
+		/// <summary>
+		/// Groups the tests by Class.
+		/// </summary>
+		private void GroupByClass()
+		{
+			Children.AddRange(TestMethodsWrapper
+								.SelectMany(c => c.TestMethods)
+								.GroupBy(tm => tm.Class.Name)
+								.Select(tr => new TestMethodWrapper(tr.Key, tr.OrderBy(t => t.FullyQualifiedName)))
+								.OrderBy(tmr => tmr.Name));
+		}
+
+		/// <summary>
+		/// Groups the test by Traits.
+		/// </summary>
+		private void GroupByTraits()
+		{
+			var traits = TestMethodsWrapper.SelectMany(c => c.TestMethods).SelectMany(m => m.Traits).Distinct();
+			var testMethodWrapper = new List<TestMethodWrapper>();
+
+			foreach (var trait in traits)
+			{
+				var selectedTraits = TestMethodsWrapper
+										.SelectMany(c => c.TestMethods)
+										.Where(m => m.Traits != null && m.Traits.Contains(trait))
+										.OrderBy(m => m.FullyQualifiedName);
+
+				testMethodWrapper.Add(new TestMethodWrapper(trait, selectedTraits));
+			}
+
+			Children.AddRange(testMethodWrapper.OrderBy(tmw => tmw.Name));
 		}
 	}
 }

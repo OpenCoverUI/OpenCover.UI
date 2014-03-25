@@ -35,10 +35,9 @@ namespace OpenCover.UI.Views
 		{
 			Package.VSEventsHandler.BuildDone += DiscoverTests;
 			Package.VSEventsHandler.SolutionOpened += DiscoverTests;
-			cmbGroupBy.SelectionChanged += cmbGroupBy_SelectionChanged;
 		}
 
-		void cmbGroupBy_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		void GroupByChanged(object sender, SelectionChangedEventArgs e)
 		{
 			switch(cmbGroupBy.SelectedIndex)
 			{
@@ -79,8 +78,7 @@ namespace OpenCover.UI.Views
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					TestsTreeView.Root = new TestMethodWrapperContainer(tests.OrderBy(test => test.Name)
-											.Select(test => new TestMethodWrapper(test.Name, test.TestMethods)), _groupField);
+					TestsTreeView.Root = new TestMethodWrapperContainer(tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods)), _groupField);
 
 					if (TestDiscoveryFinished != null)
 					{
@@ -113,9 +111,9 @@ namespace OpenCover.UI.Views
 			}
 		}
 
-		private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+		private void Refresh(object sender, MouseButtonEventArgs e)
 		{
-			DiscoverTests();
+			Package.VSEventsHandler.BuildSolution();
 		}
 	}
 }

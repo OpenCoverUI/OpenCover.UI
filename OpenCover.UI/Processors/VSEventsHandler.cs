@@ -30,7 +30,6 @@ namespace OpenCover.UI.Processors
 
 			_package.DTE.Events.SolutionEvents.Opened += OnSolutionOpened;
 			_package.DTE.Events.SolutionEvents.AfterClosing += OnSolutionClosing;
-			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
 		}
 
 		public event Action BuildDone;
@@ -45,7 +44,6 @@ namespace OpenCover.UI.Processors
 		{
 			try
 			{
-				_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
 				_package.DTE.ExecuteCommand("Build.BuildSolution");
 			}
 			catch (Exception ex)
@@ -65,8 +63,6 @@ namespace OpenCover.UI.Processors
 			{
 				BuildDone();
 			}
-
-			_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
 		}
 
 		/// <summary>
@@ -74,6 +70,8 @@ namespace OpenCover.UI.Processors
 		/// </summary>
 		private void OnSolutionOpened()
 		{
+			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
+
 			if (SolutionOpened != null)
 			{
 				SolutionOpened();
@@ -91,6 +89,8 @@ namespace OpenCover.UI.Processors
 			{
 				SolutionClosing();
 			}
+
+			_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
 		}
 	}
 }
