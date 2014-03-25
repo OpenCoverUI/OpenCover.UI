@@ -31,7 +31,7 @@ namespace OpenCover.UI
 	// in the Help/About dialog of Visual Studio.
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
 	// This attribute is needed to let the shell know that this package exposes some menus.
-	[ProvideMenuResource("Menus.ctmenu", 1)]
+	[ProvideMenuResource(1000, 1)]
 	// This attribute registers a tool window exposed by this package. 
 	[ProvideToolWindow(typeof(CodeCoverageResultsToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
 		Orientation = ToolWindowOrientation.Bottom, Window = EnvDTE.Constants.vsWindowKindOutput)]

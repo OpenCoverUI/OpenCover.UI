@@ -219,7 +219,7 @@
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="OpenCover.UI.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
+      <ResourceName>1000</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
