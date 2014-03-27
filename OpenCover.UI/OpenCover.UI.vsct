@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--This source code is released under the GPL License; Please read license.md file for more details-->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
 	<Extern href="stdidcmd.h"/>
@@ -33,6 +34,20 @@
 					<CommandName>OpenCover</CommandName>
 				</Strings>
 			</Menu>
+			<Menu guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupBy" type="MenuController" priority="0x1000">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroup"/>
+				<Strings>
+					<ButtonText>Group By</ButtonText>
+					<CommandName>Group By</CommandName>
+				</Strings>
+			</Menu>
+			<Menu guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbar" type="ToolWindowToolbar" priority="0x1000">
+				<CommandFlag>DefaultDocked</CommandFlag>
+				<Strings>
+					<ButtonText>OpenCover TestExplorer Toolbar</ButtonText>
+					<CommandName>OpenCover TestExplorer Toolbar</CommandName>
+				</Strings>
+			</Menu>
 		</Menus>
 		<Groups>
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUIMenuGroup" priority="0x0600">
@@ -46,6 +61,12 @@
 			</Group>
 			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenu"/>
+			</Group>
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroup" priority="0x0000">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbar"/>
+			</Group>
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup" priority="0x0100">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupBy"/>
 			</Group>
 		</Groups>
 		<!--Buttons section. -->
@@ -61,7 +82,7 @@
 					If you do not want an image next to your command, remove the Icon node /> -->
 			<Button guid="guidOpenCoverUICmdSet" id="cmdidOpenCoverRun" priority="0x0100" type="Button">
 				<Parent guid="guidOpenCoverUICmdSet" id="openCoverUIMenuGroup" />
-				<Icon guid="guidIcon" id="icon1" />
+				<Icon guid="guidIcon" id="OpenCoverLogo" />
 				<CommandFlag>DefaultDisabled</CommandFlag>
 				<Strings>
 					<ButtonText>Run Selected tests with OpenCover</ButtonText>
@@ -69,31 +90,57 @@
 			</Button>
 			<Button guid="guidOpenCoverUICmdSet" id="cmdidCodeCoverageResults" priority="0x0100" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup"/>
-				<Icon guid="guidIcon" id="icon1" />
+				<Icon guid="guidIcon" id="OpenCoverLogo" />
 				<Strings>
 					<ButtonText>OpenCover Results</ButtonText>
 				</Strings>
 			</Button>
 			<Button guid="guidOpenCoverUICmdSet" id="cmdidCodeCoverageTestWindow" priority="0x0100" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup"/>
-				<Icon guid="guidIcon" id="icon1" />
+				<Icon guid="guidIcon" id="OpenCoverLogo" />
 				<Strings>
 					<ButtonText>OpenCover Test Explorer</ButtonText>
 				</Strings>
 			</Button>
 			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="commandIDOpenCoverTestExplorerContextMenu" priority="1" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup" />
-				<Icon guid="guidIcon" id="icon1" />
+				<Icon guid="guidIcon" id="OpenCoverLogo" />
 				<Strings>
 					<ButtonText>Cover with OpenCover</ButtonText>
 					<CommandName>OpenCover.CoverSelectedTests</CommandName>
 				</Strings>
 			</Button>
-			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuButton" priority="1" type="Button">
-				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup" />
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarRefreshButton" priority="0x0100" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroup"/>
+				<Icon guid="guidRefresh" id="RefreshTestExplorer" />
+				<CommandFlag>DefaultDisabled</CommandFlag>
 				<Strings>
-					<ButtonText>Test Button Text</ButtonText>
-					<CommandName>OpenCover.CoverSelectedTests2</CommandName>
+					<CommandName>OpenCover.UI.Refresh</CommandName>
+					<ButtonText>Refresh</ButtonText>
+				</Strings>
+			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByClassButton" priority="0x0100" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup"/>
+				<CommandFlag>DefaultDisabled</CommandFlag>
+				<Strings>
+					<CommandName>OpenCover.UI.GroupBy.Class</CommandName>
+					<ButtonText>Class</ButtonText>
+				</Strings>
+			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByTraitButton" priority="0x0200" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup"/>
+				<CommandFlag>DefaultDisabled</CommandFlag>
+				<Strings>
+					<CommandName>OpenCover.UI.GroupBy.Trait</CommandName>
+					<ButtonText>Trait</ButtonText>
+				</Strings>
+			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByProjectButton" priority="0x0300" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup"/>
+				<CommandFlag>DefaultDisabled</CommandFlag>
+				<Strings>
+					<CommandName>OpenCover.UI.GroupBy.Project</CommandName>
+					<ButtonText>Project</ButtonText>
 				</Strings>
 			</Button>
 		</Buttons>
@@ -104,14 +151,14 @@
 						bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
 						inside a button definition. An important aspect of this declaration is that the element id 
 						must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-			<Bitmap guid="guidIcon" href="Resources\OpenCover.png" usedList="icon1"/>
+			<Bitmap guid="guidIcon" href="Resources\OpenCover.png" usedList="OpenCoverLogo"/>
+			<Bitmap guid="guidRefresh" href="Resources\Refresh.png" usedList="RefreshTestExplorer"/>
 		</Bitmaps>
 
 	</Commands>
 	<Symbols>
 		<!-- This is the package guid. -->
 		<GuidSymbol name="guidOpenCoverUIPkg" value="{8baa86ee-ed13-4508-bccf-d580eaf81949}" />
-
 		<!-- This is the guid used to group the menu commands together -->
 		<GuidSymbol name="guidOpenCoverUICmdSet" value="{c1d4257b-f994-4cfe-adb6-f780c29f7c48}">
 			<IDSymbol name="openCoverUIMenuGroup" value="0x1020" />
@@ -126,7 +173,10 @@
 			<IDSymbol name="testMenu" value="0x0001"/>
 		</GuidSymbol>
 		<GuidSymbol name="guidIcon" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590fc}" >
-			<IDSymbol name="icon1" value="1" />
+			<IDSymbol name="OpenCoverLogo" value="1" />
+		</GuidSymbol>
+		<GuidSymbol name="guidRefresh" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590fe}" >
+			<IDSymbol name="RefreshTestExplorer" value="1" />
 		</GuidSymbol>
 		<GuidSymbol name="GuidOpenCoverTestExplorerContextMenuCommandSet" value="{81F1321F-B605-47F6-AD43-FB2EC4891225}">
 			<IDSymbol name="OpenCoverTestExplorerContextMenu" value="0x1000"/>
@@ -135,6 +185,14 @@
 			<IDSymbol name="OpenCoverTestMenuButton" value="0x1300"/>
 			<IDSymbol name="OpenCoverTestMenu" value="0x1400"/>
 			<IDSymbol name="OpenCoverTestMenuGroup" value="0x100"/>
+			<IDSymbol name="OpenCoverTestExplorerToolbar" value="0x1700" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroup" value="0x1750" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarRefreshButton" value="0x1800" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupBy" value="0x1900" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByGroup" value="0x1910" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByClassButton" value="0x1920" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByTraitButton" value="0x1930" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByProjectButton" value="0x1940" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

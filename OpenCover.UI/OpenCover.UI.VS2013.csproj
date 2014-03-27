@@ -148,6 +148,7 @@
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
+    <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Model\BranchPoint.cs" />
     <Compile Include="Model\Class.cs" />

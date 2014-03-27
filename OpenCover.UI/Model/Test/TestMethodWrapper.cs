@@ -1,9 +1,15 @@
-﻿using ICSharpCode.TreeView;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details.
+//
+using ICSharpCode.TreeView;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace OpenCover.UI.Model.Test
 {
@@ -51,7 +57,20 @@ namespace OpenCover.UI.Model.Test
 		{
 			get
 			{
-				return String.Format("{0} ({1})", Name, TestMethods.Count());
+				var stackPanel = new StackPanel()
+				{
+					Orientation = Orientation.Horizontal,
+					HorizontalAlignment = HorizontalAlignment.Stretch
+				};
+
+				var textBlock = new TextBlock();
+
+				textBlock.Inlines.Add(new Bold(new Run(Name)));
+
+				stackPanel.Children.Add(textBlock);
+				stackPanel.Children.Add(new TextBlock() { Text = String.Format(" ({0})",  TestMethods.Count()) });
+
+				return stackPanel;
 			}
 		}
 

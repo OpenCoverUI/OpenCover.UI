@@ -1,4 +1,7 @@
-﻿using System;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details.
+//
+using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;

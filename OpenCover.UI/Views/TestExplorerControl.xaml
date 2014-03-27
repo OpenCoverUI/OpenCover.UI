@@ -8,23 +8,12 @@
 			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
 			 xmlns:local="clr-namespace:OpenCover.UI.Model.Test"
 			 mc:Ignorable="d" 
-			 d:DesignHeight="300" d:DesignWidth="300" x:Name="userControl">
+			 d:DesignHeight="300" d:DesignWidth="300" x:Name="userControl"
+			 >
 	<UserControl.Resources>
 		<c:WidthConverter x:Key="widthConverter"/>
 	</UserControl.Resources>
 	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="20" />
-			<RowDefinition />
-		</Grid.RowDefinitions >
-		<StackPanel Orientation="Horizontal">
-			<Image Source="/OpenCover.UI;component/Resources/Refresh.png" MouseDown="Refresh" ToolTip="Refresh" Width="16" HorizontalAlignment="Left" Grid.Row="0"  />
-			<TextBlock Margin="10,0">Group By: </TextBlock>
-			<ComboBox Name="cmbGroupBy" SelectedIndex="0" BorderThickness="0" SelectionChanged="GroupByChanged">
-				<ComboBoxItem >Class</ComboBoxItem>
-				<ComboBoxItem>Trait</ComboBoxItem>
-			</ComboBox>
-		</StackPanel>
 		<!--<TreeView x:Name="testsTreeView" Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown">
 			<TreeView.ItemContainerStyle>
 				<Style TargetType="{x:Type TreeViewItem}">
@@ -50,24 +39,20 @@
 			</TreeView.Resources>
 		</TreeView>-->
 		<sd:SharpTreeView x:Name="TestsTreeView" ShowRoot="False" ShowAlternation="False" ShowRootExpander="False" HorizontalAlignment="Stretch"
-						  Grid.Row="1" MouseRightButtonDown="Grid_MouseRightButtonDown" Foreground="Black" ShowLines="False">
+						  Grid.Row="1" Foreground="Black" ShowLines="False">
 			<ListView.View>
 				<sd:SharpGridView>
 					<!--<sd:SharpGridView.ColumnHeaderContainerStyle>
 						<Style>
 							<Setter Property="FrameworkElement.Visibility"  Value="Collapsed"/>
-							<Setter Property="FrameworkElement.Width" Value="Auto" />
-							<Setter Property="FrameworkElement.HorizontalAlignment" Value="Stretch" />
 						</Style>
 					</sd:SharpGridView.ColumnHeaderContainerStyle>-->
 					<GridView.Columns>
 						<GridViewColumn>
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
-									<StackPanel Orientation="Horizontal">
-										<sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown"
-															  Margin="0 2 0 2" HorizontalAlignment="Stretch"/>
-									</StackPanel>
+										<sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown" Name="method"
+															Margin="0 2 0 2" />
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>

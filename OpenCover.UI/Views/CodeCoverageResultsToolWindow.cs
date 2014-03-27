@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 using System;
 using System.Collections;
@@ -61,7 +61,7 @@ namespace OpenCover.UI.Views
 		/// </summary>
 		public override void OnToolWindowCreated()
 		{
-			CodeCoverageResultsControl.Package = Package as OpenCoverUIPackage;
+			CodeCoverageResultsControl.Initialize(Package as OpenCoverUIPackage);
 		}
 	}
 }

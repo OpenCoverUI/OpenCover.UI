@@ -1,4 +1,7 @@
-﻿using OpenCover.UI.Helpers;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details.
+//
+using OpenCover.UI.Helpers;
 using OpenCover.UI.Model.Test;
 using OpenCover.UI.Processors;
 using System;
@@ -18,10 +21,10 @@ namespace OpenCover.UI.Views
 	/// </summary>
 	public partial class TestExplorerControl : UserControl
 	{
-		public OpenCoverUIPackage Package { get; set; }
-		TestExplorerToolWindow _parent;
-		TestMethodGroupingField _groupField;
-		List<TestClass> _tests;
+		private OpenCoverUIPackage _package;
+		private TestExplorerToolWindow _parent;
+		private TestMethodGroupingField _groupField;
+		private List<TestClass> _tests;
 
 		public event Action TestDiscoveryFinished;
 
@@ -31,25 +34,17 @@ namespace OpenCover.UI.Views
 			InitializeComponent();
 		}
 
-		internal void Initialize()
+		internal void Initialize(OpenCoverUIPackage package)
 		{
-			Package.VSEventsHandler.BuildDone += DiscoverTests;
-			Package.VSEventsHandler.SolutionOpened += DiscoverTests;
+			_package = package;
+			_package.VSEventsHandler.BuildDone += DiscoverTests;
+			_package.VSEventsHandler.SolutionOpened += DiscoverTests;
+			_package.VSEventsHandler.SolutionClosing += ClearTestsTreeViewChildren;
 		}
 
-		void GroupByChanged(object sender, SelectionChangedEventArgs e)
+		internal void ChangeGroupBy(TestMethodGroupingField groupingField)
 		{
-			switch(cmbGroupBy.SelectedIndex)
-			{
-				case 0: _groupField = TestMethodGroupingField.Class;
-					break;
-				case 1: _groupField = TestMethodGroupingField.Trait;
-					break;
-				default:
-					_groupField = TestMethodGroupingField.Class;
-					break;
-			}
-
+			_groupField = groupingField;
 			UpdateTreeView(_tests);
 		}
 
@@ -92,10 +87,14 @@ namespace OpenCover.UI.Views
 		{
 			Dispatcher.BeginInvoke(new Action(() =>
 			{
-				if (TestsTreeView.Root != null && TestsTreeView.Root.Children != null)
+				try
 				{
-					TestsTreeView.Root.Children.Clear();
+					if (TestsTreeView.Root != null && TestsTreeView.Root.Children != null && TestsTreeView.Root.Children.Any())
+					{
+						TestsTreeView.Root.Children.Clear();
+					}
 				}
+				catch { }
 			}));
 		}
 
@@ -113,7 +112,7 @@ namespace OpenCover.UI.Views
 
 		private void Refresh(object sender, MouseButtonEventArgs e)
 		{
-			Package.VSEventsHandler.BuildSolution();
+			_package.VSEventsHandler.BuildSolution();
 		}
 	}
 }

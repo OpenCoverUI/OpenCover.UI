@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 using System;
 using System.Windows.Controls;
@@ -27,7 +27,9 @@ namespace OpenCover.UI.Converters
 			var userControl = value as Control;
 			double percentage = System.Convert.ToDouble(parameter);
 
-			return userControl.ActualWidth * percentage / 100;
+			userControl.Width = userControl.ActualWidth;
+
+			return Double.NaN;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

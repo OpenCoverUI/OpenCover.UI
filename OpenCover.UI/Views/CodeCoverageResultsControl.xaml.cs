@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio.Shell;
 using OpenCover.Framework.Model;
@@ -24,6 +24,11 @@ namespace OpenCover.UI.Views
 		/// </summary>
 		private string _lastSelectedFile;
 
+		/// <summary>
+		/// The _package
+		/// </summary>
+		private OpenCoverUIPackage _package;
+
 		private bool _isLoading;
 
 		/// <summary>
@@ -36,14 +41,6 @@ namespace OpenCover.UI.Views
 		/// The coverage session for current OpenCoer run
 		/// </summary>
 		public CoverageSession CoverageSession;
-
-		/// <summary>
-		/// Gets or sets the package.
-		/// </summary>
-		/// <value>
-		/// The package.
-		/// </value>
-		public OpenCoverUIPackage Package { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether [is loading].
@@ -93,10 +90,15 @@ namespace OpenCover.UI.Views
 		/// </summary>
 		public CodeCoverageResultsControl()
 		{
-			//TODO: Add busy indicator
-
 			InitializeComponent();
 			DataContext = this;
+		}
+
+		internal void Initialize(OpenCoverUIPackage package)
+		{
+			_package = package;
+			_package.VSEventsHandler.SolutionClosing += ClearTreeView;
+			_package.VSEventsHandler.SolutionOpened += ClearTreeView;
 		}
 
 		/// <summary>
@@ -168,15 +170,15 @@ namespace OpenCover.UI.Views
 				{
 					var file = coveredFiles.FirstOrDefault(f => f.UniqueId == method.FileRef.UniqueId);
 
-					IDEHelper.CloseFile(Package.DTE, file.FullPath);
+					IDEHelper.CloseFile(_package.DTE, file.FullPath);
 
 					_fileOpening = true;
 					_lastSelectedFile = file.FullPath;
 					try
 					{
 
-						IDEHelper.OpenFile(Package.DTE, file.FullPath);
-						IDEHelper.GoToLine(Package.DTE, method.SequencePoints.FirstOrDefault().StartLine);
+						IDEHelper.OpenFile(_package.DTE, file.FullPath);
+						IDEHelper.GoToLine(_package.DTE, method.SequencePoints.FirstOrDefault().StartLine);
 					}
 					catch { }
 				}

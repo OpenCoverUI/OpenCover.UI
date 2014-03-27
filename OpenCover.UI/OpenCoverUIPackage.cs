@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
@@ -143,7 +143,7 @@ namespace OpenCover.UI
 
 				IVsUIShell uiShell = GetService(typeof(IVsUIShell)) as IVsUIShell;
 
-				var executeSelectedTestsCommand = new ExecuteSelectedTestsCommand(this, uiShell);
+				var executeSelectedTestsCommand = new ExecuteSelectedTestsCommand(this);
 				mcs.AddCommand(executeSelectedTestsCommand);
 
 				var codeCoverageToolWindowCommand = new CodeCoverageToolWindowCommand(this);
@@ -152,6 +152,10 @@ namespace OpenCover.UI
 				var testExplorerToolWindowCommand = new TestExplorerToolWindowCommand(this);
 				mcs.AddCommand(testExplorerToolWindowCommand);
 
+				foreach (var command in TestsExplorerToolbarCommands.Commands)
+				{
+					mcs.AddCommand(command);
+				}
 
 				Commands.Add(executeSelectedTestsCommand);
 				Commands.Add(codeCoverageToolWindowCommand);

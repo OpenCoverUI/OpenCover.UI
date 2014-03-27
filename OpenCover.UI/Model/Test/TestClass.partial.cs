@@ -1,4 +1,7 @@
-﻿using ICSharpCode.TreeView;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details.
+//
+using ICSharpCode.TreeView;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project. Project-level

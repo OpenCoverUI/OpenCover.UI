@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details
+//
 using Microsoft.VisualStudio.Shell;
+using System;
 using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
 
 namespace OpenCover.UI.Views
 {
@@ -20,6 +19,9 @@ namespace OpenCover.UI.Views
 		
 		internal OleMenuCommandService mcs;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TestExplorerToolWindow"/> class.
+		/// </summary>
 		public TestExplorerToolWindow()
 		{
 			// Set the window title reading it from the resources.
@@ -37,12 +39,16 @@ namespace OpenCover.UI.Views
 			TestExplorerControl = new TestExplorerControl(this);
 
 			base.Content = TestExplorerControl;
+
+			this.ToolBar = new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, PkgCmdIDList.OpenCoverTestExplorerToolbar);
 		}
 
+		/// <summary>
+		/// This method can be overridden by the derived class to execute any code that must run after the creation of <see cref="T:Microsoft.VisualStudio.Shell.Interop.IVsWindowFrame" />.
+		/// </summary>
 		public override void OnToolWindowCreated()
 		{
-			TestExplorerControl.Package = Package as OpenCoverUIPackage;
-			TestExplorerControl.Initialize();
+			TestExplorerControl.Initialize(Package as OpenCoverUIPackage);
 		}
 	}
 }

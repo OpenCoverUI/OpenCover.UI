@@ -1,5 +1,9 @@
-﻿using ICSharpCode.TreeView;
+﻿//
+// This source code is released under the GPL License; Please read license.md file for more details.
+//
+using ICSharpCode.TreeView;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace OpenCover.UI.Model.Test
@@ -30,7 +34,11 @@ namespace OpenCover.UI.Model.Test
 					break;
 
 				case TestMethodGroupingField.Trait:
-					GroupByTraits();
+					GroupByTrait();
+					break;
+
+				case TestMethodGroupingField.Project:
+					GroupByProject();
 					break;
 			}
 		}
@@ -50,7 +58,7 @@ namespace OpenCover.UI.Model.Test
 		/// <summary>
 		/// Groups the test by Traits.
 		/// </summary>
-		private void GroupByTraits()
+		private void GroupByTrait()
 		{
 			var traits = TestMethodsWrapper.SelectMany(c => c.TestMethods).SelectMany(m => m.Traits).Distinct();
 			var testMethodWrapper = new List<TestMethodWrapper>();
@@ -66,6 +74,20 @@ namespace OpenCover.UI.Model.Test
 			}
 
 			Children.AddRange(testMethodWrapper.OrderBy(tmw => tmw.Name));
+		}
+
+		/// <summary>
+		/// Groups the tests by project.
+		/// </summary>
+		private void GroupByProject()
+		{
+			var methodsGroupedByProject = TestMethodsWrapper
+											.SelectMany(c => c.TestMethods)
+											.GroupBy(tm => tm.Class.DLLPath)
+											.Select(tm => new TestMethodWrapper(Path.GetFileNameWithoutExtension(tm.Key), tm));
+
+			Children.AddRange(methodsGroupedByProject);
+			
 		}
 	}
 }

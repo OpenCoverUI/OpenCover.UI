@@ -143,6 +143,7 @@
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
+    <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Model\BranchPoint.cs" />
     <Compile Include="Model\Class.cs" />
@@ -156,11 +157,13 @@
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
     <Compile Include="Model\Summary.cs" />
+    <Compile Include="Model\Test\TestClass.cs" />
+    <Compile Include="Model\Test\TestClass.partial.cs" />
     <Compile Include="Model\Test\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />
+    <Compile Include="Model\Test\TestMethodGroupingField.cs" />
     <Compile Include="Model\Test\TestMethodWrapper.cs" />
-    <Compile Include="Model\Test\TestMethodWrapper.partial.cs" />
     <Compile Include="Model\Test\TestMethodWrapperContainer.cs" />
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />

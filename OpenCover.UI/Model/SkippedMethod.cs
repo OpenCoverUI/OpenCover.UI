@@ -1,5 +1,5 @@
 //
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 namespace OpenCover.Framework.Model
 {

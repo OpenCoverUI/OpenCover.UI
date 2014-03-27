@@ -1,7 +1,6 @@
 ﻿//
-// This source code is released under the MIT License;
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
-using Microsoft.VisualStudio.Shell.Interop;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model.Test;
 using OpenCover.UI.Processors;
@@ -25,32 +24,26 @@ namespace OpenCover.UI.Commands
 		private const string CODE_COVERAGE_SELECT_TESTS_MESSAGE = "Please select a test to run";
 
 		private OpenCoverUIPackage _package;
-		private IVsUIShell _uiShell;
 		private IEnumerable<TestMethod> _selectedTests;
 		private TestExplorerControl _testExplorerControl;
-
-		public bool IsRunningCodeCoverage
-		{
-			get;
-			private set;
-		}
+		private CodeCoverageResultsControl _codeCoverageResultsControl;
+		private bool _isRunningCodeCoverage;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ExecuteSelectedTestsCommand"/> class.
+		/// Initializes a new instance of the <see cref="ExecuteSelectedTestsCommand" /> class.
 		/// </summary>
 		/// <param name="package">The Visual Studio Extension Package.</param>
-		public ExecuteSelectedTestsCommand(OpenCoverUIPackage package, IVsUIShell uiShell)
+		public ExecuteSelectedTestsCommand(OpenCoverUIPackage package)
 			: base(package, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, (int)PkgCmdIDList.CommandIDOpenCoverTestExplorerRunTestWithOpenCover))
 		{
 			_package = package;
-			_uiShell = uiShell;
-
-			// FetchTestsTreeView();
 
 			base.Enabled = false;
 
 			_testExplorerControl = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl;
 			_testExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
+
+			_codeCoverageResultsControl = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
 		}
 
 		/// <summary>
@@ -59,7 +52,7 @@ namespace OpenCover.UI.Commands
 		void OnTestDiscoveryFinished()
 		{
 			var hasTests = _testExplorerControl.TestsTreeView.Root != null && _testExplorerControl.TestsTreeView.Root.Children.Any();
-			if (hasTests)
+			if (hasTests & !_isRunningCodeCoverage)
 			{
 				Enabled = true;
 			}
@@ -74,6 +67,8 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		protected override void OnExecute()
 		 {
+			 _codeCoverageResultsControl.ClearTreeView();
+
 			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
 			var testsItemSource = (testGroupCollection.Children.Cast<TestMethodWrapper>());
 
@@ -103,7 +98,7 @@ namespace OpenCover.UI.Commands
 				ShowCodeCoverageResultsToolWindow();
 
 				Enabled = false;
-
+				_isRunningCodeCoverage = true;
 				_package.VSEventsHandler.BuildDone += RunOpenCover;
 				_package.VSEventsHandler.BuildSolution();
 			}
@@ -138,6 +133,7 @@ namespace OpenCover.UI.Commands
 					ShowCodeCoverageResultsToolWindow();
 
 					Enabled = true;
+					_isRunningCodeCoverage = false;
 				});
 
 			_package.VSEventsHandler.BuildDone -= RunOpenCover;
