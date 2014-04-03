@@ -12,14 +12,20 @@ using Microsoft.VisualStudio.Shell;
 using OpenCover.UI.Views;
 using OpenCover.UI.Model.Test;
 
+/// <summary>
+/// Tests Explorer Toolbar Commands
+/// </summary>
 namespace OpenCover.UI.Commands
 {
-	public class TestsExplorerToolbarCommands
+	internal class TestsExplorerToolbarCommands
 	{
 		private static bool _initialized;
 		private static OleMenuCommand _currentSelected;
 		private static List<OleMenuCommand> _allCommands;
 
+		/// <summary>
+		/// Static constructor for TestsExplorerToolbarCommands class.
+		/// </summary>
 		static TestsExplorerToolbarCommands()
 		{
 			if (!_initialized)
@@ -31,7 +37,13 @@ namespace OpenCover.UI.Commands
 			OpenCoverUIPackage.Instance.VSEventsHandler.SolutionClosing += () => EnableDisableCommands(false);
 		}
 
-		public static IEnumerable<OleMenuCommand> Commands
+		/// <summary>
+		/// Gets all the commands.
+		/// </summary>
+		/// <value>
+		/// The commands.
+		/// </value>
+		internal static IEnumerable<OleMenuCommand> Commands
 		{
 			get
 			{
@@ -39,63 +51,88 @@ namespace OpenCover.UI.Commands
 			}
 		}
 
+		internal static TestMethodGroupingField CurrentSelectedGroupBy
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Enables or disables commands.
+		/// </summary>
+		/// <param name="state">Sets Enabled property of all commands to 'state'</param>
 		private static void EnableDisableCommands(bool state)
 		{
 			_allCommands.ForEach(c => c.Enabled = state);
 		}
 
+		/// <summary>
+		/// Initializes all test explorer toolbar commands.
+		/// </summary>
 		private static void Initialize()
 		{
-			_allCommands = new List<OleMenuCommand>();
+			if (!_initialized)
+			{
+				_allCommands = new List<OleMenuCommand>();
 
-			_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-								(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton)) { Enabled = false });
+				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
+									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton)) { Enabled = false });
 
-			_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-								(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton)) { Enabled = false });
+				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
+									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton)) { Enabled = false });
 
-			_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-								(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton)) { Enabled = false });
+				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
+									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton)) { Enabled = false });
 
-			_allCommands.Add(new OleMenuCommand((s, e) => OpenCoverUIPackage.Instance.VSEventsHandler.BuildSolution(),
-								new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-												(int)PkgCmdIDList.OpenCoverTestExplorerToolbarRefreshButton)) { Enabled = false });
+				// Refresh command
+				_allCommands.Add(new OleMenuCommand((s, e) => OpenCoverUIPackage.Instance.VSEventsHandler.BuildSolution(),
+									new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
+													(int)PkgCmdIDList.OpenCoverTestExplorerToolbarRefreshButton)) { Enabled = false });
 
-			_initialized = true;
+				_initialized = true;
+			}
 		}
 
+		/// <summary>
+		/// Event handler for Group By Command.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
 		private static void Executed(object sender, EventArgs e)
 		{
 			var clicked = sender as OleMenuCommand;
 
 			UpdateCheckedMethods(clicked);
 
-			var groupingField = TestMethodGroupingField.Class;
-
+			// Group tests based on the clicked command
 			switch (clicked.CommandID.ID)
 			{
 				case PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton:
-					groupingField = TestMethodGroupingField.Class;
+					CurrentSelectedGroupBy = TestMethodGroupingField.Class;
 					break;
 				case PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton:
-					groupingField = TestMethodGroupingField.Trait;
+					CurrentSelectedGroupBy = TestMethodGroupingField.Trait;
 					break;
 				case PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton:
-					groupingField = TestMethodGroupingField.Project;
+					CurrentSelectedGroupBy = TestMethodGroupingField.Project;
 					break;
 			}
 
-			OpenCoverUIPackage.Instance.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl.ChangeGroupBy(groupingField);
+			OpenCoverUIPackage.Instance.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl.ChangeGroupBy(CurrentSelectedGroupBy);
 		}
 
-		private static void UpdateCheckedMethods(OleMenuCommand clicked)
+		/// <summary>
+		/// Updates the selected methods.
+		/// </summary>
+		/// <param name="clickedCommand">The clicked command.</param>
+		private static void UpdateCheckedMethods(OleMenuCommand clickedCommand)
 		{
 			if (_currentSelected != null)
 			{
 				_currentSelected.Checked = false;
 			}
 
-			_currentSelected = clicked;
+			_currentSelected = clickedCommand;
 
 			_currentSelected.Checked = true;
 		}

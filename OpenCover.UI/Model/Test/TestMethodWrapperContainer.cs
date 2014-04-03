@@ -2,9 +2,11 @@
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
 using ICSharpCode.TreeView;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace OpenCover.UI.Model.Test
 {
@@ -12,12 +14,23 @@ namespace OpenCover.UI.Model.Test
 	{
 		private TestMethodGroupingField _groupingField;
 
+		/// <summary>
+		/// Gets the test methods wrapper.
+		/// </summary>
+		/// <value>
+		/// The test methods wrapper.
+		/// </value>
 		internal IEnumerable<TestMethodWrapper> TestMethodsWrapper
 		{
 			get;
 			private set;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TestMethodWrapperContainer"/> class.
+		/// </summary>
+		/// <param name="testMethodsWrapper">The test methods wrapper.</param>
+		/// <param name="groupingField">The grouping field.</param>
 		internal TestMethodWrapperContainer(IEnumerable<TestMethodWrapper> testMethodsWrapper, TestMethodGroupingField groupingField)
 		{
 			this.TestMethodsWrapper = testMethodsWrapper;
@@ -25,6 +38,43 @@ namespace OpenCover.UI.Model.Test
 			this._groupingField = groupingField;
 		}
 
+		/// <summary>
+		/// Gets the selected tests.
+		/// </summary>
+		/// <returns>Selected Tests</returns>
+		internal Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> GetSelectedTestGroupsAndTests()
+		{
+			var builder = new StringBuilder();
+
+			var testsItemSource = (this.Children.Cast<TestMethodWrapper>());
+
+			var selectedTestGroups = testsItemSource
+										.Where(t => t.IsSelected)
+										.Select(t => t.FullyQualifiedName);
+
+			var selectedDLLsInGroups = testsItemSource
+										.Where(t => t.IsSelected)
+										.SelectMany(t => t.TestMethods)
+										.Select(t => t.Class.DLLPath)
+										.Distinct();
+
+
+			var testsInNotSelectedGroupQuery = this.Children
+												.Where(tg => !tg.IsSelected)
+												.SelectMany(tg => tg.Children.Where(test => test.IsSelected))
+												.Cast<TestMethod>();
+
+			var testsInNotSelectedGroup = testsInNotSelectedGroupQuery.Select(tm => tm.FullyQualifiedName);
+
+			var dllsInSelectedTests = testsInNotSelectedGroupQuery.Select(tm => tm.Class.DLLPath).Distinct();
+
+
+			return new Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>>(selectedTestGroups, testsInNotSelectedGroup, selectedDLLsInGroups.Union(dllsInSelectedTests));
+		}
+
+		/// <summary>
+		/// Loads the children.
+		/// </summary>
 		protected override void LoadChildren()
 		{
 			switch (_groupingField)
@@ -51,7 +101,13 @@ namespace OpenCover.UI.Model.Test
 			Children.AddRange(TestMethodsWrapper
 								.SelectMany(c => c.TestMethods)
 								.GroupBy(tm => tm.Class.Name)
-								.Select(tr => new TestMethodWrapper(tr.Key, tr.OrderBy(t => t.FullyQualifiedName)))
+								.Select(tr =>
+									{
+										var @class = tr.ElementAt(0).Class;
+										var fqn = String.Format("{0}.{1}", @class.Namespace, @class.Name);
+
+										return new TestMethodWrapper(tr.Key, tr.OrderBy(t => t.FullyQualifiedName), fqn);
+									})
 								.OrderBy(tmr => tmr.Name));
 		}
 
@@ -70,7 +126,7 @@ namespace OpenCover.UI.Model.Test
 										.Where(m => m.Traits != null && m.Traits.Contains(trait))
 										.OrderBy(m => m.FullyQualifiedName);
 
-				testMethodWrapper.Add(new TestMethodWrapper(trait, selectedTraits));
+				testMethodWrapper.Add(new TestMethodWrapper(trait, selectedTraits, trait));
 			}
 
 			Children.AddRange(testMethodWrapper.OrderBy(tmw => tmw.Name));
@@ -84,10 +140,14 @@ namespace OpenCover.UI.Model.Test
 			var methodsGroupedByProject = TestMethodsWrapper
 											.SelectMany(c => c.TestMethods)
 											.GroupBy(tm => tm.Class.DLLPath)
-											.Select(tm => new TestMethodWrapper(Path.GetFileNameWithoutExtension(tm.Key), tm));
+											.Select(tm =>
+											{
+												var dll = Path.GetFileNameWithoutExtension(tm.Key);
+												return new TestMethodWrapper(dll, tm, dll);
+											});
 
 			Children.AddRange(methodsGroupedByProject);
-			
+
 		}
 	}
 }

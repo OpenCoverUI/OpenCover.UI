@@ -23,9 +23,10 @@ namespace OpenCover.UI.Model.Test
 		/// </summary>
 		/// <param name="name">The name.</param>
 		/// <param name="testMethods">The test methods.</param>
-		public TestMethodWrapper(string name, IEnumerable<TestMethod> testMethods)
+		public TestMethodWrapper(string name, IEnumerable<TestMethod> testMethods, string fullyQualifiedName)
 		{
 			this.Name = name;
+			this.FullyQualifiedName = fullyQualifiedName;
 			this.TestMethods = testMethods;
 
 			this.LazyLoading = true;
@@ -38,6 +39,14 @@ namespace OpenCover.UI.Model.Test
 		/// The name.
 		/// </value>
 		internal string Name { get; private set; }
+
+		/// <summary>
+		/// Gets the fully qualified name of the wrapper.
+		/// </summary>
+		/// <value>
+		/// The fully qualified name.
+		/// </value>
+		internal string FullyQualifiedName { get; private set; }
 
 		/// <summary>
 		/// Gets the test methods.
@@ -68,7 +77,7 @@ namespace OpenCover.UI.Model.Test
 				textBlock.Inlines.Add(new Bold(new Run(Name)));
 
 				stackPanel.Children.Add(textBlock);
-				stackPanel.Children.Add(new TextBlock() { Text = String.Format(" ({0})",  TestMethods.Count()) });
+				stackPanel.Children.Add(new TextBlock() { Text = String.Format(" ({0})", TestMethods.Count()) });
 
 				return stackPanel;
 			}

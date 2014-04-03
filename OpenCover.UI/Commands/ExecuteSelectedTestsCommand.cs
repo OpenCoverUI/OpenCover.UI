@@ -22,12 +22,13 @@ namespace OpenCover.UI.Commands
 	{
 		private const string CODE_COVERAGE_RESULTS_WINDOW_TITLE = "Code Coverage";
 		private const string CODE_COVERAGE_SELECT_TESTS_MESSAGE = "Please select a test to run";
+		private const string CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE = "We could not run all the tests that you selected. Please see output window for more details.";
 
 		private OpenCoverUIPackage _package;
-		private IEnumerable<TestMethod> _selectedTests;
 		private TestExplorerControl _testExplorerControl;
 		private CodeCoverageResultsControl _codeCoverageResultsControl;
 		private bool _isRunningCodeCoverage;
+		private TestExecutor _testExecutor;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ExecuteSelectedTestsCommand" /> class.
@@ -66,49 +67,43 @@ namespace OpenCover.UI.Commands
 		/// Called when the command is executed.
 		/// </summary>
 		protected override void OnExecute()
-		 {
-			 _codeCoverageResultsControl.ClearTreeView();
+		{
+			_codeCoverageResultsControl.ClearTreeView();
 
-			var testGroupCollection = _testExplorerControl.TestsTreeView.Root;
-			var testsItemSource = (testGroupCollection.Children.Cast<TestMethodWrapper>());
+			var selectedTests = ((TestMethodWrapperContainer)_testExplorerControl.TestsTreeView.Root).GetSelectedTestGroupsAndTests();
 
-			// Need to select all tests which are under the selected group.
-			var testsInSelectedGroup = testGroupCollection.Children
-											.Where(tg => tg.IsSelected)
-											.SelectMany(tg =>
-											{
-												var testClass = tg as TestMethodWrapper;
-												return testsItemSource
-													.Where(tc => tc == testClass)
-													.SelectMany(tc => tc.TestMethods);
-											});
-
-			// Need to select only those tests which are selected under not selected groups.
-			var testsInNotSelectedGroup = testGroupCollection.Children
-															.Where(tg => !tg.IsSelected)
-															.SelectMany(tg => tg.Children.Where(test => test.IsSelected))
-															.Cast<TestMethod>();
-
-			// Union of both tests is our selected tests
-			_selectedTests = testsInNotSelectedGroup.Union(testsInSelectedGroup, new SelectedTestsComparer());
-
-			if (_selectedTests.Any())
+			if (selectedTests.Item1.Any() || selectedTests.Item2.Any())
 			{
-				// show tool window which shows the progress.
-				ShowCodeCoverageResultsToolWindow();
+				_testExecutor = new TestExecutor(_package, selectedTests, TestsExplorerToolbarCommands.CurrentSelectedGroupBy);
+				if (!_testExecutor.ValidateCommandLineArgumentsLength())
+				{
+					MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE,
+									ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
+									MessageBoxButton.OK,
+									MessageBoxImage.Error);
 
-				Enabled = false;
-				_isRunningCodeCoverage = true;
-				_package.VSEventsHandler.BuildDone += RunOpenCover;
-				_package.VSEventsHandler.BuildSolution();
+					return;
+
+				}
 			}
 			else
 			{
-				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_TESTS_MESSAGE, 
-								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE, 
-								MessageBoxButton.OK, 
+				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_TESTS_MESSAGE,
+								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
+								MessageBoxButton.OK,
 								MessageBoxImage.Error);
+
+				return;
 			}
+			
+			// show tool window which shows the progress.
+			ShowCodeCoverageResultsToolWindow();
+
+			Enabled = false;
+			_isRunningCodeCoverage = true;
+			_package.VSEventsHandler.BuildDone += RunOpenCover;
+			_package.VSEventsHandler.BuildSolution();
+			
 		}
 
 		/// <summary>
@@ -123,14 +118,20 @@ namespace OpenCover.UI.Commands
 					var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
 
 					control.IsLoading = true;
-					var testExecutor = new TestExecutor(_package, _selectedTests);
-					Tuple<string, string> files = testExecutor.Execute();
-					var finalResults = testExecutor.GetExecutionResults();
+					Tuple<string, string> files = _testExecutor.Execute();
+					var finalResults = _testExecutor.GetExecutionResults();
 
-					control.UpdateCoverageResults(finalResults);
+					if (finalResults != null)
+					{
+						control.UpdateCoverageResults(finalResults);
 
-					// if the tool window is hidden, show it again.
-					ShowCodeCoverageResultsToolWindow();
+						// if the tool window is hidden, show it again.
+						ShowCodeCoverageResultsToolWindow();
+					}
+					else
+					{
+						control.IsLoading = false;
+					}
 
 					Enabled = true;
 					_isRunningCodeCoverage = false;

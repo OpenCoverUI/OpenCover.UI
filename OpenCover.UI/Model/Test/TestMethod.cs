@@ -19,7 +19,7 @@ namespace OpenCover.UI.Model.Test
 		/// <value>
 		/// The full name.
 		/// </value>
-		[DataMember]
+		[DataMember(Name="n")]
 		public string Name { get; set; }
 
 		/// <summary>
@@ -28,7 +28,7 @@ namespace OpenCover.UI.Model.Test
 		/// <value>
 		/// The trait.
 		/// </value>
-		[DataMember]
+		[DataMember(Name="t")]
 		public string[] Traits { get; set; }
 	}
 }

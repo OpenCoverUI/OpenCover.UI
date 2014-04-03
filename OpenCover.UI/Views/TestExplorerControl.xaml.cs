@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Design;
+using System.Text;
 
 namespace OpenCover.UI.Views
 {
@@ -23,7 +24,7 @@ namespace OpenCover.UI.Views
 	{
 		private OpenCoverUIPackage _package;
 		private TestExplorerToolWindow _parent;
-		private TestMethodGroupingField _groupField;
+		private TestMethodGroupingField _currentGroupingField;
 		private List<TestClass> _tests;
 
 		public event Action TestDiscoveryFinished;
@@ -34,6 +35,10 @@ namespace OpenCover.UI.Views
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// Initializes the control by adding handlers to BuildDone, SolutionOpened & SolutionClosing events.
+		/// </summary>
+		/// <param name="package">The package.</param>
 		internal void Initialize(OpenCoverUIPackage package)
 		{
 			_package = package;
@@ -42,9 +47,13 @@ namespace OpenCover.UI.Views
 			_package.VSEventsHandler.SolutionClosing += ClearTestsTreeViewChildren;
 		}
 
+		/// <summary>
+		/// Changes the group by in OpenCover Test Explorer.
+		/// </summary>
+		/// <param name="groupingField">The grouping field.</param>
 		internal void ChangeGroupBy(TestMethodGroupingField groupingField)
 		{
-			_groupField = groupingField;
+			_currentGroupingField = groupingField;
 			UpdateTreeView(_tests);
 		}
 
@@ -73,7 +82,7 @@ namespace OpenCover.UI.Views
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					TestsTreeView.Root = new TestMethodWrapperContainer(tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods)), _groupField);
+					TestsTreeView.Root = new TestMethodWrapperContainer(tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField);
 
 					if (TestDiscoveryFinished != null)
 					{
