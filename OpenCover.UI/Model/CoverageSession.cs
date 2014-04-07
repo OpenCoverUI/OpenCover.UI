@@ -53,7 +53,7 @@ namespace OpenCover.Framework.Model
 		{
 			if (Modules != null)
 			{
-				return Modules.Where(module => module.Summary.SequenceCoverage > 0).SelectMany(module => module.GetSequencePoints());
+				return Modules.SelectMany(module => module.GetSequencePoints());
 			}
 			
 			return null;

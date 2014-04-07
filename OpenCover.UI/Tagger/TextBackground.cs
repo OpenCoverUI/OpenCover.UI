@@ -11,10 +11,20 @@ namespace OpenCover.UI.Tagger
 	/// <summary>
 	/// Type exports for background color classification type definition 
 	/// </summary>
-	public static class TypeExports
+	public static class CoveredTextBackgroundTypeExports
 	{
 		[Export(typeof(ClassificationTypeDefinition))]
-		[Name("text-background")]
+		[Name("text-background-covered")]
+		public static ClassificationTypeDefinition OrdinaryClassificationType;
+	}
+
+	/// <summary>
+	/// Type exports for background color classification type definition 
+	/// </summary>
+	public static class NotCoveredTextBackgroundTypeExports
+	{
+		[Export(typeof(ClassificationTypeDefinition))]
+		[Name("text-background-notcovered")]
 		public static ClassificationTypeDefinition OrdinaryClassificationType;
 	}
 
@@ -22,19 +32,40 @@ namespace OpenCover.UI.Tagger
 	/// Class defining background color for covered classes
 	/// </summary>
 	[Export(typeof(EditorFormatDefinition))]
-	[ClassificationType(ClassificationTypeNames = "text-background")]
-	[Name("text-background")]
+	[ClassificationType(ClassificationTypeNames = "text-background-covered")]
+	[Name("text-background-covered")]
 	[UserVisible(true)]
 	[Order(After = Priority.High)]
-	public sealed class TextBackground : ClassificationFormatDefinition
+	public sealed class CoveredTextBackground : ClassificationFormatDefinition
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TextBackground"/> class.
+		/// Initializes a new instance of the <see cref="CoveredTextBackground"/> class.
 		/// </summary>
-		public TextBackground()
+		public CoveredTextBackground()
 		{
-			DisplayName = "Text Background";
+			DisplayName = "Covered Text Background";
 			BackgroundColor = Colors.LightGreen;
+		}
+	}
+
+	/// <summary>
+	/// Class defining background color for covered classes
+	/// </summary>
+	[Export(typeof(EditorFormatDefinition))]
+	[ClassificationType(ClassificationTypeNames = "text-background-notcovered")]
+	[Name("text-background-notcovered")]
+	[UserVisible(true)]
+	[Order(After = Priority.High)]
+	public sealed class NotCoveredTextBackground : ClassificationFormatDefinition
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CoveredTextBackground"/> class.
+		/// </summary>
+		public NotCoveredTextBackground()
+		{
+			DisplayName = "Not Covered Text Background";
+			BackgroundColor = Color.FromRgb(205, 92, 92);
+			ForegroundColor = Colors.Black;
 		}
 	}
 }

@@ -172,34 +172,59 @@ namespace OpenCover.UI.Processors
 					{
 						builder.Append("/TestCaseFilter:\\\"");
 
-						foreach (var trait in _selectedTests.Item1)
-						{
-							builder.AppendFormat("TestCategory={0}|", trait);
-						}
+						BuildTestCategoryCommandlineString(builder, "TestCategory", _selectedTests.Item1);
 
-						if (builder.Length > 0)
-						{
-							builder.Length = builder.Length - 1;
-						}
+						BuildTestCategoryCommandlineString(builder, "Name", _selectedTests.Item2);
+
+						DeleteLastCharacter(builder);
 
 						builder.Append("\\\"");
 						break;
 					}
 				case TestMethodGroupingField.Class:
 					{
-						builder.Append("/Tests:");
-						builder.Append(String.Join(",", _selectedTests.Item1.Union(_selectedTests.Item2)));
+						BuildTestsCommandlineStringForClassAndProjectTypes(_selectedTests.Item1.Union(_selectedTests.Item2), builder);
+						break;
+					}
+				case TestMethodGroupingField.Project:
+					{
+						BuildTestsCommandlineStringForClassAndProjectTypes(_selectedTests.Item2, builder);
 						break;
 					}
 			}
 
 			SetOpenCoverResultsFilePath();
 
-			_commandLineArguments = String.Format("-target:\"{0}\" -targetargs:\"{1}{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All -register:user",
+			_commandLineArguments = String.Format("-target:\"{0}\" -targetargs:\"{1}{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*",
 										this._vsTestPath,
 										dllPaths,
 										builder.ToString(),
 										_openCoverResultsFile);
+		}
+
+		private void BuildTestCategoryCommandlineString(StringBuilder builder, string caption, IEnumerable<string> selection)
+		{
+			foreach (var member in selection)
+			{
+				builder.AppendFormat("{0}={1}|", caption, member);
+			}
+		}
+
+		private static void BuildTestsCommandlineStringForClassAndProjectTypes(IEnumerable<string> tests, StringBuilder builder)
+		{
+			if (tests.Any())
+			{
+				builder.Append("/Tests:");
+				builder.Append(String.Join(",", tests));
+			}
+		}
+
+		private static void DeleteLastCharacter(StringBuilder builder)
+		{
+			if (builder.Length > 0)
+			{
+				builder.Length = builder.Length - 1;
+			}
 		}
 
 		private void SetOpenCoverResultsFilePath()

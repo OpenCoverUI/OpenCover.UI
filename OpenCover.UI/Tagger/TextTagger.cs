@@ -21,8 +21,10 @@ namespace OpenCover.UI.Tagger
 	{
 		private readonly ITextView _textView;
 		private readonly ITextSearchService _searchService;
-		private readonly IClassificationType _type;
-		private NormalizedSnapshotSpanCollection _currentSpans;
+		private readonly IClassificationType _coveredType;
+		private readonly IClassificationType _notCoveredType;
+		private readonly Dictionary<SnapshotSpan, bool> _spanCoverage;
+		private List<SnapshotSpan> _currentSpans;
 		private CodeCoverageResultsControl _codeCoverageResultsControl;
 
 		/// <summary>
@@ -35,8 +37,8 @@ namespace OpenCover.UI.Tagger
 		/// </summary>
 		/// <param name="view">The view.</param>
 		/// <param name="searchService">The search service.</param>
-		/// <param name="type">The type.</param>
-		public TextTagger(ITextView view, ITextSearchService searchService, IClassificationType type)
+		/// <param name="coveredType">The type.</param>
+		public TextTagger(ITextView view, ITextSearchService searchService, IClassificationType coveredType, IClassificationType notCoveredType)
 		{
 			if (OpenCoverUIPackage.Instance == null)
 			{
@@ -45,8 +47,10 @@ namespace OpenCover.UI.Tagger
 
 			_textView = view;
 			_searchService = searchService;
-			_type = type;
+			_coveredType = coveredType;
+			_notCoveredType = notCoveredType;
 
+			_spanCoverage = new Dictionary<SnapshotSpan, bool>();
 			_codeCoverageResultsControl = OpenCoverUIPackage.Instance
 															.ToolWindows
 															.OfType<CodeCoverageResultsToolWindow>()
@@ -93,10 +97,13 @@ namespace OpenCover.UI.Tagger
 		/// <param name="snapshot">The snapshot.</param>
 		/// <param name="startColumn">The start column.</param>
 		/// <param name="totalCharacters">The total characters.</param>
-		private void AddWordSpan(List<SnapshotSpan> wordSpans, ITextSnapshot snapshot, int startColumn, int totalCharacters)
+		/// <param name="covered">if set to <c>true</c> [covered].</param>
+		private void AddWordSpan(List<SnapshotSpan> wordSpans, ITextSnapshot snapshot, int startColumn, int totalCharacters, bool covered)
 		{
 			var snapshotPoint = new SnapshotSpan(snapshot, new Span(startColumn, totalCharacters));
 			wordSpans.Add(snapshotPoint);
+
+			_spanCoverage.Add(snapshotPoint, covered);
 		}
 
 		/// <summary>
@@ -104,7 +111,7 @@ namespace OpenCover.UI.Tagger
 		/// </summary>
 		/// <param name="snapshot">The text snapshot of file being opened.</param>
 		/// <returns>Collection of word spans</returns>
-		private NormalizedSnapshotSpanCollection GetWordSpans(ITextSnapshot snapshot)
+		private List<SnapshotSpan> GetWordSpans(ITextSnapshot snapshot)
 		{
 			var wordSpans = new List<SnapshotSpan>();
 
@@ -116,11 +123,17 @@ namespace OpenCover.UI.Tagger
 
 				if (sequencePoints != null)
 				{
+					var covered = false;
+
 					foreach (var sequencePoint in sequencePoints)
 					{
 						if (sequencePoint.VisitCount == 0)
 						{
-							continue;
+							covered = false;
+						}
+						else
+						{
+							covered = true;
 						}
 
 						int sequencePointStartLine = sequencePoint.StartLine - 1;
@@ -132,19 +145,19 @@ namespace OpenCover.UI.Tagger
 						{
 							AddWordSpan(wordSpans, snapshot, 
 										startLine.Extent.Start.Position + sequencePoint.StartColumn - 1, 
-										sequencePoint.EndColumn - sequencePoint.StartColumn + 1);
+										sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
 						}
 						else
 						{
 							// Get selected lines
 							AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint, 
-																				sequencePointStartLine, sequencePointEndLine);
+																				sequencePointStartLine, sequencePointEndLine, covered);
 						}
 					}
 				}
 			}
 
-			return new NormalizedSnapshotSpanCollection(wordSpans);
+			return (wordSpans);
 		}
 
 		/// <summary>
@@ -155,11 +168,13 @@ namespace OpenCover.UI.Tagger
 		/// <param name="sequencePoint">The sequence point.</param>
 		/// <param name="sequencePointStartLine">The sequence point start line.</param>
 		/// <param name="sequencePointEndLine">The sequence point end line.</param>
+		/// <param name="covered">if set to <c>true</c> [covered].</param>
 		private void AddWordSpansForSequencePointsCoveringMultipleLines(ITextSnapshot snapshot, 
-																			List<SnapshotSpan> wordSpans, 
-																			Framework.Model.SequencePoint sequencePoint, 
-																			int sequencePointStartLine, 
-																			int sequencePointEndLine)
+																		List<SnapshotSpan> wordSpans, 
+																		Framework.Model.SequencePoint sequencePoint, 
+																		int sequencePointStartLine, 
+																		int sequencePointEndLine,
+																		bool covered)
 		{
 			int totalCharacters = 0;
 
@@ -173,18 +188,18 @@ namespace OpenCover.UI.Tagger
 				{
 					totalCharacters = selectedLine.Length - sequencePoint.StartColumn + 1;
 
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters);
+					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters, covered);
 				}
 				else if (selectedLine.LineNumber == sequencePointEndLine)
 				{
 					var temp = selectedLine.Length - (sequencePoint.EndColumn - 1);
 					totalCharacters = selectedLine.Length - temp;
 
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, totalCharacters);
+					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, totalCharacters, covered);
 				}
 				else
 				{
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, selectedLine.Length);
+					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, selectedLine.Length, covered);
 				}
 			}
 		}
@@ -196,15 +211,14 @@ namespace OpenCover.UI.Tagger
 		/// <returns>Tags for the current file based on coverage information</returns>
 		public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
 		{
-			if (spans == null || spans.Count == 0 || _currentSpans.Count == 0)
+			if (_currentSpans == null || _currentSpans.Count == 0)
 				yield break;
 
-			ITextSnapshot snapshot = _currentSpans[0].Snapshot;
-			spans = new NormalizedSnapshotSpanCollection(spans.Select(s => s.TranslateTo(snapshot, SpanTrackingMode.EdgeExclusive)));
-
-			foreach (var span in NormalizedSnapshotSpanCollection.Intersection(_currentSpans, spans))
+			foreach (var span in _currentSpans)
 			{
-				yield return new TagSpan<ClassificationTag>(span, new ClassificationTag(_type));
+				var covered = _spanCoverage.ContainsKey(span) ? _spanCoverage[span] : false;
+				var tag = covered ? new ClassificationTag(_coveredType) : new ClassificationTag(_notCoveredType);
+				yield return new TagSpan<ClassificationTag>(span, tag);
 			}
 		}
 	}

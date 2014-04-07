@@ -46,8 +46,9 @@ namespace OpenCover.UI.Tagger
 			if (buffer != textView.TextBuffer)
 				return null;
 
-			var classType = Registry.GetClassificationType("text-background");
-			return new TextTagger(textView, TextSearchService, classType) as ITagger<T>;
+			var coveredClassType = Registry.GetClassificationType("text-background-covered");
+			var notCoveredClassType = Registry.GetClassificationType("text-background-notcovered");
+			return new TextTagger(textView, TextSearchService, coveredClassType, notCoveredClassType) as ITagger<T>;
 	
 		}
 	}

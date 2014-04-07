@@ -71,25 +71,12 @@ namespace OpenCover.Framework.Model
 			}
 		}
 
-		public IEnumerable<Method> CoveredMethods
-		{
-			get
-			{
-				if (this.Methods != null && this.Methods.Length > 0)
-				{
-					return this.Methods.Where(c => c.Summary.SequenceCoverage > 0);
-				}
-
-				return null;
-			}
-		}
-
 		public IEnumerable<IGrouping<uint, SequencePoint[]>> GetSequencePoints()
 		{
 			if (Methods != null)
 			{
 				return Methods
-							.Where(methods => methods.FileRef != null && methods.Summary.SequenceCoverage > 0)
+							.Where(methods => methods.FileRef != null)
 							.GroupBy(methods => methods.FileRef.UniqueId, methods => methods.SequencePoints);
 			}
 

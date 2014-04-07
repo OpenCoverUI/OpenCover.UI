@@ -176,7 +176,7 @@ namespace OpenCover.UI.Model
 
 		protected override void LoadChildren()
 		{
-			Children.AddRange(Class.CoveredMethods.Select(method => new MethodNode(method)));
+			Children.AddRange(Class.Methods.Select(method => new MethodNode(method)));
 		}
 
 		public override object Icon

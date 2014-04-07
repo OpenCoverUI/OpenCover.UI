@@ -153,7 +153,7 @@ namespace OpenCover.UI.Views
 
 			if (treeView.SelectedItem is ClassNode)
 			{
-				method = (treeView.SelectedItem as ClassNode).Class.CoveredMethods.FirstOrDefault();
+				method = (treeView.SelectedItem as ClassNode).Class.Methods.FirstOrDefault();
 			}
 			else if (treeView.SelectedItem is MethodNode)
 			{
