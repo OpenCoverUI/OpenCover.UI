@@ -114,6 +114,7 @@ namespace OpenCover.UI.Helpers
 		internal static IEnumerable<string> GetPotentialTestDLLs()
 		{
 			string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
+			string nunitPath = "nunit.Framework.dll";
 
 			foreach (EnvDTE.Project project in DTE.Solution.Projects)
 			{
@@ -140,7 +141,7 @@ namespace OpenCover.UI.Helpers
 							foreach (Reference reference in vsProject2.References)
 							{
 								var referenceFile = Path.GetFileName(reference.Path);
-								if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
+								if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
 								{
 									isTestProject = true;
 									break;

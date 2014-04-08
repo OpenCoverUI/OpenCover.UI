@@ -3,6 +3,8 @@
 //
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mono.Cecil;
+using NUnit;
+using NUnit.Framework;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ namespace OpenCover.UI.TestDiscoverer
 	internal class Discoverer
 	{
 		private IEnumerable<string> _dlls;
+		private bool isNunitTestClass;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestDiscoverer"/> class.
@@ -86,6 +89,7 @@ namespace OpenCover.UI.TestDiscoverer
 					foreach (var type in assembly.MainModule.Types)
 					{
 						bool isTestClass = false;
+						bool isTestFixture = false;
 
 						try
 						{
@@ -93,11 +97,17 @@ namespace OpenCover.UI.TestDiscoverer
 							if (customAttributes != null)
 							{
 								isTestClass = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+								isTestFixture = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName);
 							}
 						}
 						catch { }
 
-						if (isTestClass)
+						if (isTestFixture)
+						{
+							this.isNunitTestClass = true;
+						}
+
+						if (isTestClass || isTestFixture)
 						{
 							var TestClass = new TestClass
 							{
@@ -133,16 +143,26 @@ namespace OpenCover.UI.TestDiscoverer
 				{
 					foreach (var attribute in method.CustomAttributes)
 					{
-						if (attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName)
+						if (isNunitTestClass)
 						{
-							isTestMethod = true;
-						}
-
-						if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
-						{
-							if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
+							if (attribute.AttributeType.FullName == typeof(TestCaseAttribute).FullName)
 							{
-								trait.Add(attribute.ConstructorArguments[0].Value.ToString());
+								isTestMethod = true;
+							}
+						}
+						else
+						{
+							if (attribute.AttributeType.FullName == typeof(TestMethodAttribute).FullName)
+							{
+								isTestMethod = true;
+							}
+
+							if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
+							{
+								if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
+								{
+									trait.Add(attribute.ConstructorArguments[0].Value.ToString());
+								}
 							}
 						}
 					}
