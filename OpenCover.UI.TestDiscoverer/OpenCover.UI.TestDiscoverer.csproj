@@ -63,6 +63,9 @@
     <Compile Include="..\OpenCover.UI\Model\Test\TestMethod.cs">
       <Link>Test\TestMethod.cs</Link>
     </Compile>
+    <Compile Include="..\OpenCover.UI\Model\Test\TestType.cs">
+      <Link>Test\TestType.cs</Link>
+    </Compile>
     <Compile Include="Discoverer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,9 +73,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Key.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="nunit.framework.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

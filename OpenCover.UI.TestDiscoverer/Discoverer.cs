@@ -20,7 +20,6 @@ namespace OpenCover.UI.TestDiscoverer
 	internal class Discoverer
 	{
 		private IEnumerable<string> _dlls;
-		private bool isNunitTestClass;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestDiscoverer"/> class.
@@ -88,35 +87,31 @@ namespace OpenCover.UI.TestDiscoverer
 				{
 					foreach (var type in assembly.MainModule.Types)
 					{
-						bool isTestClass = false;
-						bool isTestFixture = false;
+						bool isMSTest = false;
+						bool isNUnitTest = false;
 
 						try
 						{
 							var customAttributes = type.CustomAttributes;
 							if (customAttributes != null)
 							{
-								isTestClass = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
-								isTestFixture = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName);
+								isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+								isNUnitTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName);
 							}
 						}
 						catch { }
 
-						if (isTestFixture)
-						{
-							this.isNunitTestClass = true;
-						}
-
-						if (isTestClass || isTestFixture)
+						if (isMSTest || isNUnitTest)
 						{
 							var TestClass = new TestClass
 							{
 								DLLPath = dll,
 								Name = type.Name,
-								Namespace = type.Namespace
+								Namespace = type.Namespace,
+								TestType = isNUnitTest ? TestType.NUnit : TestType.MSTest
 							};
 
-							TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+							TestClass.TestMethods = DiscoverTestsInClass(type, TestClass, isNUnitTest);
 							classes.Add(TestClass);
 						}
 					}
@@ -131,7 +126,7 @@ namespace OpenCover.UI.TestDiscoverer
 		/// </summary>
 		/// <param name="type">Type of the class.</param>
 		/// <returns>Tests in the class</returns>
-		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestClass @class)
+		private TestMethod[] DiscoverTestsInClass(TypeDefinition type, TestClass @class, bool isNUnitTest)
 		{
 			var tests = new List<TestMethod>();
 			foreach (var method in type.Methods)
@@ -143,12 +138,14 @@ namespace OpenCover.UI.TestDiscoverer
 				{
 					foreach (var attribute in method.CustomAttributes)
 					{
-						if (isNunitTestClass)
+						if (isNUnitTest)
 						{
-							if (attribute.AttributeType.FullName == typeof(TestCaseAttribute).FullName)
+							if (attribute.AttributeType.FullName == typeof(TestAttribute).FullName || attribute.AttributeType.FullName == typeof(TestCaseAttribute).FullName)
 							{
 								isTestMethod = true;
 							}
+
+							AddTraits(trait, attribute, typeof(CategoryAttribute));
 						}
 						else
 						{
@@ -157,13 +154,7 @@ namespace OpenCover.UI.TestDiscoverer
 								isTestMethod = true;
 							}
 
-							if (attribute.AttributeType.FullName == typeof(TestCategoryAttribute).FullName)
-							{
-								if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
-								{
-									trait.Add(attribute.ConstructorArguments[0].Value.ToString());
-								}
-							}
+							AddTraits(trait, attribute, typeof(TestCategoryAttribute));
 						}
 					}
 				}
@@ -179,6 +170,17 @@ namespace OpenCover.UI.TestDiscoverer
 			}
 
 			return tests.ToArray();
+		}
+
+		private static void AddTraits(List<string> trait, CustomAttribute attribute, Type attributeType)
+		{
+			if (attribute.AttributeType.FullName == attributeType.FullName)
+			{
+				if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
+				{
+					trait.Add(attribute.ConstructorArguments[0].Value.ToString());
+				}
+			}
 		}
 	}
 }

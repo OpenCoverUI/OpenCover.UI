@@ -2,17 +2,23 @@
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
 using ICSharpCode.TreeView;
+using OpenCover.UI.Views;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace OpenCover.UI.Model.Test
 {
 	internal class TestMethodWrapperContainer : SharpTreeNode
 	{
 		private TestMethodGroupingField _groupingField;
+		private string _caption;
+
+		internal TestType TestType;
 
 		/// <summary>
 		/// Gets the test methods wrapper.
@@ -31,11 +37,15 @@ namespace OpenCover.UI.Model.Test
 		/// </summary>
 		/// <param name="testMethodsWrapper">The test methods wrapper.</param>
 		/// <param name="groupingField">The grouping field.</param>
-		internal TestMethodWrapperContainer(IEnumerable<TestMethodWrapper> testMethodsWrapper, TestMethodGroupingField groupingField)
+		internal TestMethodWrapperContainer(string caption, IEnumerable<TestMethodWrapper> testMethodsWrapper, TestMethodGroupingField groupingField, TestType testType)
 		{
-			this.TestMethodsWrapper = testMethodsWrapper;
-			this.LazyLoading = true;
-			this._groupingField = groupingField;
+			_caption = caption;
+			_groupingField = groupingField;
+
+			TestType = testType;
+
+			TestMethodsWrapper = testMethodsWrapper;
+			LazyLoading = true;
 		}
 
 		/// <summary>
@@ -44,32 +54,90 @@ namespace OpenCover.UI.Model.Test
 		/// <returns>Selected Tests</returns>
 		internal Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> GetSelectedTestGroupsAndTests()
 		{
-			var builder = new StringBuilder();
+			var testsItemSource = (Children.Cast<TestMethodWrapper>());
 
-			var testsItemSource = (this.Children.Cast<TestMethodWrapper>());
+			TestMethodWrapper noTraitsWrapper = null;
 
 			var selectedTestGroups = testsItemSource
-										.Where(t => t.IsSelected)
-										.Select(t => t.FullyQualifiedName);
+										.Where(t =>
+										{
+											if (_groupingField == TestMethodGroupingField.Trait && t.FullyQualifiedName == "No Traits")
+											{
+												if (t.IsSelected)
+												{
+													noTraitsWrapper = t;
+												}
 
-			var selectedDLLsInGroups = testsItemSource
-										.Where(t => t.IsSelected)
-										.SelectMany(t => t.TestMethods)
-										.Select(t => t.Class.DLLPath)
-										.Distinct();
+												return false;
+											}
 
+											return t.IsSelected;
+										})
+										.Select(t => t.FullyQualifiedName)
+										.ToArray();
 
-			var testsInNotSelectedGroupQuery = this.Children
-												.Where(tg => !tg.IsSelected)
-												.SelectMany(tg => tg.Children.Where(test => test.IsSelected))
-												.Cast<TestMethod>();
+			var selectedDLLsInGroups = GetSelectedDLLsInGroups(testsItemSource);
+
+			var testsInNotSelectedGroupQuery = GetTestsInNotSelectedGroupQuery();
 
 			var testsInNotSelectedGroup = testsInNotSelectedGroupQuery.Select(tm => tm.FullyQualifiedName);
+
+			if (noTraitsWrapper != null)
+			{
+				testsInNotSelectedGroup = testsInNotSelectedGroup.Union(noTraitsWrapper.TestMethods.Select(t => t.FullyQualifiedName));
+			}
 
 			var dllsInSelectedTests = testsInNotSelectedGroupQuery.Select(tm => tm.Class.DLLPath).Distinct();
 
 
 			return new Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>>(selectedTestGroups, testsInNotSelectedGroup, selectedDLLsInGroups.Union(dllsInSelectedTests));
+		}
+
+		internal Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> GetSelectedTests()
+		{
+			var testsItemSource = (Children.Cast<TestMethodWrapper>());
+
+			var selectedDLLsInGroups = GetSelectedDLLsInGroups(testsItemSource);
+
+			var testsInNotSelectedGroupQuery = GetTestsInNotSelectedGroupQuery().Select(tm => tm.FullyQualifiedName);
+
+			var testsInSelectedGroups = testsItemSource.Where(t => t.IsSelected).SelectMany(t => t.TestMethods).Select(tm => tm.FullyQualifiedName);
+
+			return new Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>>(null, testsInNotSelectedGroupQuery.Union(testsInSelectedGroups), selectedDLLsInGroups);
+		}
+
+		private IEnumerable<string> GetSelectedDLLsInGroups(IEnumerable<TestMethodWrapper> testsItemSource)
+		{
+			return testsItemSource
+					.Where(t => t.IsSelected)
+					.SelectMany(t => t.TestMethods)
+					.Select(t => t.Class.DLLPath)
+					.Distinct();
+		}
+
+		private IEnumerable<TestMethod> GetTestsInNotSelectedGroupQuery()
+		{
+			return Children
+						.Where(tg => !tg.IsSelected)
+						.SelectMany(tg => tg.Children.Where(test => test.IsSelected))
+						.Cast<TestMethod>();
+		}
+
+		public override object Text
+		{
+			get
+			{
+				if (_caption != null)
+				{
+					var treeHeader = new TreeHeader();
+					treeHeader.MainText.Text = _caption;
+					treeHeader.SubText.Text = TestMethodsWrapper.SelectMany(c => c.TestMethods).Count().ToString();
+
+					return treeHeader;
+				}
+
+				return null;
+			}
 		}
 
 		/// <summary>

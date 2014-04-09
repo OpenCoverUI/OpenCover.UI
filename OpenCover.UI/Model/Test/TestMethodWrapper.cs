@@ -2,6 +2,7 @@
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
 using ICSharpCode.TreeView;
+using OpenCover.UI.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,20 +67,11 @@ namespace OpenCover.UI.Model.Test
 		{
 			get
 			{
-				var stackPanel = new StackPanel()
-				{
-					Orientation = Orientation.Horizontal,
-					HorizontalAlignment = HorizontalAlignment.Stretch
-				};
+				var treeHeader = new TreeHeader();
+				treeHeader.MainText.Text = Name;
+				treeHeader.SubText.Text = TestMethods.Count().ToString();
 
-				var textBlock = new TextBlock();
-
-				textBlock.Inlines.Add(new Bold(new Run(Name)));
-
-				stackPanel.Children.Add(textBlock);
-				stackPanel.Children.Add(new TextBlock() { Text = String.Format(" ({0})", TestMethods.Count()) });
-
-				return stackPanel;
+				return treeHeader;
 			}
 		}
 
@@ -92,7 +84,7 @@ namespace OpenCover.UI.Model.Test
 			{
 				foreach (var method in TestMethods)
 				{
-					var methodToAdd = method;
+					TestMethod methodToAdd = method;
 
 					if (method.Parent != null)
 					{

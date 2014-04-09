@@ -46,5 +46,11 @@ namespace OpenCover.UI.Model.Test
 		/// </value>
 		[DataMember(Name="ns")]
 		public string Namespace { get; set; }
+
+		/// <summary>
+		/// Gets or sets the type of the test.
+		/// </summary>
+		[DataMember(Name = "tt")]
+		public TestType TestType { get; set; }
 	}
 }

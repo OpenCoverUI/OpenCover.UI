@@ -70,6 +70,15 @@ namespace OpenCover.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OpenCover UI.
+        /// </summary>
+        internal static string MessageBoxTitle {
+            get {
+                return ResourceManager.GetString("MessageBoxTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OpenCover Test Explorer.
         /// </summary>
         internal static string TestExplorerToolWindowTitle {

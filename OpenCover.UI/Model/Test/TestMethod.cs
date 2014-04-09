@@ -16,18 +16,12 @@ namespace OpenCover.UI.Model.Test
 		/// <summary>
 		/// Gets or sets the name of method.
 		/// </summary>
-		/// <value>
-		/// The full name.
-		/// </value>
 		[DataMember(Name="n")]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets the trait (TestCategory in MSTest.
 		/// </summary>
-		/// <value>
-		/// The trait.
-		/// </value>
 		[DataMember(Name="t")]
 		public string[] Traits { get; set; }
 	}

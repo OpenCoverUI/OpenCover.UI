@@ -1,7 +1,6 @@
 ﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model.Test;
 using System;
@@ -11,9 +10,6 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Web.Script.Serialization;
 

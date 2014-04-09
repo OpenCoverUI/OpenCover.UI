@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using VSLangProj;
 using VSLangProj80;
@@ -90,10 +91,17 @@ namespace OpenCover.UI.Helpers
 		/// <param name="message">The message.</param>
 		internal static void WriteToOutputWindow(string message)
 		{
-			if (_pane != null)
+			try
 			{
-				_pane.OutputStringThreadSafe(message);
-				_pane.OutputStringThreadSafe(Environment.NewLine);
+				if (_pane != null)
+				{
+					_pane.OutputStringThreadSafe(message);
+					_pane.OutputStringThreadSafe(Environment.NewLine);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(String.Format("{0}\n{1}", ex.Message, ex.StackTrace), Resources.MessageBoxTitle, MessageBoxButton.OK);
 			}
 		}
 

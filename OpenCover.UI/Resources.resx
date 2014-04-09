@@ -126,4 +126,7 @@
   <data name="TestExplorerToolWindowTitle" xml:space="preserve">
     <value>OpenCover Test Explorer</value>
   </data>
+  <data name="MessageBoxTitle" xml:space="preserve">
+    <value>OpenCover UI</value>
+  </data>
 </root>

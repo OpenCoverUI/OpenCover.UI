@@ -162,12 +162,15 @@
     <Compile Include="Model\Test\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />
+	<Compile Include="Model\Test\TestType.cs" />
     <Compile Include="Model\Test\TestMethodGroupingField.cs" />
     <Compile Include="Model\Test\TestMethodWrapper.cs" />
     <Compile Include="Model\Test\TestMethodWrapperContainer.cs" />
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
+	<Compile Include="Processors\MSTestExecutor.cs" />
+    <Compile Include="Processors\NUnitTestExecutor.cs" />
     <Compile Include="Processors\Discoverer.cs" />
     <Compile Include="Processors\VSEventsHandler.cs" />
     <Compile Include="Tagger\TextBackground.cs" />
@@ -195,6 +198,9 @@
       <DependentUpon>TestExplorerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TestExplorerToolWindow.cs" />
+	<Compile Include="Views\TreeHeader.xaml.cs">
+      <DependentUpon>TreeHeader.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -250,6 +256,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TestExplorerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+	<Page Include="Views\TreeHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

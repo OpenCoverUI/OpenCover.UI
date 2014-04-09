@@ -18,35 +18,37 @@ namespace OpenCover.UI.Processors
 	/// <summary>
 	/// Executes the tests with code coverage using OpenCover
 	/// </summary>
-	internal class TestExecutor
+	internal abstract class TestExecutor
 	{
-		private readonly string _openCoverPath;
-		private readonly string _vsTestPath;
+		protected const string _commandlineStringFormat = "-target:\"{0}\" -targetargs:\"{1}\" -output:\"{2}\" -hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*";
+		protected readonly string _openCoverPath;
+		
+		protected string _openCoverResultsFile;
+		protected string _testResultsFile;
+		protected string _commandLineArguments;
 
-		private Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> _selectedTests;
-		private string _openCoverResultsFile;
-		private string _testResultsFile;
-		private OpenCoverUIPackage _package;
-		private TestMethodGroupingField _groupingField;
-		private string _commandLineArguments;
-		private DirectoryInfo _currentWorkingDirectory;
+		protected Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> _selectedTests;
+		protected OpenCoverUIPackage _package;
+		protected DirectoryInfo _currentWorkingDirectory;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestExecutor"/> class.
 		/// </summary>
 		/// <param name="package">The package.</param>
 		/// <param name="selectedTests">The selected tests.</param>
-		public TestExecutor(OpenCoverUIPackage package, Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> selectedTests, TestMethodGroupingField groupingField)
+		internal TestExecutor(OpenCoverUIPackage package, Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> selectedTests)
 		{
 			_package = package;
 			_selectedTests = selectedTests;
-			_groupingField = groupingField;
 
 			_openCoverPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
 												@"Apps\OpenCover\OpenCover.Console.exe");
-			_vsTestPath = Path.Combine(Path.GetDirectoryName(_package.DTE.FullName), @"CommonExtensions\Microsoft\TestWindow\vstest.console.exe");
 		}
 
+		/// <summary>
+		/// Validates the length of the command line arguments.
+		/// </summary>
+		/// <returns>Validation result</returns>
 		internal bool ValidateCommandLineArgumentsLength()
 		{
 			SetOpenCoverCommandlineArguments();
@@ -60,10 +62,22 @@ namespace OpenCover.UI.Processors
 		}
 
 		/// <summary>
+		/// Sets the OpenCover commandline arguments.
+		/// </summary>
+		protected abstract void SetOpenCoverCommandlineArguments();
+
+		/// <summary>
+		/// Do cleanup here.
+		/// </summary>
+		internal virtual void Cleanup()
+		{ 
+		}
+
+		/// <summary>
 		/// Starts OpenCover.Console.exe to start CodeCoverage session.
 		/// </summary>
 		/// <returns>Test results (trx) and OpenCover results files' paths</returns>
-		public Tuple<string, string> Execute()
+		internal Tuple<string, string> Execute()
 		{
 			var openCoverStartInfo = GetOpenCoverProcessInfo(_commandLineArguments);
 
@@ -108,20 +122,19 @@ namespace OpenCover.UI.Processors
 		/// Deserializes the results.xml file to CoverageSession
 		/// </summary>
 		/// <returns>OpenCover execution results</returns>
-		public CoverageSession GetExecutionResults()
+		internal CoverageSession GetExecutionResults()
 		{
 			CoverageSession coverageSession = null;
 
 			try
 			{
 				var serializer = new XmlSerializer(typeof(CoverageSession), new[] { typeof(Module), typeof(OpenCover.Framework.Model.File), typeof(Class) });
-				using (var stream = System.IO.File.Open(this._openCoverResultsFile, FileMode.Open))
+				using (var stream = System.IO.File.Open(_openCoverResultsFile, FileMode.Open))
 				{
 					coverageSession = serializer.Deserialize(stream) as CoverageSession;
 				}
 
-				System.IO.File.Delete(this._openCoverResultsFile);
-
+				System.IO.File.Delete(_openCoverResultsFile);
 			}
 			catch (Exception ex)
 			{
@@ -129,8 +142,34 @@ namespace OpenCover.UI.Processors
 				IDEHelper.WriteToOutputWindow(ex.StackTrace);
 			}
 
-
 			return coverageSession;
+		}
+
+		/// <summary>
+		/// Builds the DLL path.
+		/// </summary>
+		protected string BuildDLLPath()
+		{
+			var builder = new StringBuilder();
+			foreach (var testDLL in _selectedTests.Item3)
+			{
+				builder.AppendFormat("\\\"{0}\\\" ", testDLL);
+			}
+
+			return builder.ToString().Trim();
+		}
+
+		/// <summary>
+		/// Sets the OpenCover results file path.
+		/// </summary>
+		protected void SetOpenCoverResultsFilePath()
+		{
+			var solution = _package.DTE.Solution as EnvDTE.SolutionClass;
+
+			// Create a working directory
+			_currentWorkingDirectory = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(solution.FileName), "OpenCover"));
+
+			_openCoverResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
 		}
 
 		/// <summary>
@@ -139,7 +178,7 @@ namespace OpenCover.UI.Processors
 		/// <returns>Open Cover process start information</returns>
 		private ProcessStartInfo GetOpenCoverProcessInfo(string arguments)
 		{
-			var openCoverStartInfo = new ProcessStartInfo(this._openCoverPath, arguments)
+			var openCoverStartInfo = new ProcessStartInfo(_openCoverPath, arguments)
 			{
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
@@ -151,90 +190,6 @@ namespace OpenCover.UI.Processors
 			IDEHelper.WriteToOutputWindow(openCoverStartInfo.Arguments);
 
 			return openCoverStartInfo;
-		}
-
-		private void SetOpenCoverCommandlineArguments()
-		{
-			var builder = new StringBuilder();
-
-			foreach (var testDLL in _selectedTests.Item3)
-			{
-				builder.AppendFormat("\\\"{0}\\\" ", testDLL);
-			}
-
-			string dllPaths = builder.ToString();
-
-			builder.Length = 0;
-
-			switch (_groupingField)
-			{
-				case TestMethodGroupingField.Trait:
-					{
-						builder.Append("/TestCaseFilter:\\\"");
-
-						BuildTestCategoryCommandlineString(builder, "TestCategory", _selectedTests.Item1);
-
-						BuildTestCategoryCommandlineString(builder, "Name", _selectedTests.Item2);
-
-						DeleteLastCharacter(builder);
-
-						builder.Append("\\\"");
-						break;
-					}
-				case TestMethodGroupingField.Class:
-					{
-						BuildTestsCommandlineStringForClassAndProjectTypes(_selectedTests.Item1.Union(_selectedTests.Item2), builder);
-						break;
-					}
-				case TestMethodGroupingField.Project:
-					{
-						BuildTestsCommandlineStringForClassAndProjectTypes(_selectedTests.Item2, builder);
-						break;
-					}
-			}
-
-			SetOpenCoverResultsFilePath();
-
-			_commandLineArguments = String.Format("-target:\"{0}\" -targetargs:\"{1}{2} /Logger:trx\" -output:\"{3}\" -hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*",
-										this._vsTestPath,
-										dllPaths,
-										builder.ToString(),
-										_openCoverResultsFile);
-		}
-
-		private void BuildTestCategoryCommandlineString(StringBuilder builder, string caption, IEnumerable<string> selection)
-		{
-			foreach (var member in selection)
-			{
-				builder.AppendFormat("{0}={1}|", caption, member);
-			}
-		}
-
-		private static void BuildTestsCommandlineStringForClassAndProjectTypes(IEnumerable<string> tests, StringBuilder builder)
-		{
-			if (tests.Any())
-			{
-				builder.Append("/Tests:");
-				builder.Append(String.Join(",", tests));
-			}
-		}
-
-		private static void DeleteLastCharacter(StringBuilder builder)
-		{
-			if (builder.Length > 0)
-			{
-				builder.Length = builder.Length - 1;
-			}
-		}
-
-		private void SetOpenCoverResultsFilePath()
-		{
-			var solution = _package.DTE.Solution as EnvDTE.SolutionClass;
-
-			// Create a working directory
-			_currentWorkingDirectory = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(solution.FileName), "OpenCover"));
-
-			_openCoverResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
 		}
 	}
 }

@@ -20,7 +20,6 @@ namespace OpenCover.UI.Commands
 	/// </summary>
 	public class ExecuteSelectedTestsCommand : Command
 	{
-		private const string CODE_COVERAGE_RESULTS_WINDOW_TITLE = "Code Coverage";
 		private const string CODE_COVERAGE_SELECT_TESTS_MESSAGE = "Please select a test to run";
 		private const string CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE = "We could not run all the tests that you selected. Please see output window for more details.";
 
@@ -69,27 +68,54 @@ namespace OpenCover.UI.Commands
 		protected override void OnExecute()
 		{
 			_codeCoverageResultsControl.ClearTreeView();
+			TestMethodWrapperContainer msTests = null, nUnitTests = null;
+			TestMethodWrapperContainer container = _testExplorerControl.TestsTreeView.Root as TestMethodWrapperContainer;
 
-			var selectedTests = ((TestMethodWrapperContainer)_testExplorerControl.TestsTreeView.Root).GetSelectedTestGroupsAndTests();
-
-			if (selectedTests.Item1.Any() || selectedTests.Item2.Any())
+			if (container != null)
 			{
-				_testExecutor = new TestExecutor(_package, selectedTests, TestsExplorerToolbarCommands.CurrentSelectedGroupBy);
-				if (!_testExecutor.ValidateCommandLineArgumentsLength())
+				if (container.TestType == TestType.MSTest)
 				{
-					MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE,
-									ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
-									MessageBoxButton.OK,
-									MessageBoxImage.Error);
-
-					return;
-
+					msTests = container;
+				}
+				else
+				{
+					nUnitTests = container;
 				}
 			}
 			else
 			{
+				msTests = _testExplorerControl.TestsTreeView.Root.Children[0] as TestMethodWrapperContainer;
+				nUnitTests = _testExplorerControl.TestsTreeView.Root.Children[1] as TestMethodWrapperContainer;
+			}
+
+			var selectedMSTests = msTests != null ? msTests.GetSelectedTestGroupsAndTests() : null;
+			var selectedNUnitTests = nUnitTests != null ? nUnitTests.GetSelectedTests() : null;
+
+			_testExecutor = null;
+
+			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
+			{
+				_testExecutor = new MSTestExecutor(_package, selectedMSTests);
+			}
+			else if (selectedNUnitTests != null && (selectedNUnitTests.Item2.Any() || selectedNUnitTests.Item3.Any()))
+			{
+				_testExecutor = new NUnitTestExecutor(_package, selectedNUnitTests);
+			}
+
+			if (_testExecutor == null)
+			{
 				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_TESTS_MESSAGE,
-								ExecuteSelectedTestsCommand.CODE_COVERAGE_RESULTS_WINDOW_TITLE,
+								Resources.MessageBoxTitle,
+								MessageBoxButton.OK,
+								MessageBoxImage.Error);
+
+				return;
+			}
+
+			if (!_testExecutor.ValidateCommandLineArgumentsLength())
+			{
+				MessageBox.Show(ExecuteSelectedTestsCommand.CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE,
+								Resources.MessageBoxTitle,
 								MessageBoxButton.OK,
 								MessageBoxImage.Error);
 
@@ -115,26 +141,36 @@ namespace OpenCover.UI.Commands
 			Task.Factory.StartNew(
 				() =>
 				{
-					var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
-
-					control.IsLoading = true;
-					Tuple<string, string> files = _testExecutor.Execute();
-					var finalResults = _testExecutor.GetExecutionResults();
-
-					if (finalResults != null)
+					try
 					{
-						control.UpdateCoverageResults(finalResults);
+						var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
 
-						// if the tool window is hidden, show it again.
-						ShowCodeCoverageResultsToolWindow();
+						control.IsLoading = true;
+						Tuple<string, string> files = _testExecutor.Execute();
+						var finalResults = _testExecutor.GetExecutionResults();
+
+						if (finalResults != null)
+						{
+							control.UpdateCoverageResults(finalResults);
+
+							// if the tool window is hidden, show it again.
+							ShowCodeCoverageResultsToolWindow();
+						}
+						else
+						{
+							control.IsLoading = false;
+						}
+
+						Enabled = true;
+						_isRunningCodeCoverage = false;
 					}
-					else
+					catch (Exception ex)
 					{
-						control.IsLoading = false;
-					}
+						IDEHelper.WriteToOutputWindow(ex.Message);
+						IDEHelper.WriteToOutputWindow(ex.StackTrace);
 
-					Enabled = true;
-					_isRunningCodeCoverage = false;
+						MessageBox.Show(String.Format("An exception occured: {0}\nPlease refer to output window for more details", ex.Message), Resources.MessageBoxTitle, MessageBoxButton.OK);
+					}
 				});
 
 			_package.VSEventsHandler.BuildDone -= RunOpenCover;
