@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+	<Reference Include="System.Xml.Linq" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -157,9 +158,10 @@
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
     <Compile Include="Model\Summary.cs" />
+	<Compile Include="Model\TestResult.cs" />
     <Compile Include="Model\Test\TestClass.cs" />
     <Compile Include="Model\Test\TestClass.partial.cs" />
-    <Compile Include="Model\Test\TestExecutionStatus.cs" />
+    <Compile Include="Model\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />
 	<Compile Include="Model\Test\TestType.cs" />
@@ -233,9 +235,11 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Refresh.png" />
+   <Resource Include="Resources\Refresh.png" />
     <Resource Include="Resources\Property.png" />
-    <Resource Include="Resources\busyindicator.gif" />
+    <Resource Include="Resources\Failed.png" />
+    <Resource Include="Resources\Inconclusive.png" />
+    <Resource Include="Resources\NotRun.png" />
     <Content Include="Resources\OpenCover.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

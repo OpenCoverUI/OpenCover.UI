@@ -25,7 +25,8 @@ namespace OpenCover.UI.Views
 		private OpenCoverUIPackage _package;
 		private TestExplorerToolWindow _parent;
 		private TestMethodGroupingField _currentGroupingField;
-		private List<TestClass> _tests;
+
+		internal IEnumerable<TestClass> Tests { get; private set; }
 
 		public event Action TestDiscoveryFinished;
 
@@ -54,7 +55,33 @@ namespace OpenCover.UI.Views
 		internal void ChangeGroupBy(TestMethodGroupingField groupingField)
 		{
 			_currentGroupingField = groupingField;
-			UpdateTreeView(_tests);
+			UpdateTreeView(Tests);
+		}
+
+		internal void Update()
+		{
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				ExpandNodes(TestsTreeView.Root);
+			}));
+		}
+
+		private static void ExpandNodes(ICSharpCode.TreeView.SharpTreeNode parentNode)
+		{
+			if (parentNode == null || parentNode.Children == null)
+			{
+				return;
+			}
+
+			var selectedNodes = parentNode.Children.Where(c => c.IsExpanded);
+
+			foreach (var node in selectedNodes)
+			{
+				node.IsExpanded = false;
+				node.IsExpanded = true;
+
+				ExpandNodes(node);
+			}
 		}
 
 		private void DiscoverTests()
@@ -72,9 +99,9 @@ namespace OpenCover.UI.Views
 		/// Updates the TreeView by adding .
 		/// </summary>
 		/// <param name="tests">The tests.</param>
-		private void UpdateTreeView(List<TestClass> tests)
+		private void UpdateTreeView(IEnumerable<TestClass> tests)
 		{
-			_tests = tests;
+			Tests = tests;
 
 			if (tests != null)
 			{
@@ -97,7 +124,7 @@ namespace OpenCover.UI.Views
 					else
 					{
 						TestType testType = hasMSTests ? TestType.MSTest : hasNUnitTests ? TestType.NUnit : TestType.MSTest;
-						
+
 						TestsTreeView.Root = new TestMethodWrapperContainer(null, tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, testType);
 					}
 

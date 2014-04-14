@@ -93,6 +93,9 @@ namespace OpenCover.UI.Model.Test
 			return new Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>>(selectedTestGroups, testsInNotSelectedGroup, selectedDLLsInGroups.Union(dllsInSelectedTests));
 		}
 
+		/// <summary>
+		/// Gets the selected tests.
+		/// </summary>
 		internal Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> GetSelectedTests()
 		{
 			var testsItemSource = (Children.Cast<TestMethodWrapper>());
@@ -104,6 +107,21 @@ namespace OpenCover.UI.Model.Test
 			var testsInSelectedGroups = testsItemSource.Where(t => t.IsSelected).SelectMany(t => t.TestMethods).Select(tm => tm.FullyQualifiedName);
 
 			return new Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>>(null, testsInNotSelectedGroupQuery.Union(testsInSelectedGroups), selectedDLLsInGroups);
+		}
+
+		/// <summary>
+		/// Gets all test methods.
+		/// </summary>
+		internal IEnumerable<TestMethod> GetAllTestMethods()
+		{
+			var testsItemSource = (Children.Cast<TestMethodWrapper>());
+
+			if (testsItemSource != null)
+			{
+				return testsItemSource.SelectMany(t => t.TestMethods);
+			}
+
+			return null;
 		}
 
 		private IEnumerable<string> GetSelectedDLLsInGroups(IEnumerable<TestMethodWrapper> testsItemSource)

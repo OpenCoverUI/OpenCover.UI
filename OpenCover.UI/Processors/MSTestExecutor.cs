@@ -94,5 +94,13 @@ namespace OpenCover.UI.Processors
 				builder.Length = builder.Length - 1;
 			}
 		}
+
+		protected override void ReadTestResults()
+		{
+		}
+
+		internal override void UpdateTestMethodsExecution(IEnumerable<TestClass> tests)
+		{
+		}
 	}
 }

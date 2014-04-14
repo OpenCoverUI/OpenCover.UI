@@ -93,14 +93,7 @@ namespace OpenCover.UI.Commands
 
 			_testExecutor = null;
 
-			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
-			{
-				_testExecutor = new MSTestExecutor(_package, selectedMSTests);
-			}
-			else if (selectedNUnitTests != null && (selectedNUnitTests.Item2.Any() || selectedNUnitTests.Item3.Any()))
-			{
-				_testExecutor = new NUnitTestExecutor(_package, selectedNUnitTests);
-			}
+			SetTestExecutor(selectedMSTests, selectedNUnitTests);
 
 			if (_testExecutor == null)
 			{
@@ -132,6 +125,18 @@ namespace OpenCover.UI.Commands
 			
 		}
 
+		private void SetTestExecutor(Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedMSTests, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests)
+		{
+			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
+			{
+				_testExecutor = new MSTestExecutor(_package, selectedMSTests);
+			}
+			else if (selectedNUnitTests != null && (selectedNUnitTests.Item2.Any() || selectedNUnitTests.Item3.Any()))
+			{
+				_testExecutor = new NUnitTestExecutor(_package, selectedNUnitTests);
+			}
+		}
+
 		/// <summary>
 		/// Runs OpenCover for gathering code coverage details. This method gets called after the build is completed
 		/// </summary>
@@ -141,13 +146,18 @@ namespace OpenCover.UI.Commands
 			Task.Factory.StartNew(
 				() =>
 				{
+					var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
+					var testsExplorer = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl;
+					
 					try
 					{
-						var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
 
 						control.IsLoading = true;
 						Tuple<string, string> files = _testExecutor.Execute();
 						var finalResults = _testExecutor.GetExecutionResults();
+						_testExecutor.UpdateTestMethodsExecution(_testExplorerControl.Tests);
+
+						testsExplorer.Update();
 
 						if (finalResults != null)
 						{
@@ -160,9 +170,6 @@ namespace OpenCover.UI.Commands
 						{
 							control.IsLoading = false;
 						}
-
-						Enabled = true;
-						_isRunningCodeCoverage = false;
 					}
 					catch (Exception ex)
 					{
@@ -170,6 +177,13 @@ namespace OpenCover.UI.Commands
 						IDEHelper.WriteToOutputWindow(ex.StackTrace);
 
 						MessageBox.Show(String.Format("An exception occured: {0}\nPlease refer to output window for more details", ex.Message), Resources.MessageBoxTitle, MessageBoxButton.OK);
+						
+						control.IsLoading = false;
+					}
+					finally
+					{
+						Enabled = true;
+						_isRunningCodeCoverage = false;
 					}
 				});
 

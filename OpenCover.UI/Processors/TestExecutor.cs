@@ -67,6 +67,16 @@ namespace OpenCover.UI.Processors
 		protected abstract void SetOpenCoverCommandlineArguments();
 
 		/// <summary>
+		/// Reads the test results.
+		/// </summary>
+		protected abstract void ReadTestResults();
+
+		/// <summary>
+		/// Updates the test methods execution.
+		/// </summary>
+		internal abstract void UpdateTestMethodsExecution(IEnumerable<TestClass> tests);
+
+		/// <summary>
 		/// Do cleanup here.
 		/// </summary>
 		internal virtual void Cleanup()
@@ -113,7 +123,7 @@ namespace OpenCover.UI.Processors
 
 			IDEHelper.WriteToOutputWindow(process.StandardError.ReadToEnd());
 
-			IDEHelper.OpenFile(_package.DTE, _testResultsFile);
+			ReadTestResults();
 
 			return new Tuple<string, string>(_testResultsFile, _openCoverResultsFile);
 		}

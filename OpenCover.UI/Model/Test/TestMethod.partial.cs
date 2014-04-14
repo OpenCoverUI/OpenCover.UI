@@ -2,6 +2,7 @@
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
 using ICSharpCode.TreeView;
+using OpenCover.UI.Helpers;
 using System.Windows.Controls;
 
 namespace OpenCover.UI.Model.Test
@@ -24,6 +25,20 @@ namespace OpenCover.UI.Model.Test
 		/// </value>
 		public TestExecutionStatus ExecutionStatus { get; set; }
 
+		/// <summary>
+		/// Gets the icon.
+		/// </summary>
+		public override object Icon
+		{
+			get
+			{
+				return IDEHelper.GetImageURL(GetIcon());
+			}
+		}
+
+		/// <summary>
+		/// Gets the text.
+		/// </summary>
 		public override object Text
 		{
 			get
@@ -33,11 +48,8 @@ namespace OpenCover.UI.Model.Test
 		}
 
 		/// <summary>
-		/// Gets the name of the fully qualified of .
+		/// Gets the name of the fully qualified name.
 		/// </summary>
-		/// <value>
-		/// The name of the fully qualified.
-		/// </value>
 		public string FullyQualifiedName
 		{
 			get
@@ -49,7 +61,6 @@ namespace OpenCover.UI.Model.Test
 		/// <summary>
 		/// Clones the test method
 		/// </summary>
-		/// <returns></returns>
 		public TestMethod Clone()
 		{
 			var method = new TestMethod()
@@ -61,6 +72,25 @@ namespace OpenCover.UI.Model.Test
 			};
 
 			return method;
+		}
+
+		private string GetIcon()
+		{
+			string icon = "Resources/{0}";
+
+			switch (ExecutionStatus)
+			{
+				case TestExecutionStatus.NotRun:
+					return string.Format(icon, "NotRun.png");
+				case TestExecutionStatus.Successful:
+					return string.Format(icon, "Successful.png");
+				case TestExecutionStatus.Error:
+					return string.Format(icon, "Failed.png");
+				case TestExecutionStatus.Inconclusive:
+					return string.Format(icon, "Inconclusive.png");
+				default:
+					return string.Format(icon, "NotRun.png");
+			}
 		}
 	}
 }
