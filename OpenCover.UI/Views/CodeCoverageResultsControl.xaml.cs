@@ -168,14 +168,15 @@ namespace OpenCover.UI.Views
 
 				if (coveredFiles != null)
 				{
-					var file = coveredFiles.FirstOrDefault(f => f.UniqueId == method.FileRef.UniqueId);
+                    try
+                    {
+					    var file = coveredFiles.FirstOrDefault(f => f.UniqueId == method.FileRef.UniqueId);
 
-					IDEHelper.CloseFile(_package.DTE, file.FullPath);
+					    IDEHelper.CloseFile(_package.DTE, file.FullPath);
 
-					_fileOpening = true;
-					_lastSelectedFile = file.FullPath;
-					try
-					{
+					    _fileOpening = true;
+					    _lastSelectedFile = file.FullPath;
+
 
 						IDEHelper.OpenFile(_package.DTE, file.FullPath);
 						IDEHelper.GoToLine(_package.DTE, method.SequencePoints.FirstOrDefault().StartLine);
