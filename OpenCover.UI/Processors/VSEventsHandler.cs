@@ -10,6 +10,7 @@ using VSLangProj;
 using VSLangProj80;
 using OpenCover.UI.Views;
 using OpenCover.UI.Helpers;
+using EnvDTE;
 
 namespace OpenCover.UI.Processors
 {
@@ -19,7 +20,7 @@ namespace OpenCover.UI.Processors
 	public class VSEventsHandler
 	{
 		private OpenCoverUIPackage _package;
-
+        private SolutionEvents _solutionEvents;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VSEventsHandler"/> class.
 		/// </summary>
@@ -27,9 +28,9 @@ namespace OpenCover.UI.Processors
 		public VSEventsHandler(OpenCoverUIPackage package)
 		{
 			_package = package;
-
-			_package.DTE.Events.SolutionEvents.Opened += OnSolutionOpened;
-			_package.DTE.Events.SolutionEvents.AfterClosing += OnSolutionClosing;
+            _solutionEvents = _package.DTE.Events.SolutionEvents;
+            _solutionEvents.Opened += OnSolutionOpened;
+            _solutionEvents.AfterClosing += OnSolutionClosing;
 		}
 
 		public event Action BuildDone;
