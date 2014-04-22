@@ -75,14 +75,15 @@ namespace OpenCover.UI.Commands
 			{
 				_allCommands = new List<OleMenuCommand>();
 
-				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton)) { Enabled = false });
+				_currentSelected = GetCommand((int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton);
+				_currentSelected.Checked = true;
+				_allCommands.Add(_currentSelected);
 
-				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton)) { Enabled = false });
+				_allCommands.Add(GetCommand((int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton));
 
-				_allCommands.Add(new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
-									(int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton)) { Enabled = false });
+				_allCommands.Add(GetCommand((int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton));
+
+				_allCommands.Add(GetCommand((int)PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByOutcomeButton));
 
 				// Refresh command
 				_allCommands.Add(new OleMenuCommand((s, e) => OpenCoverUIPackage.Instance.VSEventsHandler.BuildSolution(),
@@ -91,6 +92,11 @@ namespace OpenCover.UI.Commands
 
 				_initialized = true;
 			}
+		}
+
+		private static OleMenuCommand GetCommand(int buttonId)
+		{
+			return new OleMenuCommand(Executed, new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, buttonId)) { Enabled = false };
 		}
 
 		/// <summary>
@@ -115,6 +121,9 @@ namespace OpenCover.UI.Commands
 					break;
 				case PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton:
 					CurrentSelectedGroupBy = TestMethodGroupingField.Project;
+					break;
+				case PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByOutcomeButton:
+					CurrentSelectedGroupBy = TestMethodGroupingField.Outcome;
 					break;
 			}
 

@@ -10,6 +10,7 @@ namespace OpenCover.UI.Model.Test
 	{
 		Class = 0,
 		Trait = 1,
-		Project = 2
+		Project = 2,
+		Outcome = 3
 	}
 }

@@ -17,5 +17,6 @@ namespace OpenCover.UI
 		public const int OpenCoverTestExplorerToolbarGroupByClassButton = 0x1920;
 		public const int OpenCoverTestExplorerToolbarGroupByTraitButton = 0x1930;
 		public const int OpenCoverTestExplorerToolbarGroupByProjectButton = 0x1940;
+		public const int OpenCoverTestExplorerToolbarGroupByOutcomeButton = 0x1950;
 	};
 }

@@ -30,7 +30,7 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		protected override void OnExecute()
 		{
-			var frame = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().Frame as IVsWindowFrame;
+			var frame = _package.GetToolWindow<TestExplorerToolWindow>().Frame as IVsWindowFrame;
 			if (frame != null)
 			{
 				frame.Show();

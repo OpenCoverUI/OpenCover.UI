@@ -20,6 +20,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace OpenCover.UI
 {
@@ -85,20 +86,43 @@ namespace OpenCover.UI
 			ToolWindows = new List<ToolWindowPane>();
 		}
 
-		private void AddToolWindow<T>() where T : ToolWindowPane
+		internal T GetToolWindow<T>() where T : ToolWindowPane
 		{
-			T toolWindow = FindToolWindow(typeof(T), 0, true) as T;
-
-			ToolWindows.Add(toolWindow);
-
-			if (toolWindow == null || toolWindow.Frame == null)
+			var toolWindow = ToolWindows.OfType<T>().FirstOrDefault();
+			if (toolWindow == null)
 			{
-				throw new NotSupportedException(Resources.CanNotCreateWindow);
+				Dispatcher.CurrentDispatcher.Invoke(new Action(() => { toolWindow = AddToolWindow<T>(); }));
 			}
-			else
+
+			return toolWindow;
+		}
+
+		private T AddToolWindow<T>() where T : ToolWindowPane
+		{
+			try
 			{
-				((IVsWindowFrame)toolWindow.Frame).ShowNoActivate();
+				T toolWindow = FindToolWindow(typeof(T), 0, true) as T;
+
+				ToolWindows.Add(toolWindow);
+
+				if (toolWindow == null || toolWindow.Frame == null)
+				{
+					throw new NotSupportedException(Resources.CanNotCreateWindow);
+				}
+				else
+				{
+					((IVsWindowFrame)toolWindow.Frame).ShowNoActivate();
+				}
+
+				return toolWindow;
 			}
+			catch (Exception ex)
+			{
+				IDEHelper.WriteToOutputWindow(ex.Message);
+				IDEHelper.WriteToOutputWindow(ex.StackTrace);
+			}
+
+			return null;
 		}
 
 		private void ShowMessageBox(string message)
@@ -137,9 +161,6 @@ namespace OpenCover.UI
 			if (null != mcs)
 			{
 				VSEventsHandler = new VSEventsHandler(this);
-
-				AddToolWindow<CodeCoverageResultsToolWindow>();
-				AddToolWindow<TestExplorerToolWindow>();
 
 				IVsUIShell uiShell = GetService(typeof(IVsUIShell)) as IVsUIShell;
 

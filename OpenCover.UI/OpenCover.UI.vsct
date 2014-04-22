@@ -143,6 +143,14 @@
 					<ButtonText>Project</ButtonText>
 				</Strings>
 			</Button>
+			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByOutcomeButton" priority="0x0300" type="Button">
+				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup"/>
+				<CommandFlag>DefaultDisabled</CommandFlag>
+				<Strings>
+					<CommandName>OpenCover.UI.GroupBy.Outcome</CommandName>
+					<ButtonText>Outcome</ButtonText>
+				</Strings>
+			</Button>
 		</Buttons>
 		<!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
 		<Bitmaps>
@@ -193,6 +201,7 @@
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByClassButton" value="0x1920" />
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByTraitButton" value="0x1930" />
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByProjectButton" value="0x1940" />
+			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByOutcomeButton" value="0x1950" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

@@ -28,7 +28,7 @@ namespace OpenCover.UI.Views
 
 		internal IEnumerable<TestClass> Tests { get; private set; }
 
-		public event Action TestDiscoveryFinished;
+		internal static event Action TestDiscoveryFinished;
 
 		public TestExplorerControl(TestExplorerToolWindow parent)
 		{
@@ -109,6 +109,8 @@ namespace OpenCover.UI.Views
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
+					//TODO: Refactor code to make grouping dynamic. Works for now but becomes difficult to manage if we need to support multiple Test Frameworks.
+
 					var msTests = tests.Where(tc => tc.TestType == TestType.MSTest);
 					var nUnitTests = tests.Where(tc => tc.TestType == TestType.NUnit);
 
@@ -136,6 +138,9 @@ namespace OpenCover.UI.Views
 			}
 		}
 
+		/// <summary>
+		/// Clears the tests TreeView children.
+		/// </summary>
 		private void ClearTestsTreeViewChildren()
 		{
 			Dispatcher.BeginInvoke(new Action(() =>
@@ -151,6 +156,11 @@ namespace OpenCover.UI.Views
 			}));
 		}
 
+		/// <summary>
+		/// Handles the MouseRightButtonDown event of the Grid control.
+		/// </summary>
+		/// <param name="sender">The source of the event.</param>
+		/// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
 		private void Grid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			OleMenuCommandService mcs = this._parent.mcs;
@@ -163,6 +173,11 @@ namespace OpenCover.UI.Views
 			}
 		}
 
+		/// <summary>
+		/// Refreshes Test Explorer control.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The <see cref="MouseButtonEventArgs"/> instance containing the event data.</param>
 		private void Refresh(object sender, MouseButtonEventArgs e)
 		{
 			_package.VSEventsHandler.BuildSolution();

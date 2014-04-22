@@ -13,6 +13,9 @@ using System.Windows.Documents;
 
 namespace OpenCover.UI.Model.Test
 {
+	/// <summary>
+	/// Container for Test Methods Wrapper
+	/// </summary>
 	internal class TestMethodWrapperContainer : SharpTreeNode
 	{
 		private TestMethodGroupingField _groupingField;
@@ -124,6 +127,10 @@ namespace OpenCover.UI.Model.Test
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the selected dlls in groups.
+		/// </summary>
+		/// <param name="testsItemSource">The tests item source.</param>
 		private IEnumerable<string> GetSelectedDLLsInGroups(IEnumerable<TestMethodWrapper> testsItemSource)
 		{
 			return testsItemSource
@@ -133,6 +140,9 @@ namespace OpenCover.UI.Model.Test
 					.Distinct();
 		}
 
+		/// <summary>
+		/// Gets the tests in not selected group query.
+		/// </summary>
 		private IEnumerable<TestMethod> GetTestsInNotSelectedGroupQuery()
 		{
 			return Children
@@ -141,6 +151,9 @@ namespace OpenCover.UI.Model.Test
 						.Cast<TestMethod>();
 		}
 
+		/// <summary>
+		/// Gets the text.
+		/// </summary>
 		public override object Text
 		{
 			get
@@ -175,6 +188,10 @@ namespace OpenCover.UI.Model.Test
 
 				case TestMethodGroupingField.Project:
 					GroupByProject();
+					break;
+
+				case TestMethodGroupingField.Outcome:
+					GroupByOutcome();
 					break;
 			}
 		}
@@ -234,6 +251,46 @@ namespace OpenCover.UI.Model.Test
 
 			Children.AddRange(methodsGroupedByProject);
 
+		}
+
+		/// <summary>
+		/// Groups the tests by outcome.
+		/// </summary>
+		private void GroupByOutcome()
+		{
+			var methodsGroupedByProject = TestMethodsWrapper
+										.SelectMany(c => c.TestMethods)
+										.GroupBy(tm => tm.ExecutionStatus)
+										.Select(tm =>
+										{
+											var text = GetOutcomeText(tm.Key);
+											return new TestMethodWrapper(text, tm, text);
+										});
+
+			Children.AddRange(methodsGroupedByProject);
+		}
+
+		/// <summary>
+		/// Converts Enum to its string equivalent.
+		/// </summary>
+		/// <param name="status">The status.</param>
+		private string GetOutcomeText(TestExecutionStatus status)
+		{
+			// TODO: Find a better approach. It works for now!
+
+			switch (status)
+			{
+				case TestExecutionStatus.NotRun:
+					return "Not Run";
+				case TestExecutionStatus.Successful:
+					return "Successful";
+				case TestExecutionStatus.Error:
+					return "Error";
+				case TestExecutionStatus.Inconclusive:
+					return "Inconclusive";
+				default:
+					return "Not Run";
+			}
 		}
 	}
 }

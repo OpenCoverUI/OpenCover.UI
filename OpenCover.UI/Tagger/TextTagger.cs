@@ -52,9 +52,7 @@ namespace OpenCover.UI.Tagger
 
 			_spanCoverage = new Dictionary<SnapshotSpan, bool>();
 			_codeCoverageResultsControl = OpenCoverUIPackage.Instance
-															.ToolWindows
-															.OfType<CodeCoverageResultsToolWindow>()
-															.First()
+															.GetToolWindow<CodeCoverageResultsToolWindow>()
 															.CodeCoverageResultsControl;
 
 			_currentSpans = GetWordSpans(_textView.TextSnapshot);

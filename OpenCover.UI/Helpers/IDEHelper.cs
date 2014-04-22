@@ -120,66 +120,65 @@ namespace OpenCover.UI.Helpers
 		/// Finds all the dlls in the project with reference to UnitTestFramework.dll
 		/// </summary>
 		/// <returns>List of all dlls which might contain tests</returns>
-        internal static IEnumerable<string> GetPotentialTestDLLs()
-        {
-            string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
-            string nunitPath = "nunit.Framework.dll";
+		internal static IEnumerable<string> GetPotentialTestDLLs()
+		{
+			string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
+			string nunitPath = "nunit.Framework.dll";
 
-            List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
+			List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
 
-            GetProjects(DTE.Solution.Projects, projects);
+			GetProjects(DTE.Solution.Projects, projects);
 
-            foreach (var currentProject in projects)
-            {
-                var vsProject2 = currentProject.Object as VSProject2;
-                bool isTestProject = false;
+			foreach (var currentProject in projects)
+			{
+				var vsProject2 = currentProject.Object as VSProject2;
+				bool isTestProject = false;
 
-                if (vsProject2 != null)
-                {
-                    foreach (Reference reference in vsProject2.References)
-                    {
-                        var referenceFile = Path.GetFileName(reference.Path);
-                        if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            isTestProject = true;
-                            break;
-                        }
-                    }
+				if (vsProject2 != null)
+				{
+					foreach (Reference reference in vsProject2.References)
+					{
+						var referenceFile = Path.GetFileName(reference.Path);
+						if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
+						{
+							isTestProject = true;
+							break;
+						}
+					}
 
-                    if (isTestProject)
-                    {
-                        yield return GetOutputPath(currentProject);
-                    }
-                }
-            }
+					if (isTestProject)
+					{
+						yield return GetOutputPath(currentProject);
+					}
+				}
+			}
 
-        }
+		}
 
-        private static void GetProjects(EnvDTE.Projects projects, List<EnvDTE.Project> projectList)
-        {
-            foreach (EnvDTE.Project project in projects)
-                GetProjects(project, projectList);
-        }
+		private static void GetProjects(EnvDTE.Projects projects, List<EnvDTE.Project> projectList)
+		{
+			foreach (EnvDTE.Project project in projects)
+				GetProjects(project, projectList);
+		}
 
-        private static void GetProjects(EnvDTE.Project project, List<EnvDTE.Project> projectList)
-        {
-            if (project == null)
-                return;
+		private static void GetProjects(EnvDTE.Project project, List<EnvDTE.Project> projectList)
+		{
+			if (project == null)
+				return;
 
-            if (project.Kind.Contains("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"))
-                projectList.Add(project);
-            
-            if (project.ProjectItems.Count == 0)
-                return;
+			if (project.Kind.Contains("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"))
+				projectList.Add(project);
+			
+			if (project.ProjectItems == null || project.ProjectItems.Count == 0)
+				return;
 
-
-            foreach (EnvDTE.ProjectItem proj in project.ProjectItems)
-            {
-                var DTEProject = proj.Object as EnvDTE.Project;
-                if (DTEProject != null)
-                    GetProjects(DTEProject, projectList);
-            }
-        }
+			foreach (EnvDTE.ProjectItem proj in project.ProjectItems)
+			{
+				var DTEProject = proj.Object as EnvDTE.Project;
+				if (DTEProject != null)
+					GetProjects(DTEProject, projectList);
+			}
+		}
 
 		internal static string GetImageURL(string url)
 		{

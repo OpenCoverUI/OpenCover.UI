@@ -24,10 +24,11 @@ namespace OpenCover.UI.Commands
 		private const string CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE = "We could not run all the tests that you selected. Please see output window for more details.";
 
 		private OpenCoverUIPackage _package;
-		private TestExplorerControl _testExplorerControl;
-		private CodeCoverageResultsControl _codeCoverageResultsControl;
 		private bool _isRunningCodeCoverage;
 		private TestExecutor _testExecutor;
+
+		private CodeCoverageResultsControl CodeCoverageResults { get { return _package.GetToolWindow<CodeCoverageResultsToolWindow>().CodeCoverageResultsControl; } }
+		private TestExplorerControl TestExplorer { get { return _package.GetToolWindow<TestExplorerToolWindow>().TestExplorerControl; } }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ExecuteSelectedTestsCommand" /> class.
@@ -40,10 +41,7 @@ namespace OpenCover.UI.Commands
 
 			base.Enabled = false;
 
-			_testExplorerControl = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl;
-			_testExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
-
-			_codeCoverageResultsControl = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
+			TestExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
 		}
 
 		/// <summary>
@@ -51,7 +49,7 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		void OnTestDiscoveryFinished()
 		{
-			var hasTests = _testExplorerControl.TestsTreeView.Root != null && _testExplorerControl.TestsTreeView.Root.Children.Any();
+			var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
 			if (hasTests & !_isRunningCodeCoverage)
 			{
 				Enabled = true;
@@ -67,9 +65,9 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		protected override void OnExecute()
 		{
-			_codeCoverageResultsControl.ClearTreeView();
+			CodeCoverageResults.ClearTreeView();
 			TestMethodWrapperContainer msTests = null, nUnitTests = null;
-			TestMethodWrapperContainer container = _testExplorerControl.TestsTreeView.Root as TestMethodWrapperContainer;
+			TestMethodWrapperContainer container = TestExplorer.TestsTreeView.Root as TestMethodWrapperContainer;
 
 			if (container != null)
 			{
@@ -84,8 +82,8 @@ namespace OpenCover.UI.Commands
 			}
 			else
 			{
-				msTests = _testExplorerControl.TestsTreeView.Root.Children[0] as TestMethodWrapperContainer;
-				nUnitTests = _testExplorerControl.TestsTreeView.Root.Children[1] as TestMethodWrapperContainer;
+				msTests = TestExplorer.TestsTreeView.Root.Children[0] as TestMethodWrapperContainer;
+				nUnitTests = TestExplorer.TestsTreeView.Root.Children[1] as TestMethodWrapperContainer;
 			}
 
 			var selectedMSTests = msTests != null ? msTests.GetSelectedTestGroupsAndTests() : null;
@@ -146,8 +144,8 @@ namespace OpenCover.UI.Commands
 			Task.Factory.StartNew(
 				() =>
 				{
-					var control = _package.ToolWindows.OfType<CodeCoverageResultsToolWindow>().First().CodeCoverageResultsControl;
-					var testsExplorer = _package.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl;
+					var control = _package.GetToolWindow<CodeCoverageResultsToolWindow>().CodeCoverageResultsControl;
+					var testsExplorer = _package.GetToolWindow<TestExplorerToolWindow>().TestExplorerControl;
 					
 					try
 					{
@@ -155,9 +153,9 @@ namespace OpenCover.UI.Commands
 						control.IsLoading = true;
 						Tuple<string, string> files = _testExecutor.Execute();
 						var finalResults = _testExecutor.GetExecutionResults();
-						_testExecutor.UpdateTestMethodsExecution(_testExplorerControl.Tests);
+						_testExecutor.UpdateTestMethodsExecution(TestExplorer.Tests);
 
-						testsExplorer.Update();
+						testsExplorer.ChangeGroupBy(TestMethodGroupingField.Outcome);
 
 						if (finalResults != null)
 						{
