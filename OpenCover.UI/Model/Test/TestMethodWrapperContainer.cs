@@ -103,13 +103,13 @@ namespace OpenCover.UI.Model.Test
 		{
 			var testsItemSource = (Children.Cast<TestMethodWrapper>());
 
-			var selectedDLLsInGroups = GetSelectedDLLsInGroups(testsItemSource);
+			var testsInNotSelectedGroupQuery = GetTestsInNotSelectedGroupQuery().Select(tm => new { tm.FullyQualifiedName, tm.Class.DLLPath });
 
-			var testsInNotSelectedGroupQuery = GetTestsInNotSelectedGroupQuery().Select(tm => tm.FullyQualifiedName);
+			var testsInSelectedGroups = testsItemSource.Where(t => t.IsSelected).SelectMany(t => t.TestMethods).Select(tm => new { tm.FullyQualifiedName, tm.Class.DLLPath });
 
-			var testsInSelectedGroups = testsItemSource.Where(t => t.IsSelected).SelectMany(t => t.TestMethods).Select(tm => tm.FullyQualifiedName);
+			var allTests = testsInNotSelectedGroupQuery.Union(testsInSelectedGroups);
 
-			return new Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>>(null, testsInNotSelectedGroupQuery.Union(testsInSelectedGroups), selectedDLLsInGroups);
+			return new Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>>(null, allTests.Select(t => t.FullyQualifiedName), allTests.Select(t => t.DLLPath).Distinct());
 		}
 
 		/// <summary>

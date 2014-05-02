@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Tagging;
+using OpenCover.UI.Helpers;
 using OpenCover.UI.Views;
 using System;
 using System.Collections.Generic;
@@ -101,7 +102,10 @@ namespace OpenCover.UI.Tagger
 			var snapshotPoint = new SnapshotSpan(snapshot, new Span(startColumn, totalCharacters));
 			wordSpans.Add(snapshotPoint);
 
-			_spanCoverage.Add(snapshotPoint, covered);
+			if (!_spanCoverage.ContainsKey(snapshotPoint))
+			{
+				_spanCoverage.Add(snapshotPoint, covered); 
+			}
 		}
 
 		/// <summary>
@@ -117,41 +121,49 @@ namespace OpenCover.UI.Tagger
 			if (_codeCoverageResultsControl != null && _codeCoverageResultsControl.IsFileOpening)
 			{
 				// Get covered sequence points
-				var sequencePoints = _codeCoverageResultsControl.GetActiveDocumentSequencePoints();
-
-				if (sequencePoints != null)
+				try
 				{
-					var covered = false;
+					var sequencePoints = _codeCoverageResultsControl.GetActiveDocumentSequencePoints();
 
-					foreach (var sequencePoint in sequencePoints)
+					if (sequencePoints != null)
 					{
-						if (sequencePoint.VisitCount == 0)
-						{
-							covered = false;
-						}
-						else
-						{
-							covered = true;
-						}
+						var covered = false;
 
-						int sequencePointStartLine = sequencePoint.StartLine - 1;
-						int sequencePointEndLine = sequencePoint.EndLine - 1;
-
-						var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
-
-						if (sequencePoint.EndLine == sequencePoint.StartLine)
+						foreach (var sequencePoint in sequencePoints)
 						{
-							AddWordSpan(wordSpans, snapshot, 
-										startLine.Extent.Start.Position + sequencePoint.StartColumn - 1, 
-										sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
-						}
-						else
-						{
-							// Get selected lines
-							AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint, 
-																				sequencePointStartLine, sequencePointEndLine, covered);
+							if (sequencePoint.VisitCount == 0)
+							{
+								covered = false;
+							}
+							else
+							{
+								covered = true;
+							}
+
+							int sequencePointStartLine = sequencePoint.StartLine - 1;
+							int sequencePointEndLine = sequencePoint.EndLine - 1;
+
+							var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
+
+							if (sequencePoint.EndLine == sequencePoint.StartLine)
+							{
+								AddWordSpan(wordSpans, snapshot,
+											startLine.Extent.Start.Position + sequencePoint.StartColumn - 1,
+											sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
+							}
+							else
+							{
+								// Get selected lines
+								AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint,
+																					sequencePointStartLine, sequencePointEndLine, covered);
+							}
 						}
 					}
+				}
+				catch (Exception ex)
+				{
+					IDEHelper.WriteToOutputWindow(ex.Message);
+					IDEHelper.WriteToOutputWindow(ex.StackTrace);
 				}
 			}
 

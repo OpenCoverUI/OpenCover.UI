@@ -1,19 +1,18 @@
 ﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
+using Microsoft.VisualStudio.Shell;
+using OpenCover.UI.Commands;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model.Test;
 using OpenCover.UI.Processors;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.VisualStudio.Shell;
-using System.ComponentModel.Design;
-using System.Text;
 
 namespace OpenCover.UI.Views
 {
@@ -55,6 +54,8 @@ namespace OpenCover.UI.Views
 		internal void ChangeGroupBy(TestMethodGroupingField groupingField)
 		{
 			_currentGroupingField = groupingField;
+			TestsExplorerToolbarCommands.UpdateSelectedGroupBy(groupingField);
+			
 			UpdateTreeView(Tests);
 		}
 

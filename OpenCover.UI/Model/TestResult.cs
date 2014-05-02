@@ -21,11 +21,12 @@ namespace OpenCover.UI.Model
 		/// <param name="status">The test execution status.</param>
 		/// <param name="executionTime">The test execution time.</param>
 		/// <param name="failureMessages">The failure messages.</param>
-		public TestResult(string methodName, TestExecutionStatus status, decimal executionTime, string errorMessage, string stackTrace)
+		public TestResult(string methodName, TestExecutionStatus status, decimal executionTime, string errorMessage, string stackTrace, List<TestResult> testCases)
 		{
 			MethodName = methodName;
 			Status = status;
 			ExecutionTime = executionTime;
+			TestCases = testCases;
 
 			if (errorMessage != null || stackTrace != null)
 			{
@@ -39,7 +40,7 @@ namespace OpenCover.UI.Model
 		public string MethodName
 		{
 			get;
-			private set;
+			set;
 		}
 
 		/// <summary>
@@ -67,6 +68,26 @@ namespace OpenCover.UI.Model
 		{
 			get;
 			private set;
+		}
+
+		/// <summary>
+		/// Gets the test cases.
+		/// </summary>
+		public List<TestResult> TestCases
+		{
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether this instance is test case.
+		/// </summary>
+		public bool IsTestCase
+		{
+			get
+			{
+				return TestCases != null;
+			}
 		}
 	}
 

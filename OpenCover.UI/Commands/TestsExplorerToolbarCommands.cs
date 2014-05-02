@@ -66,6 +66,12 @@ namespace OpenCover.UI.Commands
 			_allCommands.ForEach(c => c.Enabled = state);
 		}
 
+		internal static void UpdateSelectedGroupBy(TestMethodGroupingField field)
+		{
+			CurrentSelectedGroupBy = field;
+			UpdateCheckedMethods(GetCommand());
+		}
+
 		/// <summary>
 		/// Initializes all test explorer toolbar commands.
 		/// </summary>
@@ -144,6 +150,32 @@ namespace OpenCover.UI.Commands
 			_currentSelected = clickedCommand;
 
 			_currentSelected.Checked = true;
+		}
+
+		private static OleMenuCommand GetCommand()
+		{
+			int commandID = 0;
+
+			switch (CurrentSelectedGroupBy)
+			{
+				case TestMethodGroupingField.Class:
+					commandID = PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton;
+					break;
+				case TestMethodGroupingField.Trait:
+					commandID = PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByTraitButton;
+					break;
+				case TestMethodGroupingField.Project:
+					commandID = PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByProjectButton;
+					break;
+				case TestMethodGroupingField.Outcome:
+					commandID = PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByOutcomeButton;
+					break;
+				default:
+					commandID = PkgCmdIDList.OpenCoverTestExplorerToolbarGroupByClassButton;
+					break;
+			}
+
+			return Commands.FirstOrDefault(c => c.CommandID.ID == commandID);
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿//
+﻿using OpenCover.UI.Commands;
+//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
 using OpenCover.UI.Model.Test;
@@ -26,7 +27,7 @@ namespace OpenCover.UI.Processors
 			string dllPaths = BuildDLLPath();
 			var builder = new StringBuilder();
 
-			switch (_groupingField)
+			switch (TestsExplorerToolbarCommands.CurrentSelectedGroupBy)
 			{
 				case TestMethodGroupingField.Trait:
 					{

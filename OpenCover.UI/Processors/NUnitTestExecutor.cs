@@ -64,28 +64,68 @@ namespace OpenCover.UI.Processors
 		/// </summary>
 		protected override void ReadTestResults()
 		{
-			var testResultsFile = XDocument.Load(_testResultsFile);
-
-			_executionStatus.Clear();
-
-			var assemblies = testResultsFile.Descendants("test-suite").Where(ts => ts.Attribute("type") != null && ts.Attribute("type").Value == "Assembly");
-
-			foreach (var assembly in assemblies)
+			try
 			{
-				var testMethods = assembly.Descendants("test-case").Select(tc =>
-									{
-										var failure = tc.Element("failure");
-										var errorMessage = GetElementValue(failure, "message");
-										var stackTrace = GetElementValue(failure, "stack-trace");
+				if (File.Exists(_testResultsFile))
+				{
+					var testResultsFile = XDocument.Load(_testResultsFile);
 
-										return new TestResult(tc.Attribute("name").Value,
-																GetTestExecutionStatus(tc.Attribute("result").Value),
-																Decimal.Parse(tc.Attribute("time").Value),
-																errorMessage,
-																stackTrace);
-									});
+					_executionStatus.Clear();
 
-				_executionStatus.Add(assembly.Attribute("name").Value, testMethods);
+					var assemblies = GetElementsByAttribute(testResultsFile, "test-suite", "type", "Assembly");
+
+					foreach (var assembly in assemblies)
+					{
+						decimal tempTime = 0;
+
+						var testCases = GetElementsByAttribute(assembly, "test-suite", "type", "TestFixture");
+
+						var testMethods = testCases.Elements("results").Elements("test-case").Select(tc =>
+											{
+												var failure = tc.Element("failure");
+												var errorMessage = GetElementValue(failure, "message");
+												var stackTrace = GetElementValue(failure, "stack-trace");
+
+												return new TestResult(GetAttributeValue(tc, "name"),
+																		GetTestExecutionStatus(GetAttributeValue(tc, "result")),
+																		Decimal.TryParse(GetAttributeValue(tc, "time"), out tempTime) ? tempTime : 0,
+																		errorMessage,
+																		stackTrace,
+																		null);
+											});
+
+						testMethods = testMethods.Union(testCases.Elements("results").Elements("test-suite").Select(ts =>
+						{
+							var testCasesInTestSuite = ts.Element("results").Elements("test-case");
+							var testResults = new List<TestResult>();
+
+							foreach (var testCase in testCasesInTestSuite)
+							{
+								testResults.Add(GetTestResult(testCase, null)); 
+							}
+
+							var testResult = GetTestResult(ts, testResults);
+							if (testResults.Any())
+							{
+								var testCaseName = testResults.First();
+								testResult.MethodName = testCaseName.MethodName.Substring(0, testCaseName.MethodName.IndexOf("("));
+							}
+
+							return testResult;
+						}));
+
+						_executionStatus.Add(assembly.Attribute("name").Value, testMethods);
+					}
+				}
+				else
+				{
+					IDEHelper.WriteToOutputWindow("Test Results File does not exist: {0}", _testResultsFile);
+				}
+			}
+			catch (Exception ex)
+			{
+				IDEHelper.WriteToOutputWindow(ex.Message);
+				IDEHelper.WriteToOutputWindow(ex.StackTrace);
 			}
 		}
 
@@ -193,11 +233,24 @@ namespace OpenCover.UI.Processors
 			}
 		}
 
+		private TestResult GetTestResult(XElement element, List<TestResult> testCases)
+		{
+			var failure = element.Element("failure");
+			decimal tempTime = -1;
+
+			return new TestResult(GetAttributeValue(element, "name"),
+											GetTestExecutionStatus(GetAttributeValue(element, "result")),
+											Decimal.TryParse(GetAttributeValue(element, "time"), out tempTime) ? tempTime : 0,
+											GetElementValue(failure, "message"),
+											GetElementValue(failure, "stack-trace"),
+											testCases);
+		}
+
 		/// <summary>
 		/// Gets the element's value.
 		/// </summary>
 		/// <param name="element">The element.</param>
-		private string GetElementValue(XElement element, string attribute)
+		private string GetAttributeValue(XElement element, string attribute)
 		{
 			if (element != null)
 			{
@@ -209,6 +262,32 @@ namespace OpenCover.UI.Processors
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Gets the element's value.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		private string GetElementValue(XElement element, string childElement)
+		{
+			// TODO: Refactor code to remove the duplicated methods - GetElementValue and GetAttributeValue. 
+			// The only difference in these methods is accessing Element/Attribute methods.
+			if (element != null)
+			{
+				var child = element.Element(childElement);
+				if (child != null)
+				{
+					return child.Value;
+				}
+			}
+
+			return null;
+		}
+
+		private IEnumerable<XElement> GetElementsByAttribute<T>(T parent, string elementName, string attributeName, string attributeValue)
+			where T : XContainer
+		{
+			return parent.Descendants(elementName).Where(ts => ts.Attribute(attributeName) != null && ts.Attribute(attributeName).Value == attributeValue);
 		}
 	}
 }
