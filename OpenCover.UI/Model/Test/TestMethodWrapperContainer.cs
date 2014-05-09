@@ -260,7 +260,7 @@ namespace OpenCover.UI.Model.Test
 		{
 			var methodsGroupedByProject = TestMethodsWrapper
 										.SelectMany(c => c.TestMethods)
-										.GroupBy(tm => tm.ExecutionStatus)
+										.GroupBy(tm => tm.ExecutionResult != null ? tm.ExecutionResult.Status : TestExecutionStatus.NotRun)
 										.Select(tm =>
 										{
 											var text = GetOutcomeText(tm.Key);

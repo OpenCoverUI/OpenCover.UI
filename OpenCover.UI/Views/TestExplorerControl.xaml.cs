@@ -4,10 +4,12 @@
 using Microsoft.VisualStudio.Shell;
 using OpenCover.UI.Commands;
 using OpenCover.UI.Helpers;
+using OpenCover.UI.Model;
 using OpenCover.UI.Model.Test;
 using OpenCover.UI.Processors;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Windows;
@@ -19,20 +21,36 @@ namespace OpenCover.UI.Views
 	/// <summary>
 	/// Interaction logic for TestExplorerControl.xaml
 	/// </summary>
-	public partial class TestExplorerControl : UserControl
+	public partial class TestExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private OpenCoverUIPackage _package;
 		private TestExplorerToolWindow _parent;
 		private TestMethodGroupingField _currentGroupingField;
+		private TestResultsViewModel _testResult;
 
 		internal IEnumerable<TestClass> Tests { get; private set; }
 
+		public TestResultsViewModel TestResult
+		{
+			get
+			{
+				return _testResult;
+			}
+			private set
+			{
+				_testResult = value;
+				NotifyPropertyChanged("TestResult");
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
 		internal static event Action TestDiscoveryFinished;
 
 		public TestExplorerControl(TestExplorerToolWindow parent)
 		{
 			_parent = parent;
 			InitializeComponent();
+			DataContext = this;
 		}
 
 		/// <summary>
@@ -55,36 +73,13 @@ namespace OpenCover.UI.Views
 		{
 			_currentGroupingField = groupingField;
 			TestsExplorerToolbarCommands.UpdateSelectedGroupBy(groupingField);
-			
+
 			UpdateTreeView(Tests);
 		}
 
-		internal void Update()
-		{
-			Dispatcher.BeginInvoke(new Action(() =>
-			{
-				ExpandNodes(TestsTreeView.Root);
-			}));
-		}
-
-		private static void ExpandNodes(ICSharpCode.TreeView.SharpTreeNode parentNode)
-		{
-			if (parentNode == null || parentNode.Children == null)
-			{
-				return;
-			}
-
-			var selectedNodes = parentNode.Children.Where(c => c.IsExpanded);
-
-			foreach (var node in selectedNodes)
-			{
-				node.IsExpanded = false;
-				node.IsExpanded = true;
-
-				ExpandNodes(node);
-			}
-		}
-
+		/// <summary>
+		/// Discovers the tests.
+		/// </summary>
 		private void DiscoverTests()
 		{
 			System.Threading.Tasks.Task.Factory.StartNew(new Action(() =>
@@ -135,6 +130,8 @@ namespace OpenCover.UI.Views
 					{
 						TestDiscoveryFinished();
 					}
+
+					TestSelectionChanged(null, null);
 				}));
 			}
 		}
@@ -183,5 +180,58 @@ namespace OpenCover.UI.Views
 		{
 			_package.VSEventsHandler.BuildSolution();
 		}
+
+		/// <summary>
+		/// Handler for selection change event.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
+		private void TestSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (TestsTreeView.SelectedItems.Count == 1 && TestsTreeView.SelectedItems[0] is TestMethod)
+			{
+				var testMethod = TestsTreeView.SelectedItems[0] as TestMethod;
+				TestResult = new TestResultsViewModel(testMethod.Name,
+													  testMethod.ExecutionResult,
+													  null);
+			}
+			else
+			{
+				dynamic groupedTests = Tests.SelectMany(t => t.TestMethods)
+														  .GroupBy(t => t.ExecutionResult.Status)
+														  .Select(t => new { Status = t.Key, Count = t.Count() })
+														  .Where(t => t.Count > 0);
+
+				TestResult = new TestResultsViewModel("Summary", null, groupedTests);
+			}
+		}
+
+		/// <summary>
+		/// Notifies the property changed.
+		/// </summary>
+		/// <param name="property">The property.</param>
+		private void NotifyPropertyChanged(string property)
+		{
+			if (PropertyChanged != null)
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(property));
+			}
+		}
+	}
+
+	public class TestResultsViewModel
+	{
+		public TestResultsViewModel(string caption, TestResult testResult, dynamic executionStatus)
+		{
+			Result = testResult;
+			Caption = caption;
+			ExecutionStatus = executionStatus;
+		}
+
+		public string Caption { get; set; }
+
+		public dynamic ExecutionStatus { get; set; }
+
+		public TestResult Result { get; set; }
 	}
 }

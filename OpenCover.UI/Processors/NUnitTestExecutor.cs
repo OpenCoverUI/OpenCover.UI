@@ -23,7 +23,6 @@ namespace OpenCover.UI.Processors
 	{
 		private string _runListFile;
 		private string _nUnitPath;
-		private Dictionary<string, IEnumerable<TestResult>> _executionStatus;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NUnitTestExecutor"/> class.
@@ -76,43 +75,9 @@ namespace OpenCover.UI.Processors
 
 					foreach (var assembly in assemblies)
 					{
-						decimal tempTime = 0;
-
 						var testCases = GetElementsByAttribute(assembly, "test-suite", "type", "TestFixture");
-
-						var testMethods = testCases.Elements("results").Elements("test-case").Select(tc =>
-											{
-												var failure = tc.Element("failure");
-												var errorMessage = GetElementValue(failure, "message");
-												var stackTrace = GetElementValue(failure, "stack-trace");
-
-												return new TestResult(GetAttributeValue(tc, "name"),
-																		GetTestExecutionStatus(GetAttributeValue(tc, "result")),
-																		Decimal.TryParse(GetAttributeValue(tc, "time"), out tempTime) ? tempTime : 0,
-																		errorMessage,
-																		stackTrace,
-																		null);
-											});
-
-						testMethods = testMethods.Union(testCases.Elements("results").Elements("test-suite").Select(ts =>
-						{
-							var testCasesInTestSuite = ts.Element("results").Elements("test-case");
-							var testResults = new List<TestResult>();
-
-							foreach (var testCase in testCasesInTestSuite)
-							{
-								testResults.Add(GetTestResult(testCase, null)); 
-							}
-
-							var testResult = GetTestResult(ts, testResults);
-							if (testResults.Any())
-							{
-								var testCaseName = testResults.First();
-								testResult.MethodName = testCaseName.MethodName.Substring(0, testCaseName.MethodName.IndexOf("("));
-							}
-
-							return testResult;
-						}));
+						var testMethods = testCases.Elements("results").Elements("test-case").Select(tc => GetTestResult(tc, null));
+						testMethods = testMethods.Union(testCases.Elements("results").Elements("test-suite").Select(ts => ReadTestCase(ts)));
 
 						_executionStatus.Add(assembly.Attribute("name").Value, testMethods);
 					}
@@ -144,9 +109,10 @@ namespace OpenCover.UI.Processors
 
 			foreach (var test in executedTests)
 			{
-				test.TestMethod.ExecutionStatus = test.Result.result.Status;
+				test.TestMethod.ExecutionResult = test.Result.result;
 			}
 		}
+
 
 		/// <summary>
 		/// Delete temporary files created.
@@ -215,75 +181,56 @@ namespace OpenCover.UI.Processors
 		}
 
 		/// <summary>
-		/// Gets the test execution status enum.
+		/// Reads the test case.
 		/// </summary>
-		/// <param name="status">The status.</param>
-		private TestExecutionStatus GetTestExecutionStatus(string status)
+		/// <param name="ts">The test-suite element.</param>
+		private TestResult ReadTestCase(XElement ts)
 		{
-			switch (status.ToLower())
+			var testCasesInTestSuite = ts.Element("results").Elements("test-case");
+			var testResults = new List<TestResult>();
+
+			foreach (var testCase in testCasesInTestSuite)
 			{
-				case "success":
-					return TestExecutionStatus.Successful;
-				case "failure":
-					return TestExecutionStatus.Error;
-				case "inconclusive":
-					return TestExecutionStatus.Inconclusive;
-				default:
-					return TestExecutionStatus.NotRun;
+				testResults.Add(GetTestResult(testCase, null));
 			}
+
+			var testResult = GetTestResult(ts, testResults);
+			if (testResults.Any())
+			{
+				var testCaseName = testResults.First();
+				testResult.MethodName = testCaseName.MethodName.Substring(0, testCaseName.MethodName.IndexOf("("));
+			}
+
+			return testResult;
 		}
 
+		/// <summary>
+		/// Gets the test result.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="testCases">The test cases.</param>
 		private TestResult GetTestResult(XElement element, List<TestResult> testCases)
 		{
 			var failure = element.Element("failure");
 			decimal tempTime = -1;
 
 			return new TestResult(GetAttributeValue(element, "name"),
-											GetTestExecutionStatus(GetAttributeValue(element, "result")),
-											Decimal.TryParse(GetAttributeValue(element, "time"), out tempTime) ? tempTime : 0,
-											GetElementValue(failure, "message"),
-											GetElementValue(failure, "stack-trace"),
-											testCases);
+								  GetTestExecutionStatus(GetAttributeValue(element, "result")),
+								  Decimal.TryParse(GetAttributeValue(element, "time"), out tempTime) ? tempTime : 0,
+								  GetElementValue(failure, "message", XNamespace.None),
+								  GetElementValue(failure, "stack-trace", XNamespace.None),
+								  testCases);
 		}
 
 		/// <summary>
-		/// Gets the element's value.
+		/// Gets the elements by attribute.
 		/// </summary>
-		/// <param name="element">The element.</param>
-		private string GetAttributeValue(XElement element, string attribute)
-		{
-			if (element != null)
-			{
-				var xAttribute = element.Attribute(attribute);
-				if (xAttribute != null)
-				{
-					return xAttribute.Value;
-				}
-			}
-
-			return null;
-		}
-
-		/// <summary>
-		/// Gets the element's value.
-		/// </summary>
-		/// <param name="element">The element.</param>
-		private string GetElementValue(XElement element, string childElement)
-		{
-			// TODO: Refactor code to remove the duplicated methods - GetElementValue and GetAttributeValue. 
-			// The only difference in these methods is accessing Element/Attribute methods.
-			if (element != null)
-			{
-				var child = element.Element(childElement);
-				if (child != null)
-				{
-					return child.Value;
-				}
-			}
-
-			return null;
-		}
-
+		/// <typeparam name="T">XContainer derivative</typeparam>
+		/// <param name="parent">The parent.</param>
+		/// <param name="elementName">Name of the element.</param>
+		/// <param name="attributeName">Name of the attribute.</param>
+		/// <param name="attributeValue">The attribute value.</param>
+		/// <returns></returns>
 		private IEnumerable<XElement> GetElementsByAttribute<T>(T parent, string elementName, string attributeName, string attributeValue)
 			where T : XContainer
 		{

@@ -20,12 +20,12 @@ namespace OpenCover.UI.Converters
 		/// <param name="parameter">The converter parameter to use.</param>
 		/// <param name="culture">The culture to use in the converter.</param>
 		/// <returns>
-		/// A converted value. If the method returns null, the valid null value is used.
+		/// A converted value. If the testResult returns null, the valid null value is used.
 		/// </returns>
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
 			bool boolean = (bool)value;
-			return boolean ? Visibility.Visible : Visibility.Hidden;
+			return boolean ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -47,7 +47,7 @@ namespace OpenCover.UI.Converters
 		/// <param name="parameter">The converter parameter to use.</param>
 		/// <param name="culture">The culture to use in the converter.</param>
 		/// <returns>
-		/// A converted value. If the method returns null, the valid null value is used.
+		/// A converted value. If the testResult returns null, the valid null value is used.
 		/// </returns>
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{

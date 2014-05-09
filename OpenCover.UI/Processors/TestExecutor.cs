@@ -3,6 +3,7 @@
 //
 using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
+using OpenCover.UI.Model;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace OpenCover.UI.Processors
@@ -30,6 +32,7 @@ namespace OpenCover.UI.Processors
 		protected Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> _selectedTests;
 		protected OpenCoverUIPackage _package;
 		protected DirectoryInfo _currentWorkingDirectory;
+		protected Dictionary<string, IEnumerable<TestResult>> _executionStatus;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestExecutor"/> class.
@@ -43,6 +46,8 @@ namespace OpenCover.UI.Processors
 
 			_openCoverPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
 												@"Apps\OpenCover\OpenCover.Console.exe");
+
+			_executionStatus = new Dictionary<string, IEnumerable<TestResult>>();
 		}
 
 		/// <summary>
@@ -75,7 +80,7 @@ namespace OpenCover.UI.Processors
 		/// Updates the test methods execution.
 		/// </summary>
 		internal abstract void UpdateTestMethodsExecution(IEnumerable<TestClass> tests);
-
+		
 		/// <summary>
 		/// Do cleanup here.
 		/// </summary>
@@ -180,6 +185,65 @@ namespace OpenCover.UI.Processors
 			_currentWorkingDirectory = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(solution.FileName), "OpenCover"));
 
 			_openCoverResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
+		}
+
+		/// <summary>
+		/// Gets the element's value.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		protected string GetAttributeValue(XElement element, string attribute)
+		{
+			if (element != null)
+			{
+				var xAttribute = element.Attribute(attribute);
+				if (xAttribute != null)
+				{
+					return xAttribute.Value;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the element's value.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		protected string GetElementValue(XElement element, string childElement, XNamespace ns)
+		{
+			// TODO: Refactor code to remove the duplicated methods - GetElementValue and GetAttributeValue. 
+			// The only difference in these methods is accessing Element/Attribute methods.
+			if (element != null)
+			{
+				var child = element.Element(ns + childElement);
+				if (child != null)
+				{
+					return child.Value;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the test execution status enum.
+		/// </summary>
+		/// <param name="status">The status.</param>
+		protected TestExecutionStatus GetTestExecutionStatus(string status)
+		{
+			switch (status.ToLower())
+			{
+				case "success":
+				case "passed":
+					return TestExecutionStatus.Successful;
+				case "failure":
+				case "failed":
+					return TestExecutionStatus.Error;
+				case "inconclusive":
+					return TestExecutionStatus.Inconclusive;
+				default:
+					return TestExecutionStatus.NotRun;
+			}
 		}
 
 		/// <summary>

@@ -3,7 +3,7 @@
 //
 namespace OpenCover.UI.Model
 {
-	internal enum TestExecutionStatus
+	public enum TestExecutionStatus
 	{
 		NotRun = 0,
 		Successful = 1,

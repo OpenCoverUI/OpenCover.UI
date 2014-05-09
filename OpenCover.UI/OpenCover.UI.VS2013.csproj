@@ -48,6 +48,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\ICSharpCode.TreeView.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\Editor\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
@@ -151,6 +152,8 @@
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
     <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\TestExecutionResultStatusToIconConverter.cs" />
     <Compile Include="Model\BranchPoint.cs" />
     <Compile Include="Model\Class.cs" />
     <Compile Include="Model\CoverageSession.cs" />
@@ -205,6 +208,9 @@
       <DependentUpon>TestExplorerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TestExplorerToolWindow.cs" />
+    <Compile Include="Views\TestResults.xaml.cs">
+      <DependentUpon>TestResults.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TreeHeader.xaml.cs">
       <DependentUpon>TreeHeader.xaml</DependentUpon>
     </Compile>
@@ -272,6 +278,10 @@
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TestResults.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\TreeHeader.xaml">
       <SubType>Designer</SubType>

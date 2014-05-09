@@ -12,7 +12,7 @@ namespace OpenCover.UI.Model
 	/// <summary>
 	/// Represents a test Result file.
 	/// </summary>
-	internal class TestResult
+	public class TestResult
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TestResult"/> class.
@@ -21,7 +21,7 @@ namespace OpenCover.UI.Model
 		/// <param name="status">The test execution status.</param>
 		/// <param name="executionTime">The test execution time.</param>
 		/// <param name="failureMessages">The failure messages.</param>
-		public TestResult(string methodName, TestExecutionStatus status, decimal executionTime, string errorMessage, string stackTrace, List<TestResult> testCases)
+		public TestResult(string methodName, TestExecutionStatus status, decimal? executionTime, string errorMessage, string stackTrace, List<TestResult> testCases)
 		{
 			MethodName = methodName;
 			Status = status;
@@ -55,7 +55,7 @@ namespace OpenCover.UI.Model
 		/// <summary>
 		/// Gets the test execution time.
 		/// </summary>
-		public decimal ExecutionTime
+		public decimal? ExecutionTime
 		{
 			get;
 			private set;
@@ -89,12 +89,22 @@ namespace OpenCover.UI.Model
 				return TestCases != null;
 			}
 		}
+
+		internal TestResult Clone()
+		{
+			return new TestResult(
+				MethodName, 
+				Status, 
+				ExecutionTime, FailureMessages != null ? FailureMessages.Message : null, 
+				FailureMessages != null ? FailureMessages.StackTrace : null, 
+				TestCases != null ? TestCases.Select(tc => tc.Clone()).ToList() : null);
+		}
 	}
 
 	/// <summary>
 	/// Represents an Error class
 	/// </summary>
-	internal class TestResultError
+	public class TestResultError
 	{
 		/// <summary>
 		/// Gets the message.

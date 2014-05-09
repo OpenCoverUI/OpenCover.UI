@@ -43,6 +43,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Lib\ICSharpCode.TreeView.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\Editor\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
@@ -91,7 +92,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-	<Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="VSLangProj, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -146,6 +147,8 @@
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
     <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\TestExecutionResultStatusToIconConverter.cs" />
     <Compile Include="Model\BranchPoint.cs" />
     <Compile Include="Model\Class.cs" />
     <Compile Include="Model\CoverageSession.cs" />
@@ -158,20 +161,20 @@
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
     <Compile Include="Model\Summary.cs" />
-	<Compile Include="Model\TestResult.cs" />
+    <Compile Include="Model\TestResult.cs" />
     <Compile Include="Model\Test\TestClass.cs" />
     <Compile Include="Model\Test\TestClass.partial.cs" />
     <Compile Include="Model\TestExecutionStatus.cs" />
     <Compile Include="Model\Test\TestMethod.cs" />
     <Compile Include="Model\Test\TestMethod.partial.cs" />
-	<Compile Include="Model\Test\TestType.cs" />
+    <Compile Include="Model\Test\TestType.cs" />
     <Compile Include="Model\Test\TestMethodGroupingField.cs" />
     <Compile Include="Model\Test\TestMethodWrapper.cs" />
     <Compile Include="Model\Test\TestMethodWrapperContainer.cs" />
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
-	<Compile Include="Processors\MSTestExecutor.cs" />
+    <Compile Include="Processors\MSTestExecutor.cs" />
     <Compile Include="Processors\NUnitTestExecutor.cs" />
     <Compile Include="Processors\Discoverer.cs" />
     <Compile Include="Processors\VSEventsHandler.cs" />
@@ -200,7 +203,10 @@
       <DependentUpon>TestExplorerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TestExplorerToolWindow.cs" />
-	<Compile Include="Views\TreeHeader.xaml.cs">
+    <Compile Include="Views\TestResults.xaml.cs">
+      <DependentUpon>TestResults.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TreeHeader.xaml.cs">
       <DependentUpon>TreeHeader.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -235,7 +241,7 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-   <Resource Include="Resources\Refresh.png" />
+    <Resource Include="Resources\Refresh.png" />
     <Resource Include="Resources\Property.png" />
     <Resource Include="Resources\Failed.png" />
     <Resource Include="Resources\Inconclusive.png" />
@@ -263,7 +269,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-	<Page Include="Views\TreeHeader.xaml">
+    <Page Include="Views\TestResults.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\TreeHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

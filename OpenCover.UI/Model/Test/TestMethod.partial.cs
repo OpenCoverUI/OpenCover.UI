@@ -10,7 +10,15 @@ namespace OpenCover.UI.Model.Test
 	internal partial class TestMethod : SharpTreeNode
 	{
 		/// <summary>
-		/// Gets or sets the class that this method belongs to.
+		/// Initializes a new instance of the <see cref="TestMethod"/> class.
+		/// </summary>
+		public TestMethod()
+		{
+			ExecutionResult = new TestResult(null, TestExecutionStatus.NotRun, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Gets or sets the class that this testResult belongs to.
 		/// </summary>
 		/// <value>
 		/// The class.
@@ -18,12 +26,9 @@ namespace OpenCover.UI.Model.Test
 		public TestClass Class { get; set; }
 
 		/// <summary>
-		/// Gets or sets the test execution status.
+		/// Gets or sets the execution result.
 		/// </summary>
-		/// <value>
-		/// The execution status.
-		/// </value>
-		public TestExecutionStatus ExecutionStatus { get; set; }
+		public TestResult ExecutionResult { get; set; }
 
 		/// <summary>
 		/// Gets the icon.
@@ -32,7 +37,7 @@ namespace OpenCover.UI.Model.Test
 		{
 			get
 			{
-				return IDEHelper.GetImageURL(GetIcon());
+				return IDEHelper.GetImageURL(IDEHelper.GetIcon(ExecutionResult.Status));
 			}
 		}
 
@@ -59,7 +64,7 @@ namespace OpenCover.UI.Model.Test
 		}
 
 		/// <summary>
-		/// Clones the test method
+		/// Clones the test testResult
 		/// </summary>
 		public TestMethod Clone()
 		{
@@ -68,29 +73,10 @@ namespace OpenCover.UI.Model.Test
 				Name = this.Name,
 				Class = this.Class,
 				Traits = this.Traits,
-				ExecutionStatus = this.ExecutionStatus
+				ExecutionResult = this.ExecutionResult != null ? this.ExecutionResult.Clone() : null
 			};
 
 			return method;
-		}
-
-		private string GetIcon()
-		{
-			string icon = "Resources/{0}";
-
-			switch (ExecutionStatus)
-			{
-				case TestExecutionStatus.NotRun:
-					return string.Format(icon, "NotRun.png");
-				case TestExecutionStatus.Successful:
-					return string.Format(icon, "Successful.png");
-				case TestExecutionStatus.Error:
-					return string.Format(icon, "Failed.png");
-				case TestExecutionStatus.Inconclusive:
-					return string.Format(icon, "Inconclusive.png");
-				default:
-					return string.Format(icon, "NotRun.png");
-			}
 		}
 	}
 }

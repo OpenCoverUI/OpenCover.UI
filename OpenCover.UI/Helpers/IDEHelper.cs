@@ -5,6 +5,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using OpenCover.UI.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -233,6 +234,25 @@ namespace OpenCover.UI.Helpers
 			}
 
 			return Path.Combine(absoluteOutputPath, project.Properties.Item("OutputFileName").Value.ToString());
+		}
+
+		internal static string GetIcon(TestExecutionStatus status)
+		{
+			string icon = "Resources/{0}";
+
+			switch (status)
+			{
+				case TestExecutionStatus.NotRun:
+					return string.Format(icon, "NotRun.png");
+				case TestExecutionStatus.Successful:
+					return string.Format(icon, "Successful.png");
+				case TestExecutionStatus.Error:
+					return string.Format(icon, "Failed.png");
+				case TestExecutionStatus.Inconclusive:
+					return string.Format(icon, "Inconclusive.png");
+				default:
+					return string.Format(icon, "NotRun.png");
+			}
 		}
 
 		/// <summary>

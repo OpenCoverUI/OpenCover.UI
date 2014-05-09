@@ -20,16 +20,14 @@ namespace OpenCover.UI.Converters
 		/// <param name="parameter">The converter parameter to use.</param>
 		/// <param name="culture">The culture to use in the converter.</param>
 		/// <returns>
-		/// A converted value. If the method returns null, the valid null value is used.
+		/// A converted value. If the testResult returns null, the valid null value is used.
 		/// </returns>
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			var userControl = value as Control;
+			double width = System.Convert.ToDouble(value);
 			double percentage = System.Convert.ToDouble(parameter);
 
-			userControl.Width = userControl.ActualWidth;
-
-			return Double.NaN;
+			return width * percentage / 100;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -136,7 +136,7 @@ namespace OpenCover.UI.Commands
 		}
 
 		/// <summary>
-		/// Runs OpenCover for gathering code coverage details. This method gets called after the build is completed
+		/// Runs OpenCover for gathering code coverage details. This testResult gets called after the build is completed
 		/// </summary>
 		private void RunOpenCover()
 		{
