@@ -3,14 +3,12 @@
 //
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mono.Cecil;
-using NUnit;
 using NUnit.Framework;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace OpenCover.UI.TestDiscoverer
 {
@@ -96,7 +94,7 @@ namespace OpenCover.UI.TestDiscoverer
 							if (customAttributes != null)
 							{
 								isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
-								isNUnitTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName);
+								isNUnitTest = IsNUnitTest(type);
 							}
 						}
 						catch { }
@@ -119,6 +117,30 @@ namespace OpenCover.UI.TestDiscoverer
 			}
 
 			return classes;
+		}
+
+		/// <summary>
+		/// Determines whether the Type has TestFixtrue Attribute on itself or on one of its parents
+		/// </summary>
+		/// <param name="type">The type.</param>
+		private bool IsNUnitTest(TypeDefinition type)
+		{
+			if (type == null)
+			{
+				return false;
+			}
+
+			if (type.CustomAttributes != null && type.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName))
+			{
+				return true;
+			}
+
+			if (type.BaseType != null && type.BaseType is TypeDefinition)
+			{
+				return IsNUnitTest(type.BaseType as TypeDefinition);
+			}
+
+			return false;
 		}
 
 		/// <summary>
