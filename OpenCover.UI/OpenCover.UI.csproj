@@ -37,6 +37,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.TreeView, Version=5.0.0.0, Culture=neutral, PublicKeyToken=f829da5c02be14ee, processorArchitecture=MSIL">
@@ -144,6 +145,7 @@
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
+    <Compile Include="Commands\MSTestSettingsFileSelectorCommand.cs" />
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
     <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
@@ -227,6 +229,7 @@
       <Link>license.md</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\Successful.png" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

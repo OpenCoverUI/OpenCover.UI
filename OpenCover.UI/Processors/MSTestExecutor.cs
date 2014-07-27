@@ -52,9 +52,11 @@ namespace OpenCover.UI.Processors
 
 			SetOpenCoverResultsFilePath();
 
+			string testSettingsFile = _package.Commands.OfType<MSTestSettingsFileSelectorCommand>().FirstOrDefault().SelectedFile;
+
 			_commandLineArguments = String.Format(_commandlineStringFormat,
 										_vsTestPath,
-										String.Format("{0} {1} /Logger:trx", dllPaths, builder.ToString()),
+										String.Format("{0} {1} /Logger:trx{2}", dllPaths, builder.ToString(), String.IsNullOrWhiteSpace(testSettingsFile) ? String.Empty : String.Format(" /Settings:\\\"{0}\\\"", testSettingsFile)),
 										_openCoverResultsFile);
 		}
 

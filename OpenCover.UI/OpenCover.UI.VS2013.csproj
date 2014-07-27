@@ -33,6 +33,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -149,6 +150,7 @@
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
+    <Compile Include="Commands\MSTestSettingsFileSelectorCommand.cs" />
     <Compile Include="Commands\TestExplorerToolWindowCommand.cs" />
     <Compile Include="Commands\TestsExplorerToolbarCommands.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />

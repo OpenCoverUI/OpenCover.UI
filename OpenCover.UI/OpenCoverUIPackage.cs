@@ -173,6 +173,9 @@ namespace OpenCover.UI
 				var testExplorerToolWindowCommand = new TestExplorerToolWindowCommand(this);
 				mcs.AddCommand(testExplorerToolWindowCommand);
 
+				var testSettingsFileSelectorCommand = new MSTestSettingsFileSelectorCommand(this);
+				mcs.AddCommand(testSettingsFileSelectorCommand);
+
 				foreach (var command in TestsExplorerToolbarCommands.Commands)
 				{
 					mcs.AddCommand(command);
@@ -181,6 +184,7 @@ namespace OpenCover.UI
 				Commands.Add(executeSelectedTestsCommand);
 				Commands.Add(codeCoverageToolWindowCommand);
 				Commands.Add(testExplorerToolWindowCommand);
+				Commands.Add(testSettingsFileSelectorCommand);
 			}
 		}
 	}
