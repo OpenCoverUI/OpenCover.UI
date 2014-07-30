@@ -1,18 +1,16 @@
-﻿using Microsoft.Win32;
-using OpenCover.UI.Model;
-//
+﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
-using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
+using Microsoft.Win32;
 using OpenCover.UI.Helpers;
+using OpenCover.UI.Model;
+using OpenCover.UI.Model.Test;
 
 namespace OpenCover.UI.Processors
 {
@@ -50,7 +48,7 @@ namespace OpenCover.UI.Processors
 			_testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));
 			_runListFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.txt", fileFormat));
 
-			_commandLineArguments = String.Format(_commandlineStringFormat,
+			_commandLineArguments = String.Format(CommandlineStringFormat,
 													_nUnitPath,
 													String.Format("{0} /runlist=\\\"{1}\\\" /nologo /noshadow /result=\\\"{2}\\\"", dllPaths, _runListFile, _testResultsFile),
 													_openCoverResultsFile);

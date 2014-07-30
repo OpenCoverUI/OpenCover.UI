@@ -1,19 +1,18 @@
 ﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
-using OpenCover.Framework.Model;
-using OpenCover.UI.Helpers;
-using OpenCover.UI.Model;
-using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using OpenCover.Framework.Model;
+using OpenCover.UI.Helpers;
+using OpenCover.UI.Model;
+using OpenCover.UI.Model.Test;
 
 namespace OpenCover.UI.Processors
 {
@@ -22,7 +21,33 @@ namespace OpenCover.UI.Processors
 	/// </summary>
 	internal abstract class TestExecutor
 	{
-		protected const string _commandlineStringFormat = "-target:\"{0}\" -targetargs:\"{1}\" -output:\"{2}\" -hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*";
+	    private const string _fixedCommandLineParameters = "-target:\"{0}\" -targetargs:\"{1}\" -output:\"{2}\"";
+
+        private const string _defaultCustomizableCommandLineParameters =
+	        "-hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*";
+
+        private readonly CommandLineParameterReader _commandLineParameterReader = new CommandLineParameterReader();
+
+        /// <summary>
+        /// Gets the commandline string format.
+        /// </summary>
+        /// <value>
+        /// The commandline string format.
+        /// </value>
+		protected string CommandlineStringFormat 
+        {
+            get
+            {
+                var customizableParameters = _defaultCustomizableCommandLineParameters;
+                if (_commandLineParameterReader.ReadParameters(_currentWorkingDirectory))
+                {
+                    customizableParameters = String.Join(" ", _commandLineParameterReader.Parameters);
+                }
+
+                return String.Format("{0} {1}", _fixedCommandLineParameters, customizableParameters);
+            }
+        }
+
 		protected readonly string _openCoverPath;
 		
 		protected string _openCoverResultsFile;

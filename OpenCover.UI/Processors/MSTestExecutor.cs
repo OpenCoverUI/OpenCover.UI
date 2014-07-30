@@ -1,9 +1,9 @@
-﻿using OpenCover.UI.Commands;
-using OpenCover.UI.Helpers;
-using OpenCover.UI.Model;
-//
+﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
+using OpenCover.UI.Commands;
+using OpenCover.UI.Helpers;
+using OpenCover.UI.Model;
 using OpenCover.UI.Model.Test;
 using System;
 using System.Collections.Generic;
@@ -54,7 +54,7 @@ namespace OpenCover.UI.Processors
 
 			string testSettingsFile = _package.Commands.OfType<MSTestSettingsFileSelectorCommand>().FirstOrDefault().SelectedFile;
 
-			_commandLineArguments = String.Format(_commandlineStringFormat,
+			_commandLineArguments = String.Format(CommandlineStringFormat,
 										_vsTestPath,
 										String.Format("{0} {1} /Logger:trx{2}", dllPaths, builder.ToString(), String.IsNullOrWhiteSpace(testSettingsFile) ? String.Empty : String.Format(" /Settings:\\\"{0}\\\"", testSettingsFile)),
 										_openCoverResultsFile);
