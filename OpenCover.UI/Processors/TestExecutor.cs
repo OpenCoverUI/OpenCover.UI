@@ -26,7 +26,7 @@ namespace OpenCover.UI.Processors
         private const string _defaultCustomizableCommandLineParameters =
 	        "-hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*";
 
-        private readonly CommandLineParameterReader _commandLineParameterReader = new CommandLineParameterReader();
+        private readonly ConfigurationReader _commandLineParameterReader = new ConfigurationReader();
 
         /// <summary>
         /// Gets the commandline string format.
@@ -39,7 +39,7 @@ namespace OpenCover.UI.Processors
             get
             {
                 var customizableParameters = _defaultCustomizableCommandLineParameters;
-                if (_commandLineParameterReader.ReadParameters(_currentWorkingDirectory))
+                if (_commandLineParameterReader.ReadConfiguration(_currentWorkingDirectory))
                 {
                     customizableParameters = String.Join(" ", _commandLineParameterReader.Parameters);
                 }
@@ -174,7 +174,13 @@ namespace OpenCover.UI.Processors
 					coverageSession = serializer.Deserialize(stream) as CoverageSession;
 				}
 
-				System.IO.File.Delete(_openCoverResultsFile);
+			    if (_commandLineParameterReader.ReadConfiguration(_currentWorkingDirectory))
+			    {
+			        ExecuteTestResultPostProcessor(_testResultsFile);
+			        ExecuteCoverageResultPostProcessor(_openCoverResultsFile);
+			    }
+
+			    System.IO.File.Delete(_openCoverResultsFile);
 			}
 			catch (Exception ex)
 			{
@@ -185,7 +191,69 @@ namespace OpenCover.UI.Processors
 			return coverageSession;
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Executes the test result post processor.
+        /// </summary>
+        /// <param name="testResultsFile">The test results file.</param>
+        private void ExecuteTestResultPostProcessor(string testResultsFile)
+        {
+            var command = _commandLineParameterReader.TestResultPostProcessorCommand;
+            ExecutePostProcessor(command, testResultsFile);
+        }
+
+        /// <summary>
+        /// Executes the coverage result post processor.
+        /// </summary>
+        /// <param name="testCoverageResultsFile">The test coverage results file.</param>
+        private void ExecuteCoverageResultPostProcessor(string testCoverageResultsFile)
+        {
+            var command = _commandLineParameterReader.CoverageResultPostProcessorCommand;
+            ExecutePostProcessor(command, testCoverageResultsFile);
+        }
+
+        /// <summary>
+        /// Executes the post processor.
+        /// </summary>
+        /// <param name="command">The command.</param>
+        /// <param name="resultsFile">The results file.</param>
+        private void ExecutePostProcessor(string command, string resultsFile)
+        {
+            var normalizedCommand = Path.Combine(_currentWorkingDirectory.FullName, command);
+            if (System.IO.File.Exists(normalizedCommand) && System.IO.File.Exists(resultsFile))
+            {
+                if (!String.IsNullOrWhiteSpace(String.Format("cmd /C {0}", normalizedCommand)))
+                {
+                    var postProcessorInfo = new ProcessStartInfo(normalizedCommand, resultsFile)
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        WorkingDirectory = _currentWorkingDirectory.FullName
+                    };
+
+                    IDEHelper.WriteToOutputWindow("{0} {1}", command, postProcessorInfo.Arguments);
+
+                    Process process = Process.Start(postProcessorInfo);
+                    Debug.Assert(process != null, "process != null");
+                    while (!process.HasExited)
+                    {
+                        var nextLine = process.StandardOutput.ReadLine();
+                        IDEHelper.WriteToOutputWindow(nextLine);
+                    }
+
+                    process.WaitForExit();
+
+                    IDEHelper.WriteToOutputWindow(process.StandardError.ReadToEnd());
+                }
+            }
+            else
+            {
+                IDEHelper.WriteToOutputWindow("Cannot find '{0}', when executing on {1}", normalizedCommand, resultsFile);
+            }
+        }
+
+	    /// <summary>
 		/// Builds the DLL path.
 		/// </summary>
 		protected string BuildDLLPath()
