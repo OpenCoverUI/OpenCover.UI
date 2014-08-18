@@ -181,6 +181,7 @@
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
+    <Compile Include="Processors\ConfigurationReader.cs" />
     <Compile Include="Processors\Discoverer.cs" />
     <Compile Include="Processors\MSTestExecutor.cs" />
     <Compile Include="Processors\NUnitTestExecutor.cs" />
