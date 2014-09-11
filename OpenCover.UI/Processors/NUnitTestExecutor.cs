@@ -3,10 +3,12 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
+using EnvDTE;
 using Microsoft.Win32;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model;
@@ -125,40 +127,54 @@ namespace OpenCover.UI.Processors
 			}
 		}
 
+	   private IEnumerable<DirectoryInfo> ProgramFilesFolders()
+	   {
+	      var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+	      if (Environment.Is64BitOperatingSystem)
+	      {
+	         if (path.EndsWith(" (x86)"))
+	         {
+	            yield return new DirectoryInfo(path.Replace(" (x86)", ""));
+	         }
+	         else
+	         {
+	            yield return new DirectoryInfo(path + " (x86)");
+	         }
+	      }
+         yield return new DirectoryInfo(path);
+	   }
+
 		/// <summary>
 		/// Sets the NUnit path.
 		/// </summary>
 		private void SetNUnitPath()
 		{
-			var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-			var programFilesDirectoryInfo = new DirectoryInfo(programFiles);
-			var nUnitDirectories = programFilesDirectoryInfo.GetDirectories("NUnit*");
+		   _nUnitPath = OpenCoverUISettings.Default.NUnitPath;
+		   if (!File.Exists(_nUnitPath))
+		   {
+		      var nunits =
+		         from programDir in ProgramFilesFolders()
+		         from nunitDir in programDir.GetDirectories("NUnit*")
+		         orderby nunitDir.LastWriteTime descending
+		         let nunitPath = Path.Combine(nunitDir.FullName, "bin", "nunit-console.exe")
+		         where File.Exists(nunitPath)
+		         select nunitPath;
 
-			if (nUnitDirectories != null)
-			{
-				var latestInstalledNUnitDirectory = nUnitDirectories.OrderByDescending(d => d.LastWriteTime).FirstOrDefault();
-				if (latestInstalledNUnitDirectory != null)
-				{
-					_nUnitPath = Path.Combine(latestInstalledNUnitDirectory.FullName, "bin", "nunit-console.exe");
-
-					if (!File.Exists(_nUnitPath))
-					{
-						_nUnitPath = null;
-					}
-				}
-			}
-
-			if (_nUnitPath == null)
-			{
-				MessageBox.Show("NUnit not found at its default path. Please select the Nunit executable", Resources.MessageBoxTitle, MessageBoxButton.OK);
-				var dialog = new OpenFileDialog();
-				dialog.Filter = "Executables (*.exe)|*.exe";
-
-				if (dialog.ShowDialog() == true)
-				{
-					_nUnitPath = dialog.FileName;
-				}
-			}
+		      _nUnitPath = nunits.FirstOrDefault();               
+		         
+		      if (_nUnitPath == null)
+		      {
+		         MessageBox.Show("NUnit not found at its default path. Please select the Nunit executable",
+		            Resources.MessageBoxTitle, MessageBoxButton.OK);
+		         var dialog = new OpenFileDialog {Filter = "Executables (*.exe)|*.exe"};
+		         if (dialog.ShowDialog() == true)
+		         {
+		            _nUnitPath = dialog.FileName;
+		            OpenCoverUISettings.Default.NUnitPath = _nUnitPath;
+		            OpenCoverUISettings.Default.Save();
+		         }
+		      }
+		   }
 		}
 
 		/// <summary>
