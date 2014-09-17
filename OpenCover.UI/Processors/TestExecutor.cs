@@ -24,7 +24,7 @@ namespace OpenCover.UI.Processors
 		private const string _fixedCommandLineParameters = "-target:\"{0}\" -targetargs:\"{1}\" -output:\"{2}\"";
 
 		private const string _defaultCustomizableCommandLineParameters =
-			"-hideskipped:All -register:user -excludebyattribute:*.ExcludeFromCodeCoverage*";
+			"-hideskipped:All -register:user";
 
 		private readonly ConfigurationReader _commandLineParameterReader = new ConfigurationReader();
 
@@ -57,6 +57,7 @@ namespace OpenCover.UI.Processors
 		protected Tuple<IEnumerable<String>, IEnumerable<String>, IEnumerable<String>> _selectedTests;
 		protected OpenCoverUIPackage _package;
 		protected DirectoryInfo _currentWorkingDirectory;
+		protected DirectoryInfo _currentTestWorkingDirectory;
 		protected Dictionary<string, IEnumerable<TestResult>> _executionStatus;
 
 		/// <summary>
@@ -140,11 +141,6 @@ namespace OpenCover.UI.Processors
 				}
 
 				string nextLine = process.StandardOutput.ReadLine();
-				if (!String.IsNullOrWhiteSpace(nextLine) && nextLine.StartsWith("Results File:"))
-				{
-					_testResultsFile = nextLine.Replace("Results File: ", "");
-				}
-
 				IDEHelper.WriteToOutputWindow(nextLine);
 				consoleOutputReaderBuilder.AppendLine(nextLine);
 			}
@@ -276,8 +272,9 @@ namespace OpenCover.UI.Processors
 
 			// Create a working directory
 			_currentWorkingDirectory = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(solution.FileName), "OpenCover"));
+			_currentTestWorkingDirectory = Directory.CreateDirectory(Path.Combine(_currentWorkingDirectory.FullName, Guid.NewGuid().ToString()));
 
-			_openCoverResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
+			_openCoverResultsFile = Path.Combine(_currentTestWorkingDirectory.FullName, String.Format("{0}.xml", Guid.NewGuid()));
 		}
 
 		/// <summary>
@@ -351,7 +348,7 @@ namespace OpenCover.UI.Processors
 				RedirectStandardError = true,
 				UseShellExecute = false,
 				CreateNoWindow = true,
-				WorkingDirectory = _currentWorkingDirectory.FullName
+				WorkingDirectory = _currentTestWorkingDirectory.FullName
 			};
 
 			IDEHelper.WriteToOutputWindow(openCoverStartInfo.Arguments);

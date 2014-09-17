@@ -60,7 +60,8 @@ namespace OpenCover.UI.Views
 		internal void Initialize(OpenCoverUIPackage package)
 		{
 			_package = package;
-			_package.VSEventsHandler.BuildDone += DiscoverTests;
+			_package.VSEventsHandler.BuildSucceeded += DiscoverTests;
+			_package.VSEventsHandler.BuildFailed += () => { IDEHelper.WriteToOutputWindow("Build failed. Please make sure your solution builds properly before refreshing this window."); };
 			_package.VSEventsHandler.SolutionOpened += DiscoverTests;
 			_package.VSEventsHandler.SolutionClosing += ClearTestsTreeViewChildren;
 		}

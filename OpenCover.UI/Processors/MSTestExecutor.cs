@@ -104,6 +104,8 @@ namespace OpenCover.UI.Processors
 
 		protected override void ReadTestResults()
 		{
+			UpdateTestResultsFile();
+
 			if (File.Exists(_testResultsFile))
 			{
 				XNamespace ns = "http://microsoft.com/schemas/VisualStudio/TeamTest/2010";
@@ -140,9 +142,9 @@ namespace OpenCover.UI.Processors
 
 											});
 
-				_execution = unitTests.Join(results, 
-					f => new { f.executionId, f.testId }, 
-					r => new { r.executionId, r.testId }, 
+				_execution = unitTests.Join(results,
+					f => new { f.executionId, f.testId },
+					r => new { r.executionId, r.testId },
 					(f, r) =>
 					{
 						r.result.MethodName = f.methodName;
@@ -151,17 +153,26 @@ namespace OpenCover.UI.Processors
 			}
 		}
 
+		private void UpdateTestResultsFile()
+		{
+			var files = Directory.GetFiles(Path.Combine(_currentTestWorkingDirectory.FullName, "TestResults"), "*.trx");
+			if (files != null && files.Length > 0)
+			{
+				_testResultsFile = files[0];
+			}
+		}
+
 		private TestResult GetTestResult(XElement ut, XNamespace ns)
 		{
 			var output = ut.Element(ns + "Output");
-											XElement errorInfo = null;
-											if (output != null)
-											{
-												errorInfo = output.Element(ns + "ErrorInfo");
-											}
+			XElement errorInfo = null;
+			if (output != null)
+			{
+				errorInfo = output.Element(ns + "ErrorInfo");
+			}
 
-											var errorMessage = errorInfo != null ? GetElementValue(errorInfo, "Message", ns) : null;
-											var stackTrace = errorInfo != null ? GetElementValue(errorInfo, "StackTrace", ns) : null;
+			var errorMessage = errorInfo != null ? GetElementValue(errorInfo, "Message", ns) : null;
+			var stackTrace = errorInfo != null ? GetElementValue(errorInfo, "StackTrace", ns) : null;
 
 			return new TestResult(null,
 								GetTestExecutionStatus(GetAttributeValue(ut, "outcome")),
@@ -169,7 +180,6 @@ namespace OpenCover.UI.Processors
 								errorMessage,
 								stackTrace,
 								null);
-
 		}
 
 		internal override void UpdateTestMethodsExecution(IEnumerable<TestClass> tests)

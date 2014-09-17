@@ -20,7 +20,15 @@ namespace OpenCover.UI.Processors
 	public class VSEventsHandler
 	{
 		private OpenCoverUIPackage _package;
-        private SolutionEvents _solutionEvents;
+		private SolutionEvents _solutionEvents;
+		private bool _building;
+		private bool _buildSuccessful;
+
+		public event Action BuildSucceeded;
+		public event Action BuildFailed;
+		public event Action SolutionOpened;
+		public event Action SolutionClosing;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VSEventsHandler"/> class.
 		/// </summary>
@@ -28,14 +36,11 @@ namespace OpenCover.UI.Processors
 		public VSEventsHandler(OpenCoverUIPackage package)
 		{
 			_package = package;
-            _solutionEvents = _package.DTE.Events.SolutionEvents;
-            _solutionEvents.Opened += OnSolutionOpened;
-            _solutionEvents.AfterClosing += OnSolutionClosing;
+			_solutionEvents = _package.DTE.Events.SolutionEvents;
+			_solutionEvents.Opened += OnSolutionOpened;
+			_solutionEvents.AfterClosing += OnSolutionClosing;
+			_buildSuccessful = true;
 		}
-
-		public event Action BuildDone;
-		public event Action SolutionOpened;
-		public event Action SolutionClosing;
 
 		/// <summary>
 		/// Builds the solution.
@@ -60,10 +65,23 @@ namespace OpenCover.UI.Processors
 		/// <param name="Action">The action.</param>
 		void OnBuildDone(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
 		{
-			if (BuildDone != null)
+			if (_buildSuccessful)
 			{
-				BuildDone();
+				if (BuildSucceeded != null)
+				{
+					BuildSucceeded();
+				}
 			}
+			else
+			{
+				if (BuildFailed != null)
+				{
+					BuildFailed();
+				}
+			}
+
+			_building = false;
+			_buildSuccessful = true;
 		}
 
 		/// <summary>
@@ -71,11 +89,25 @@ namespace OpenCover.UI.Processors
 		/// </summary>
 		private void OnSolutionOpened()
 		{
+			_package.DTE.Events.BuildEvents.OnBuildProjConfigDone += OnBuildProjConfigDone;
 			_package.DTE.Events.BuildEvents.OnBuildDone += OnBuildDone;
 
 			if (SolutionOpened != null)
 			{
 				SolutionOpened();
+			}
+		}
+
+		private void OnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
+		{
+			if (!_building)
+			{
+				_building = true;
+			}
+
+			if (!success)
+			{
+				_buildSuccessful = false;
 			}
 		}
 
@@ -92,6 +124,7 @@ namespace OpenCover.UI.Processors
 			}
 
 			_package.DTE.Events.BuildEvents.OnBuildDone -= OnBuildDone;
+			_package.DTE.Events.BuildEvents.OnBuildProjConfigDone -= OnBuildProjConfigDone;
 		}
 	}
 }

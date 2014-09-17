@@ -102,7 +102,6 @@
 			</Button>
 			<Button guid="guidOpenCoverUICmdSet" id="cmdidCodeCoverageTestWindow" priority="0x0100" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup"/>
-				<Icon guid="guidIcon" id="OpenCoverLogo" />
 				<Strings>
 					<ButtonText>OpenCover Test Explorer</ButtonText>
 				</Strings>

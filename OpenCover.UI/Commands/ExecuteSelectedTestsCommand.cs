@@ -116,13 +116,27 @@ namespace OpenCover.UI.Commands
 			// show tool window which shows the progress.
 			ShowCodeCoverageResultsToolWindow();
 
-			Enabled = false;
-			_isRunningCodeCoverage = true;
-			_package.VSEventsHandler.BuildDone += RunOpenCover;
+			SetCommandAvailabilityStatus(false);
+			_package.VSEventsHandler.BuildSucceeded += RunOpenCover;
+			_package.VSEventsHandler.BuildFailed += () => SetCommandAvailabilityStatus(false);
 			_package.VSEventsHandler.BuildSolution();
-			
 		}
 
+		/// <summary>
+		/// Sets the command availability status to either true or false.
+		/// </summary>
+		/// <param name="status">if set to <c>true</c> [status].</param>
+		private void SetCommandAvailabilityStatus(bool status)
+		{
+			Enabled = status;
+			_isRunningCodeCoverage = !status;
+		}
+
+		/// <summary>
+		/// Sets the test executor based on the type of Unit Tests selected.
+		/// </summary>
+		/// <param name="selectedMSTests">The selected ms tests.</param>
+		/// <param name="selectedNUnitTests">The selected n unit tests.</param>
 		private void SetTestExecutor(Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedMSTests, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests)
 		{
 			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
@@ -149,7 +163,6 @@ namespace OpenCover.UI.Commands
 					
 					try
 					{
-
 						control.IsLoading = true;
 						Tuple<string, string> files = _testExecutor.Execute();
 						var finalResults = _testExecutor.GetExecutionResults();
@@ -185,9 +198,12 @@ namespace OpenCover.UI.Commands
 					}
 				});
 
-			_package.VSEventsHandler.BuildDone -= RunOpenCover;
+			_package.VSEventsHandler.BuildSucceeded -= RunOpenCover;
 		}
 
+		/// <summary>
+		/// Shows the code coverage results tool window.
+		/// </summary>
 		private void ShowCodeCoverageResultsToolWindow()
 		{
 			_package.Commands.OfType<CodeCoverageToolWindowCommand>().First().Invoke();
