@@ -91,6 +91,7 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
     <Reference Include="System.Runtime.Serialization" />
@@ -181,6 +182,11 @@
     <Compile Include="Model\TrackedMethod.cs" />
     <Compile Include="Converters\WidthConverter.cs" />
     <Compile Include="Helpers\IDEHelper.cs" />
+    <Compile Include="OpenCoverUISettings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>OpenCoverUISettings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Processors\ConfigurationReader.cs" />
     <Compile Include="Processors\Discoverer.cs" />
     <Compile Include="Processors\MSTestExecutor.cs" />
@@ -236,6 +242,11 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="Resources\Successful.png" />
+    <None Include="app.config" />
+    <None Include="OpenCoverUISettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>OpenCoverUISettings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
