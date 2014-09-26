@@ -219,17 +219,7 @@ namespace OpenCover.UI.Model
 			{
 				try
 				{
-					var methodName = Method.Name.Split(new[] { ':' })[2];
-
-					string searchText = Method.IsGetter ? "get_" : Method.IsSetter ? "set_" : null;
-
-					if (searchText != null)
-					{
-						methodName = methodName.Replace(searchText, "");
-						methodName = methodName.Substring(0, methodName.IndexOf("("));
-					}
-
-					return methodName;
+					return Method.Name.Split(new[] { ':' })[2];
 				}
 				catch
 				{
