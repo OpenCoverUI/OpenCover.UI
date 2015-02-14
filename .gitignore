@@ -15,8 +15,7 @@ build/
 [Bb]in/
 [Oo]bj/
 
-# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
-!packages/*/build/
+
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -154,3 +153,9 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+packages
+!packages/repositories.config
+
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+!packages/*/build/

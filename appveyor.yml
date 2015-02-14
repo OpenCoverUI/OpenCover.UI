@@ -1,0 +1,11 @@
+version: 1.0.{build}
+os: Windows Server 2012 R2
+configuration: Release
+build:
+  project: OpenCover.UI.VS2013.sln
+  parallel: true
+  verbosity: minimal
+test: off
+artifacts:
+- path: OpenCover.UI\bin\Release\OpenCover.UI.vsix
+  name: VSIX
