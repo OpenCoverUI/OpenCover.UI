@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<!--This source code is released under the GPL License; Please read license.md file for more details-->
+<!--This source code is released under the MIT License; Please read license.md file for more details-->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
 	<Extern href="stdidcmd.h"/>
