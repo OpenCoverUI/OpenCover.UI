@@ -13,8 +13,6 @@ No configuration option is available yet.
 ================================================================================================
 LICENSE
 
-Copyright (c) 2014 Raghavendra Nagaraj
+Copyright (c) 2015 Raghavendra Nagaraj
 
 Please refer to the license.md file for the license.
-
-For commercial license contact jamdagni86@gmail.com!
