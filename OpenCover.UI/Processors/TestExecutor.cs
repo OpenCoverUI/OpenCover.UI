@@ -13,6 +13,7 @@ using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model;
 using OpenCover.UI.Model.Test;
+using Microsoft.Win32;
 
 namespace OpenCover.UI.Processors
 {
@@ -48,7 +49,7 @@ namespace OpenCover.UI.Processors
 			}
 		}
 
-		protected readonly string _openCoverPath;
+		protected string _openCoverPath;
 		
 		protected string _openCoverResultsFile;
 		protected string _testResultsFile;
@@ -70,11 +71,30 @@ namespace OpenCover.UI.Processors
 			_package = package;
 			_selectedTests = selectedTests;
 
-			_openCoverPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-												@"Apps\OpenCover\OpenCover.Console.exe");
+            SetOpenCoverPath();
 
 			_executionStatus = new Dictionary<string, IEnumerable<TestResult>>();
 		}
+
+        /// <summary>
+        /// Sets the OpenCover path.
+        /// </summary>
+        private void SetOpenCoverPath()
+        {
+            _openCoverPath = OpenCoverUISettings.Default.OpenCoverPath;
+            if (!System.IO.File.Exists(_openCoverPath))
+            {
+                MessageBox.Show("OpenCover not found. Please select the OpenCover executable",
+                    Resources.MessageBoxTitle, MessageBoxButton.OK);
+                var dialog = new OpenFileDialog { Filter = "Executables (*.exe)|*.exe" };
+                if (dialog.ShowDialog() == true)
+                {
+                    _openCoverPath = dialog.FileName;
+                    OpenCoverUISettings.Default.OpenCoverPath = _openCoverPath;
+                    OpenCoverUISettings.Default.Save();
+                }
+            }
+        }
 
 		/// <summary>
 		/// Validates the length of the command line arguments.
