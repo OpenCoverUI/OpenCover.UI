@@ -106,6 +106,12 @@
 					<ButtonText>OpenCover Test Explorer</ButtonText>
 				</Strings>
 			</Button>
+      <Button guid="guidOpenCoverUICmdSet" id="OpenCoverOpenSettings" priority="0x0100" type="Button">
+        <Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup"/>
+        <Strings>
+          <ButtonText>OpenCover UI Settings</ButtonText>
+        </Strings>
+      </Button>
 			<Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuButton" priority="1" type="Button">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup" />
 				<Icon guid="guidIcon" id="OpenCoverLogo" />
@@ -178,8 +184,9 @@
 			<IDSymbol name="cmdidOpenCoverRun" value="0x0100" />
 			<IDSymbol name="cmdidCodeCoverageResults" value="0x0101" />
 			<IDSymbol name="cmdidCodeCoverageTestWindow" value="0x0102" />
-			<IDSymbol name="OpenCoverSelectMSTestSettingsButton" value="0x0103"/>
-		</GuidSymbol>
+      <IDSymbol name="OpenCoverSelectMSTestSettingsButton" value="0x0103"/>
+      <IDSymbol name="OpenCoverOpenSettings" value="0x0104"/>
+    </GuidSymbol>
 		<GuidSymbol name="guidTestExplorerContextMenuCmdSet" value="{1E198C22-5980-4E7E-92F3-F73168D1FB63}">
 			<IDSymbol name="testExplorerContextMenu" value="0x0002"/>
 			<IDSymbol name="testWindowsMenu" value="0x0010"/>

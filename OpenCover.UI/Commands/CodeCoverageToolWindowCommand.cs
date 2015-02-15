@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace OpenCover.UI.Commands
 {
+    /// 
 	/// <summary>
 	/// Shows the Code Coverage Tool Window
 	/// </summary>

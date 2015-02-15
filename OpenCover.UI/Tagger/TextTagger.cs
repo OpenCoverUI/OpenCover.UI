@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Tagging;
+using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Views;
 using System;
@@ -181,7 +182,7 @@ namespace OpenCover.UI.Tagger
 		/// <param name="covered">if set to <c>true</c> [covered].</param>
 		private void AddWordSpansForSequencePointsCoveringMultipleLines(ITextSnapshot snapshot, 
 																		List<SnapshotSpan> wordSpans, 
-																		Framework.Model.SequencePoint sequencePoint, 
+																		SequencePoint sequencePoint, 
 																		int sequencePointStartLine, 
 																		int sequencePointEndLine,
 																		bool covered)
