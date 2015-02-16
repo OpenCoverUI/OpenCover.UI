@@ -9,43 +9,52 @@
 			 xmlns:local="clr-namespace:OpenCover.UI.Model.Test"
 			 xmlns:test="clr-namespace:OpenCover.UI.Model"
 			 xmlns:v="clr-namespace:OpenCover.UI.Views"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.11.0"
+             xmlns:win="clr-namespace:System.Windows;assembly=PresentationFramework"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="300" d:DesignWidth="300"
 			 x:Name="testExplorerControl">
+    
 	<UserControl.Resources>
-		<c:WidthConverter x:Key="widthConverter"/>
-		<c:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
-		<c:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
-		<SolidColorBrush x:Key="gridSplitterColor">
-			<SolidColorBrush.Color>
-				<Color A="255" R="41" G="57" B="85"/>
-			</SolidColorBrush.Color>
-		</SolidColorBrush>
-	</UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml" />
+                <ResourceDictionary>
+                    <c:WidthConverter x:Key="widthConverter"/>
+                    <c:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
+                    <c:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Style>
+        <win:StaticResource ResourceKey="VSUserControlStyle"/>
+    </UserControl.Style>
+    
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="80*" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="20*" />
 		</Grid.RowDefinitions>
-		<sd:SharpTreeView x:Name="TestsTreeView" ShowRoot="False" ShowAlternation="False" ShowRootExpander="False" HorizontalAlignment="Stretch"
-						  Grid.Row="0" Foreground="Black" ShowLines="False" SelectionChanged="TestSelectionChanged">
-			<ListView.View>
-				<sd:SharpGridView>
-					<GridView.Columns>
-						<GridViewColumn>
-							<GridViewColumn.CellTemplate>
-								<DataTemplate>
-									<sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown" Name="method"
+        <sd:SharpTreeView x:Name="TestsTreeView" ShowRootExpander="False" HorizontalAlignment="Stretch"
+						  Grid.Row="0" SelectionChanged="TestSelectionChanged">
+            <ListView.View>
+                <sd:SharpGridView>
+                    <GridView.Columns>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <sd:SharpTreeNodeView MouseRightButtonDown="Grid_MouseRightButtonDown" Name="method"
 															Margin="0 2 0 2" />
-								</DataTemplate>
-							</GridViewColumn.CellTemplate>
-						</GridViewColumn>
-					</GridView.Columns>
-				</sd:SharpGridView>
-			</ListView.View>
-		</sd:SharpTreeView>
-		<GridSplitter Grid.Row="1" Grid.RowSpan="1" ResizeDirection="Rows" Width="Auto" Height="3" HorizontalAlignment="Stretch" Margin="0" Background="{StaticResource gridSplitterColor}" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
+                </sd:SharpGridView>
+            </ListView.View>
+        </sd:SharpTreeView>
+        <GridSplitter Grid.Row="1" Grid.RowSpan="1" ResizeDirection="Rows" Width="Auto" Height="3" HorizontalAlignment="Stretch" Margin="0" />
 		<StackPanel Grid.Row="2" HorizontalAlignment="Stretch" Margin="0" Orientation="Vertical">
 			<TextBlock Text="{Binding TestResult.Caption}" Margin="0,0,0,4" FontWeight="Bold" FontSize="14"/>
 			<ItemsControl ItemsSource="{Binding TestResult.ExecutionStatus}">
@@ -61,16 +70,24 @@
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 			<v:TestResults DataContext="{Binding TestResult.Result}" />
-			<TreeView DataContext="{Binding TestResult.Result}" HorizontalAlignment="Stretch" Visibility="{Binding Path=TestCases, Converter={StaticResource nullToVisibilityConverter}}"
-				MaxHeight="300" BorderThickness="0">
-				<TreeViewItem Header="Test Cases" ItemsSource="{Binding TestCases}" Visibility="{Binding Converter={StaticResource nullToVisibilityConverter}}">
-					<TreeViewItem.ItemTemplate>
-						<DataTemplate>
-							<v:TestResults />
-						</DataTemplate>
-					</TreeViewItem.ItemTemplate>
-				</TreeViewItem>
-			</TreeView>
-		</StackPanel>
+            <Border
+                    Visibility="{Binding Path=TestResult, Converter={StaticResource nullToVisibilityConverter}}">
+                <Border DataContext="{Binding TestResult}" 
+                    Visibility="{Binding Path=Result, Converter={StaticResource nullToVisibilityConverter}}">
+                    <TreeView DataContext="{Binding Result}" HorizontalAlignment="Stretch" 
+                          Visibility="{Binding Path=TestCases, Converter={StaticResource nullToVisibilityConverter}}"
+				          MaxHeight="300" BorderThickness="0" BorderBrush="Transparent">
+                        <TreeViewItem Header="Test Cases" ItemsSource="{Binding TestCases}" 
+                                  Visibility="{Binding Converter={StaticResource nullToVisibilityConverter}}">
+                            <TreeViewItem.ItemTemplate>
+                                <DataTemplate>
+                                    <v:TestResults />
+                                </DataTemplate>
+                            </TreeViewItem.ItemTemplate>
+                        </TreeViewItem>
+                    </TreeView>
+                </Border>
+            </Border>
+        </StackPanel>
 	</Grid>
 </UserControl>

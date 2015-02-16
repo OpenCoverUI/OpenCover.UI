@@ -4,24 +4,38 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.11.0"
+             xmlns:win="clr-namespace:System.Windows;assembly=PresentationFramework"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="300" d:DesignWidth="300"
 			 x:Name="testResults">
-	<UserControl.Resources>
-		<c:WidthConverter x:Key="widthConverter"/>
-		<c:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
-		<c:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
-	</UserControl.Resources>
-	<StackPanel Orientation="Vertical" x:Name="wrapper" HorizontalAlignment="Stretch"
-				MaxWidth="{Binding ActualWidth, ElementName=testExplorerControl}" Margin="0, 2">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml" />
+                <ResourceDictionary>
+                    <c:WidthConverter x:Key="widthConverter"/>
+                    <c:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
+                    <c:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Style>
+        <win:StaticResource ResourceKey="VSUserControlStyle"/>
+    </UserControl.Style>
+
+    <StackPanel Orientation="Vertical" x:Name="wrapper" HorizontalAlignment="Stretch"
+				MaxWidth="{Binding ActualWidth, ElementName=testExplorerControl}" Margin="0, 2" >
 		<StackPanel Orientation="Horizontal" Margin="0,0,0,2">
 			<Image Source="{Binding Path=Status, Converter={StaticResource testExecutionResultStatusToIconConverter}}" Margin="0,0,2,0" />
 			<TextBlock Text="{Binding Status}" FontWeight="Bold" Margin="1,0"/>
 		</StackPanel>
-		<StackPanel Orientation="Horizontal" Margin="0,0,0,2" DataContext="{Binding ExecutionTime}" Visibility="{Binding Converter={StaticResource nullToVisibilityConverter}}">
+		<StackPanel Orientation="Horizontal" Margin="0,0,0,2" DataContext="{Binding ExecutionTime}" 
+                    Visibility="{Binding Converter={StaticResource nullToVisibilityConverter}}">
 			<TextBlock Text="Elapsed time - " FontWeight="Bold"/>
-			<TextBlock Text="{Binding}"/>
-		</StackPanel>
+            <TextBlock Text="{Binding}"/>
+        </StackPanel>
 		<StackPanel Orientation="Vertical" Margin="0,0,0,2" DataContext="{Binding FailureMessages}"
 					Visibility="{Binding Converter={StaticResource nullToVisibilityConverter}}" HorizontalAlignment="Stretch"
 					Width="{Binding ActualWidth, ElementName=testExplorerControl, Converter={StaticResource widthConverter}, ConverterParameter=80}">
