@@ -1,3 +1,5 @@
+[![Build status](https://img.shields.io/appveyor/ci/sawilde/opencover-ui.svg)](https://ci.appveyor.com/project/sawilde/opencover-ui)
+
 OpenCover.UI
 ============
 
