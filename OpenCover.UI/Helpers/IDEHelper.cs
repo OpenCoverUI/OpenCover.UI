@@ -167,7 +167,7 @@ namespace OpenCover.UI.Helpers
 			if (project == null)
 				return;
 
-			if (project.Kind.Contains("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC"))
+			if (project.Kind.Contains("FAE04EC0-301F-11D3-BF4B-00C04F79EFBC") || project.Kind.Contains("F184B08F-C81C-45F6-A57F-5ABD9991F28F"))
 				projectList.Add(project);
 			
 			if (project.ProjectItems == null || project.ProjectItems.Count == 0)

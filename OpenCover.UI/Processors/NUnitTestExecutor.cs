@@ -152,11 +152,19 @@ namespace OpenCover.UI.Processors
 		   _nUnitPath = OpenCoverUISettings.Default.NUnitPath;
 		   if (!File.Exists(_nUnitPath))
 		   {
-		      var nunits =
+                var consoleName = "nunit-console.exe";
+               if (Environment.Is64BitOperatingSystem && _selectedTests != null && _selectedTests.Item3 != null && _selectedTests.Item3.Any())
+               {
+                   // check whether any test assembly was build as x86.
+                   if (IsX86Build(_selectedTests.Item3.First()))
+                       consoleName = "nunit-console-x86.exe";
+               }
+
+               var nunits =
 		         from programDir in ProgramFilesFolders()
 		         from nunitDir in programDir.GetDirectories("NUnit*")
 		         orderby nunitDir.LastWriteTime descending
-		         let nunitPath = Path.Combine(nunitDir.FullName, "bin", "nunit-console.exe")
+                 let nunitPath = Path.Combine(nunitDir.FullName, "bin", consoleName)
 		         where File.Exists(nunitPath)
 		         select nunitPath;
 
@@ -250,5 +258,17 @@ namespace OpenCover.UI.Processors
 		{
 			return parent.Descendants(elementName).Where(ts => ts.Attribute(attributeName) != null && ts.Attribute(attributeName).Value == attributeValue);
 		}
+
+        /// <summary>
+        /// Determines whether the given assembly was build for x86 platform.
+        /// </summary>
+        /// <param name="assemblyFileName">Path to the assembly to check.</param>
+        /// <returns></returns>
+        private bool IsX86Build(string assemblyFileName)
+        {
+            var assemblyInfo = System.Reflection.AssemblyName.GetAssemblyName(assemblyFileName);               
+            
+            return assemblyInfo.ProcessorArchitecture == System.Reflection.ProcessorArchitecture.X86;
+        }
 	}
 }

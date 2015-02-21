@@ -7,15 +7,29 @@
 			 xmlns:sd="http://icsharpcode.net/sharpdevelop/treeview"
 			 xmlns:c="clr-namespace:OpenCover.UI.Converters"
 			 xmlns:v="clr-namespace:OpenCover.UI.Views"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.11.0"
+             xmlns:win="clr-namespace:System.Windows;assembly=PresentationFramework"
 			 mc:Ignorable="d"
 			 d:DesignHeight="300" d:DesignWidth="1000"
 			 Name="CodeCoverageToolWindow">
+    
 	<UserControl.Resources>
-		<c:WidthConverter x:Key="widthConverter"/>
-		<c:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
-		<c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml" />
+                <ResourceDictionary>
+                    <c:WidthConverter x:Key="widthConverter"/>
+                    <c:BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter"/>
+                    <c:NotBooleanToVisibilityConverter x:Key="notBooleanToVisibilityConverter"/>
+        </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
 	</UserControl.Resources>
-	<Grid>
+    <UserControl.Style>
+        <win:StaticResource ResourceKey="VSUserControlStyle"/>
+    </UserControl.Style>
+
+    <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition />
 		</Grid.RowDefinitions>
@@ -27,11 +41,12 @@
 			<Canvas Grid.Row="0" Width="50" Height="50">
 				<v:BusyIndicator Visibility="{Binding IsLoading, Converter={StaticResource booleanToVisibilityConverter}, ConverterParameter=IsLoading}" />
 			</Canvas>
-			<TextBlock Grid.Row="1" FontWeight="Bold">Please wait while we collect coverage results</TextBlock>
+            <TextBlock Grid.Row="1">Please wait while we collect coverage results</TextBlock>
 		</Grid>
-		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView" ShowRoot="False" ShowAlternation="True" 
+		<sd:SharpTreeView x:Name="CodeCoverageResultsTreeView"
 						  MouseDoubleClick="TreeViewItemDoubleClicked" Grid.Row="0" 
-						  Visibility="{Binding IsLoading, Converter={StaticResource notBooleanToVisibilityConverter}, ConverterParameter=IsLoading}">
+						  Visibility="{Binding IsLoading, Converter={StaticResource notBooleanToVisibilityConverter}, ConverterParameter=IsLoading}"
+                          BorderBrush="Transparent" BorderThickness="0">
 			<ListView.View>
 				<sd:SharpGridView>
 					<GridView.Columns>

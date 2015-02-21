@@ -15,7 +15,7 @@ namespace OpenCover.UI.Tagger
 	/// Background color tagger provider
 	/// </summary>
 	[Export(typeof(IViewTaggerProvider))]
-	[ContentType("CSharp")]
+    [ContentType("CSharp"), ContentType("Basic")]
 	[TagType(typeof(ClassificationTag))]
 	public class TextTaggerProvider : IViewTaggerProvider
 	{
