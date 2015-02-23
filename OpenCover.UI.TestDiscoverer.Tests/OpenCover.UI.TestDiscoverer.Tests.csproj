@@ -4,18 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{35A80560-72A2-40EE-A73D-35DF58EBAB13}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{BE463850-39A2-4F5D-88E3-2976D64AA04A}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenCover.UI.TestDiscoverer</RootNamespace>
-    <AssemblyName>OpenCover.UI.TestDiscoverer</AssemblyName>
+    <RootNamespace>OpenCover.UI.TestDiscoverer.Tests</RootNamespace>
+    <AssemblyName>OpenCover.UI.TestDiscoverer.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +24,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,17 +38,22 @@
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\OpenCover.UI\Lib\Mono.Cecil.dll</HintPath>
+    <Reference Include="FluentAssertions">
+      <HintPath>..\packages\FluentAssertions.3.3.0\lib\net45\FluentAssertions.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentAssertions.Core">
+      <HintPath>..\packages\FluentAssertions.3.3.0\lib\net45\FluentAssertions.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Ploeh.AutoFixture">
+      <HintPath>..\packages\AutoFixture.3.24.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,27 +61,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\OpenCover.UI\Model\Test\TestClass.cs">
-      <Link>Test\TestClass.cs</Link>
-    </Compile>
-    <Compile Include="..\OpenCover.UI\Model\Test\TestMethod.cs">
-      <Link>Test\TestMethod.cs</Link>
-    </Compile>
-    <Compile Include="..\OpenCover.UI\Model\Test\TestType.cs">
-      <Link>Test\TestType.cs</Link>
-    </Compile>
-    <Compile Include="Discoverer.cs" />
-    <Compile Include="DiscovererBase.cs" />
-    <Compile Include="IDiscoverer.cs" />
-    <Compile Include="MSTest\MSTestDiscoverer.cs" />
-    <Compile Include="NUnit\NUnitDiscoverer.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="MSTest\MSTestDiscovererTests.cs" />
+    <Compile Include="NUnit\NUnitDiscovererTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="Key.snk" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OpenCover.UI.TestDiscoverer.TestResources\OpenCover.UI.TestDiscoverer.TestResources.csproj">
+      <Project>{4f2c8986-42cd-4614-8302-0a824ffe8d89}</Project>
+      <Name>OpenCover.UI.TestDiscoverer.TestResources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenCover.UI.TestDiscoverer\OpenCover.UI.TestDiscoverer.csproj">
+      <Project>{35a80560-72a2-40ee-a73d-35df58ebab13}</Project>
+      <Name>OpenCover.UI.TestDiscoverer</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.Tests", "OpenC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.TestDiscoverer", "OpenCover.UI.TestDiscoverer\OpenCover.UI.TestDiscoverer.csproj", "{35A80560-72A2-40EE-A73D-35DF58EBAB13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.TestDiscoverer.Tests", "OpenCover.UI.TestDiscoverer.Tests\OpenCover.UI.TestDiscoverer.Tests.csproj", "{BE463850-39A2-4F5D-88E3-2976D64AA04A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.TestDiscoverer.TestResources", "OpenCover.UI.TestDiscoverer.TestResources\OpenCover.UI.TestDiscoverer.TestResources.csproj", "{4F2C8986-42CD-4614-8302-0A824FFE8D89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{35A80560-72A2-40EE-A73D-35DF58EBAB13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35A80560-72A2-40EE-A73D-35DF58EBAB13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35A80560-72A2-40EE-A73D-35DF58EBAB13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE463850-39A2-4F5D-88E3-2976D64AA04A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE463850-39A2-4F5D-88E3-2976D64AA04A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE463850-39A2-4F5D-88E3-2976D64AA04A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE463850-39A2-4F5D-88E3-2976D64AA04A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
