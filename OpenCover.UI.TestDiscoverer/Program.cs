@@ -36,7 +36,8 @@ namespace OpenCover.UI.TestDiscoverer
 		{
 			if (args != null && args.Length > 0)
 			{
-				var tests = new Discoverer(args.Skip(1)).Discover();
+                var dlls = args.Skip(1);
+                var tests = new Discoverer(dlls).Discover();
 				string serialized = String.Empty;
 
 				if (tests != null)
