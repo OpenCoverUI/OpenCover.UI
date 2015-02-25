@@ -153,6 +153,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Glyphs\LineCoverageGlyphFactory.cs" />
+    <Compile Include="Glyphs\LineCoverageGlyphFactoryProvider.cs" />
+    <Compile Include="Helpers\LineCoverageState.cs" />
+    <Compile Include="Tagger\LineCoverageTag.cs" />
+    <Compile Include="Tagger\LineCoverageTagger.cs" />
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecuteSelectedTestsCommand.cs" />
@@ -197,6 +202,8 @@
     <Compile Include="Processors\MSTestExecutor.cs" />
     <Compile Include="Processors\NUnitTestExecutor.cs" />
     <Compile Include="Processors\VSEventsHandler.cs" />
+    <Compile Include="Tagger\LineCoverageTaggerProvider.cs" />
+    <Compile Include="Helpers\TaggerBase.cs" />
     <Compile Include="Tagger\TextBackground.cs" />
     <Compile Include="Tagger\TextTagger.cs" />
     <Compile Include="Tagger\TextTaggerProvider.cs" />

@@ -5,6 +5,8 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using OpenCover.UI.Model;
 using System;
 using System.Collections.Generic;
@@ -266,5 +268,44 @@ namespace OpenCover.UI.Helpers
 		{
 			return obj.GetType().GetProperty(propertyName).GetValue(obj) as T;
 		}
+
+
+        /// <summary>
+        /// Returns the document file name of the text view.
+        /// </summary>
+        /// <param name="view">The view instance.</param>
+        /// <returns></returns>
+        internal static string GetFileName(ITextView view)
+        {
+            ITextBuffer TextBuffer = view.TextBuffer;
+
+            ITextDocument TextDocument = GetTextDocument(TextBuffer);
+
+            if (TextDocument == null || TextDocument.FilePath == null || TextDocument.FilePath.Equals("Temp.txt"))
+            {
+                return null;
+            }
+
+            return TextDocument.FilePath;
+        }
+
+        /// <summary>
+        /// Retrives the ITextDocument from the text buffer.
+        /// </summary>
+        /// <param name="TextBuffer">The text buffer instance.</param>
+        /// <returns></returns>
+        private static ITextDocument GetTextDocument(ITextBuffer TextBuffer)
+        {
+            if (TextBuffer == null)
+                return null;
+
+            ITextDocument textDoc;
+            var rc = TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDoc);
+
+            if (rc == true)
+                return textDoc;
+            else
+                return null;
+        }
 	}
 }
