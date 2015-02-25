@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="OpenCover.UI.Views.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:OpenCover.UI.Converters"
+             xmlns:viewModel="clr-namespace:OpenCover.UI.Framework.ViewModel;assembly=OpenCover.UI.Framework"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModel:SettingsViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml" />
+                <ResourceDictionary>
+                    <converters:WidthConverter x:Key="widthConverter"/>
+                    <converters:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
+                    <converters:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Style>
+        <StaticResource ResourceKey="VSUserControlStyle"/>
+    </UserControl.Style>
+    
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
+                <TextBlock Text="NUnit Path:" Width="100" HorizontalAlignment="Right" />
+                <TextBox Text="{Binding Path=NUnitExePath, Mode=TwoWay}" Width="150"/>
+                <Button Width="20" Command="{Binding ProcessSelectNUnitExe}">...</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
+                <TextBlock Text="OpenCover Path:" Width="100" HorizontalAlignment="Right"/>
+                <TextBox Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" Width="150"/>
+                <Button Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,5,10,5"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

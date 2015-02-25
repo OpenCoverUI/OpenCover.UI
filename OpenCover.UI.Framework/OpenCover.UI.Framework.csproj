@@ -65,8 +65,9 @@
     <Compile Include="ExcludeCoverageAttribute.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\ISettingsDialogViewModel.cs" />
-    <Compile Include="ViewModel\SettingsDialogViewModel.cs" />
+    <Compile Include="ViewModel\IOpenCoverUiSettings.cs" />
+    <Compile Include="ViewModel\ISettingsViewModel.cs" />
+    <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>

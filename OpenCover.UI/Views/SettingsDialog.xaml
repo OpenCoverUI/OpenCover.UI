@@ -3,26 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModel="clr-namespace:OpenCover.UI.Framework.ViewModel;assembly=OpenCover.UI.Framework"
+        xmlns:views="clr-namespace:OpenCover.UI.Views"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModel:SettingsDialogViewModel, IsDesignTimeCreatable=True}"
-        Title="SettingsDialog" Height="300" Width="300">
+        Title="SettingsDialog" Height="300" Width="300" MinWidth="300" MinHeight="300">
+
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
-                <TextBlock Text="NUnit Path:" Width="100" HorizontalAlignment="Right" />
-                <TextBox Text="{Binding Path=NUnitExePath, Mode=TwoWay}" Width="150"/>
-                <Button Width="20" Command="{Binding ProcessSelectNUnitExe}"> ... </Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
-                <TextBlock Text="OpenCover Path:" Width="100" HorizontalAlignment="Right"/>
-                <TextBox Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" Width="150"/>
-                <Button Width="20" Command="{Binding ProcessSelectOpenCoverExe}" > ... </Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
-                <Button Click="CloseButton_OnClick" >Close</Button>
-            </StackPanel >
-            <TextBlock Margin="10,5,10,5">"This UI looks awful" - think so then fix it :)</TextBlock>
-        </StackPanel>
+        <views:SettingsControl/>        
     </Grid>
 </Window>

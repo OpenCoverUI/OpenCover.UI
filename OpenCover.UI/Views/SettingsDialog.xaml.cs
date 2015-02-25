@@ -23,12 +23,8 @@ namespace OpenCover.UI.Views
         public SettingsDialog()
         {
             InitializeComponent();
-            this.DataContext = new SettingsDialogViewModel();
         }
 
-        private void CloseButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+       
     }
 }

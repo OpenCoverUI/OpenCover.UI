@@ -43,7 +43,7 @@ namespace OpenCover.UI.Framework.ViewModel
             ////}
 
             SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<SettingsDialogViewModel>();
+            SimpleIoc.Default.Register<SettingsViewModel>();
         }
 
         public MainViewModel Main
@@ -54,11 +54,11 @@ namespace OpenCover.UI.Framework.ViewModel
             }
         }
 
-        public SettingsDialogViewModel SettingsDialog
+        public SettingsViewModel SettingsDialog
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<SettingsDialogViewModel>();
+                return ServiceLocator.Current.GetInstance<SettingsViewModel>();
             }
         }
         
