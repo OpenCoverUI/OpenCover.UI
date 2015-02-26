@@ -71,8 +71,19 @@ namespace OpenCover.UI.Helper
         /// Disposes the base class
         /// </summary>
         public void Dispose()
+        {           
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the base class
+        /// <param name="disposing">True for clean up managed ressources.</param>
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
         {
-            if (_textView != null) {
+            if (_textView != null)
+            {
                 _textView.GotAggregateFocus -= SetupSelectionChangedListener;
                 _textView.LayoutChanged -= ViewLayoutChanged;
             }
@@ -86,17 +97,6 @@ namespace OpenCover.UI.Helper
             _spanCoverage.Clear();
             _currentSpans.Clear();
             _codeCoverageResultsControl = null;
-
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the base class
-        /// <param name="disposing">True for clean up managed ressources.</param>
-        /// </summary>
-        public virtual void Dispose(bool disposing)
-        { 
         }
 
 		/// <summary>
