@@ -6,8 +6,6 @@ using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.TextManager.Interop;
-using Microsoft.VisualStudio.Editor;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Commands;
 using OpenCover.UI.Helpers;
