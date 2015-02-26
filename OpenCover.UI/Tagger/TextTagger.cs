@@ -60,15 +60,6 @@ namespace OpenCover.UI.Tagger
 
             base.Dispose();
         }
-
-        /// <summary>
-        /// Determines whether it's allowed to get/analyze the sequence points
-        /// </summary>
-        /// <returns></returns>
-        protected override bool IsAllowedToGetSequencePoints()
-        {
-            return _codeCoverageResultsControl != null && _codeCoverageResultsControl.IsFileOpening;
-        }
 	
 		/// <summary>
 		/// Generates tags based on Coverage information.

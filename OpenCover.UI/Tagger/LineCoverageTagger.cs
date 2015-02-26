@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using OpenCover.UI.Views;
 
 namespace OpenCover.UI.Tagger
 {
@@ -16,6 +17,7 @@ namespace OpenCover.UI.Tagger
     {
         private IClassifier _classifier;
         private ITextBuffer _buffer;
+        private CodeCoverageResultsControl _codeCoverageResultsControl;
 
         /// <summary>
         /// Occurs when tags are changed
@@ -32,7 +34,12 @@ namespace OpenCover.UI.Tagger
             _classifier = classifier;
             _buffer = buffer;
 
-            OpenCoverUIPackage.Instance.Settings.PropertyChanged += OnSettingsChanged; 
+            _codeCoverageResultsControl = OpenCoverUIPackage.Instance
+                                                            .GetToolWindow<CodeCoverageResultsToolWindow>()
+                                                            .CodeCoverageResultsControl;
+
+            OpenCoverUIPackage.Instance.Settings.PropertyChanged += OnSettingsChanged;
+            _codeCoverageResultsControl.NewCoverageDataAvailable += OnNewCoverageDataAvailable;
         }
 
         /// <summary>
@@ -45,6 +52,13 @@ namespace OpenCover.UI.Tagger
 
             if (OpenCoverUIPackage.Instance != null)
                 OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
+
+            if (_codeCoverageResultsControl != null)
+            {
+                _codeCoverageResultsControl.NewCoverageDataAvailable -= OnNewCoverageDataAvailable;
+            }
+
+            _codeCoverageResultsControl = null;
         }
 
         /// <summary>
@@ -90,6 +104,16 @@ namespace OpenCover.UI.Tagger
         {
             if (TagsChanged != null)
                 TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length)));
+        }
+
+        /// <summary>
+        /// Will be called when new data is available
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnNewCoverageDataAvailable(object sender, EventArgs e)
+        {
+            RaiseAllTagsChanged();
         }
     }        
 }

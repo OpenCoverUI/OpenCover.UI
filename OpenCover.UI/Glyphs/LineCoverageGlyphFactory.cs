@@ -27,7 +27,6 @@ namespace OpenCover.UI.Glyphs
     {
         const double _glyphSize = 12.0;
         
-        private IEnumerable<SequencePoint> _sequencePoints;
         private static Brush _redBrush = new SolidColorBrush(Color.FromRgb(196, 64, 47));
         private static Brush _greenBrush = new SolidColorBrush(Color.FromRgb(88, 196, 84));
         private static Brush _orangeBrush = new SolidColorBrush(Color.FromRgb(196, 136, 41));
@@ -38,16 +37,7 @@ namespace OpenCover.UI.Glyphs
         /// <param name="view">The current text editor.</param>
         public LineCoverageGlyphFactory(IWpfTextView view) :base(view)
         {
-            _sequencePoints = GetSequencePointsForActiveDocument();            
-        }
-
-        /// <summary>
-        /// Disposes the factory
-        /// </summary>
-        public override void Dispose()
-        {
-            _sequencePoints = null;
-            base.Dispose();
+                       
         }
 
         /// <summary>
@@ -149,6 +139,5 @@ namespace OpenCover.UI.Glyphs
             
             return LineCoverageState.Unknown;
         }
-       
     }
 }

@@ -34,7 +34,7 @@ namespace OpenCover.UI.Helper
         protected List<SnapshotSpan> _currentSpans;
 
         /// <summary>
-        /// The result
+        /// The result control
         /// </summary>
 		protected CodeCoverageResultsControl _codeCoverageResultsControl;
 
@@ -64,7 +64,8 @@ namespace OpenCover.UI.Helper
 			_currentSpans = GetWordSpans(_textView.TextSnapshot);
 
 			_textView.GotAggregateFocus += SetupSelectionChangedListener;
-		}
+            _codeCoverageResultsControl.NewCoverageDataAvailable += OnNewCoverageDataAvailable;
+		}       
 
         /// <summary>
         /// Disposes the base class
@@ -74,6 +75,11 @@ namespace OpenCover.UI.Helper
             if (_textView != null) {
                 _textView.GotAggregateFocus -= SetupSelectionChangedListener;
                 _textView.LayoutChanged -= ViewLayoutChanged;
+            }
+
+            if (_codeCoverageResultsControl != null)
+            {
+                _codeCoverageResultsControl.NewCoverageDataAvailable -= OnNewCoverageDataAvailable;
             }
 
             _textView = null;
@@ -117,6 +123,20 @@ namespace OpenCover.UI.Helper
         {
             if (TagsChanged != null)
                 TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(_textView.TextBuffer.CurrentSnapshot, 0, _textView.TextBuffer.CurrentSnapshot.Length)));
+        }
+
+        /// <summary>
+        /// Will be called when new data is available
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void OnNewCoverageDataAvailable(object sender, EventArgs e)
+        {
+            // update spans
+            _spanCoverage.Clear();
+            _currentSpans = GetWordSpans(_textView.TextBuffer.CurrentSnapshot);
+
+            RaiseAllTagsChanged();
         }
 
 		/// <summary>
