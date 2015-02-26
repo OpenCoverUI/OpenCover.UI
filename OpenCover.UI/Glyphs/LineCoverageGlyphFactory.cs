@@ -17,6 +17,7 @@ using OpenCover.UI.Views;
 using OpenCover.UI.Helpers;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Helper;
+using OpenCover.UI.Tagger;
 
 namespace OpenCover.UI.Glyphs
 {
@@ -67,8 +68,15 @@ namespace OpenCover.UI.Glyphs
 
             ellipse.ToolTip = GetToolTipText(state);
 
+            if (state == LineCoverageState.Partly)
+            {
+                ellipse.MouseEnter += OnGlyphMouseEnter;
+                ellipse.MouseLeave += OnGlyphMouseLeave;
+                ellipse.Tag = line;
+            }
+
             return ellipse;
-        }
+        }            
 
         /// <summary>
         /// Determines the correct brush for the coverage state.
@@ -104,7 +112,7 @@ namespace OpenCover.UI.Glyphs
                 case LineCoverageState.Uncovered:
                     return "This line is not covered by any test.";
                 case LineCoverageState.Partly:
-                    return "This line is partly covered by tests. Click to show detailed coverage information.";
+                    return "This line is partly covered by tests. The detailed coverage information is shown within the editor.";
             }
 
             return null;
@@ -118,9 +126,9 @@ namespace OpenCover.UI.Glyphs
         private LineCoverageState GetLineCoverageState(ITextViewLine line)
         {
             // get cover state for all spans included in this line
-            var spans = _currentSpans.Where(s => (s.Start >= line.Start && s.Start <= line.End) || (s.Start < line.Start && s.End >= line.Start)).ToList();
+            var spans = GetSpansForLine(line, _currentSpans);
            
-            if (spans.Count > 0)
+            if (spans.Any())
             {
                 IEnumerable<bool> coverageStates = spans.Select(s => _spanCoverage[s]);
 
@@ -139,5 +147,43 @@ namespace OpenCover.UI.Glyphs
             
             return LineCoverageState.Unknown;
         }
+
+        /// <summary>
+        /// Calculates the spans covered by the given line
+        /// </summary>
+        /// <param name="line">Line to retrieve the spans for.</param>
+        /// <param name="spanContainer">container of all spans</param>
+        /// <returns></returns>
+        public static IEnumerable<SnapshotSpan> GetSpansForLine(ITextViewLine line, IEnumerable<SnapshotSpan> spanContainer)
+        {
+            return spanContainer.Where(s => (s.Start >= line.Start && s.Start <= line.End) || (s.Start < line.Start && s.End >= line.Start));
+        }    
+
+        /// <summary>
+        /// Hide the colored line
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnGlyphMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            TextTagger tagger = TextTagger.GetTagger(_textView);
+
+            if (tagger != null)
+                tagger.RemoveLineRestriction();
+        }
+
+        /// <summary>
+        /// Shows the line colors
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnGlyphMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            IWpfTextViewLine line = (IWpfTextViewLine)((System.Windows.Shapes.Ellipse)sender).Tag;
+            TextTagger tagger = TextTagger.GetTagger(_textView);
+
+            if (tagger != null)
+                tagger.ShowForLine(line);
+        }    
     }
 }
