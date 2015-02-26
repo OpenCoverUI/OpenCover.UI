@@ -57,7 +57,8 @@ namespace OpenCover.UI.Tagger
         /// <summary>
         /// Disposes the tagger
         /// </summary>
-        public override void Dispose()
+        /// <param name="disposing">True for managed ressources</param>
+        public override void Dispose(bool disposing)
         {
             if (OpenCoverUIPackage.Instance != null)
                 OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
@@ -68,7 +69,7 @@ namespace OpenCover.UI.Tagger
             _coveredType = null;
             _notCoveredType = null;
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 	
 		/// <summary>

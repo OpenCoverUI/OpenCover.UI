@@ -70,7 +70,7 @@ namespace OpenCover.UI.Helper
         /// <summary>
         /// Disposes the base class
         /// </summary>
-        public virtual void Dispose()
+        public void Dispose()
         {
             if (_textView != null) {
                 _textView.GotAggregateFocus -= SetupSelectionChangedListener;
@@ -86,6 +86,17 @@ namespace OpenCover.UI.Helper
             _spanCoverage.Clear();
             _currentSpans.Clear();
             _codeCoverageResultsControl = null;
+
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the base class
+        /// <param name="disposing">True for clean up managed ressources.</param>
+        /// </summary>
+        public virtual void Dispose(bool disposing)
+        { 
         }
 
 		/// <summary>
@@ -156,16 +167,7 @@ namespace OpenCover.UI.Helper
 			{
 				_spanCoverage.Add(snapshotPoint, covered); 
 			}
-		}
-
-        /// <summary>
-        /// Determines whether it's allowed to get/analyze the sequence points
-        /// </summary>
-        /// <returns></returns>
-        protected virtual bool IsAllowedToGetSequencePoints()
-        {
-            return _codeCoverageResultsControl != null;
-        }
+		}       
 
 		/// <summary>
 		/// Returns the word spans based on covered lines.
@@ -175,56 +177,53 @@ namespace OpenCover.UI.Helper
         protected List<SnapshotSpan> GetWordSpans(ITextSnapshot snapshot)
 		{
 			var wordSpans = new List<SnapshotSpan>();
-
-			// If the file was opened by CodeCoverageResultsControl,
-			if (_codeCoverageResultsControl != null && IsAllowedToGetSequencePoints())
+			
+			// Get covered sequence points
+			try
 			{
-				// Get covered sequence points
-				try
+                var sequencePoints = GetSequencePointsForActiveDocument();
+
+				if (sequencePoints != null)
 				{
-                    var sequencePoints = GetSequencePointsForActiveDocument();
+					var covered = false;
 
-					if (sequencePoints != null)
+					foreach (var sequencePoint in sequencePoints)
 					{
-						var covered = false;
-
-						foreach (var sequencePoint in sequencePoints)
+						if (sequencePoint.VisitCount == 0)
 						{
-							if (sequencePoint.VisitCount == 0)
-							{
-								covered = false;
-							}
-							else
-							{
-								covered = true;
-							}
+							covered = false;
+						}
+						else
+						{
+							covered = true;
+						}
 
-							int sequencePointStartLine = sequencePoint.StartLine - 1;
-							int sequencePointEndLine = sequencePoint.EndLine - 1;
+						int sequencePointStartLine = sequencePoint.StartLine - 1;
+						int sequencePointEndLine = sequencePoint.EndLine - 1;
 
-							var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
+						var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
 
-							if (sequencePoint.EndLine == sequencePoint.StartLine)
-							{
-								AddWordSpan(wordSpans, snapshot,
-											startLine.Extent.Start.Position + sequencePoint.StartColumn - 1,
-											sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
-							}
-							else
-							{
-								// Get selected lines
-								AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint,
-																					sequencePointStartLine, sequencePointEndLine, covered);
-							}
+						if (sequencePoint.EndLine == sequencePoint.StartLine)
+						{
+							AddWordSpan(wordSpans, snapshot,
+										startLine.Extent.Start.Position + sequencePoint.StartColumn - 1,
+										sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
+						}
+						else
+						{
+							// Get selected lines
+							AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint,
+																				sequencePointStartLine, sequencePointEndLine, covered);
 						}
 					}
 				}
-				catch (Exception ex)
-				{
-					IDEHelper.WriteToOutputWindow(ex.Message);
-					IDEHelper.WriteToOutputWindow(ex.StackTrace);
-				}
 			}
+			catch (Exception ex)
+			{
+				IDEHelper.WriteToOutputWindow(ex.Message);
+				IDEHelper.WriteToOutputWindow(ex.StackTrace);
+			}
+			
 
 			return (wordSpans);
 		}
