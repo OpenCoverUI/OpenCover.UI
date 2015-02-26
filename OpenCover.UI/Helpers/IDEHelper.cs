@@ -307,5 +307,38 @@ namespace OpenCover.UI.Helpers
             else
                 return null;
         }
+
+        /// Given an IWpfTextViewHost representing the currently selected editor pane,
+        /// return the ITextDocument for that view. That's useful for learning things 
+        /// like the filename of the document, its creation date, and so on.
+        internal static ITextDocument GetTextDocumentForView(IWpfTextViewHost viewHost)
+        {
+            ITextDocument document;
+            viewHost.TextView.TextDataModel.DocumentBuffer.Properties.TryGetProperty(typeof(ITextDocument), out document);
+            return document;
+        }
+
+        ///// <summary>
+        ///// Refreshes/Repaints the active file in Visual Studio.
+        ///// </summary>
+        //internal static void RefreshActiveDocument(EnvDTE.DTE DTE)
+        //{
+        //    try
+        //    {                
+        //        IWpfTextViewHost host = OpenCoverUIPackage.Instance.GetCurrentViewHost();
+        //        if (host != null)
+        //        {
+        //            var doc = GetTextDocumentForView(host);
+        //            doc.UpdateDirtyState(true, DateTime.Now);
+        //        }
+                            
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine(ex.Message);
+        //    }
+        //}
+
+       
 	}
 }

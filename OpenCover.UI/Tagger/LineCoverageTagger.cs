@@ -12,9 +12,10 @@ namespace OpenCover.UI.Tagger
     /// <summary>
     /// Tagger to produce tags to create glyphs for covered lines
     /// </summary>
-    public sealed class LineCoverageTagger : ITagger<LineCoverageTag>
+    public sealed class LineCoverageTagger : ITagger<LineCoverageTag>, IDisposable
     {
         private IClassifier _classifier;
+        private ITextBuffer _buffer;
 
         /// <summary>
         /// Occurs when tags are changed
@@ -24,10 +25,26 @@ namespace OpenCover.UI.Tagger
         /// <summary>
         /// Initializes a new instance of the <see cref="LineCoverageTagger"/> class.
         /// </summary>
+        /// <param name="buffer">The text buffer</param>
         /// <param name="classifier">The classifier helper instance.</param>
-        public LineCoverageTagger(IClassifier classifier)
+        public LineCoverageTagger(ITextBuffer buffer, IClassifier classifier)
         {
             _classifier = classifier;
+            _buffer = buffer;
+
+            OpenCoverUIPackage.Instance.Settings.PropertyChanged += OnSettingsChanged; 
+        }
+
+        /// <summary>
+        /// Disposes the tagger.
+        /// </summary>
+        public void Dispose()
+        {
+            _classifier = null;
+            _buffer = null;
+
+            if (OpenCoverUIPackage.Instance != null)
+                OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
         }
 
         /// <summary>
@@ -37,6 +54,9 @@ namespace OpenCover.UI.Tagger
         /// <returns>Tags for the current file based on coverage information</returns>
         IEnumerable<ITagSpan<LineCoverageTag>> ITagger<LineCoverageTag>.GetTags(NormalizedSnapshotSpanCollection spans)
         {
+            if (!OpenCoverUIPackage.Instance.Settings.ShowCoverageGlyphs)
+                yield break;
+            
             foreach (SnapshotSpan span in spans)
             {
                 //look at each classification span 
@@ -50,6 +70,26 @@ namespace OpenCover.UI.Tagger
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Will be called when the settings were changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ShowCoverageGlyphs")
+                RaiseAllTagsChanged();
+        }
+
+        /// <summary>
+        /// Tell the editor that the tags in the whole buffer changed. It will call back into GetTags().
+        /// </summary>
+        private void RaiseAllTagsChanged()
+        {
+            if (TagsChanged != null)
+                TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length)));
         }
     }        
 }

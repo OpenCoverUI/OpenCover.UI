@@ -34,7 +34,7 @@ namespace OpenCover.UI.Tagger
             if (buffer == null)
                 throw new ArgumentNullException("buffer");
 
-            return new LineCoverageTagger(AggregatorService.GetClassifier(buffer)) as ITagger<T>;
+            return new LineCoverageTagger(buffer, AggregatorService.GetClassifier(buffer)) as ITagger<T>;
         }
     }
 }

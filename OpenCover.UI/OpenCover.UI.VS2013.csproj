@@ -57,6 +57,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\Editor\Microsoft.VisualStudio.CoreUtility.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Editor, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v4.0\Microsoft.VisualStudio.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Platform.WindowManagement, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -93,6 +97,20 @@
     <Reference Include="Microsoft.VisualStudio.Shell.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.TextManager.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v4.0\Microsoft.VisualStudio.TextManager.Interop.11.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v4.0\Microsoft.VisualStudio.TextManager.Interop.12.0.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -153,9 +171,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ResultsToolbarCommands.cs" />
     <Compile Include="Glyphs\LineCoverageGlyphFactory.cs" />
     <Compile Include="Glyphs\LineCoverageGlyphFactoryProvider.cs" />
     <Compile Include="Helpers\LineCoverageState.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Tagger\LineCoverageTag.cs" />
     <Compile Include="Tagger\LineCoverageTagger.cs" />
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
@@ -203,7 +223,7 @@
     <Compile Include="Processors\NUnitTestExecutor.cs" />
     <Compile Include="Processors\VSEventsHandler.cs" />
     <Compile Include="Tagger\LineCoverageTaggerProvider.cs" />
-    <Compile Include="Helpers\TaggerBase.cs" />
+    <Compile Include="Helpers\TextViewCoverageProviderBase.cs" />
     <Compile Include="Tagger\TextBackground.cs" />
     <Compile Include="Tagger\TextTagger.cs" />
     <Compile Include="Tagger\TextTaggerProvider.cs" />
@@ -253,6 +273,8 @@
       <Link>license.md</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\ShowCodeCoverageGlyphs.png" />
+    <Resource Include="Resources\ShowCodeCoverageColoring.png" />
     <Resource Include="Resources\Successful.png" />
     <None Include="app.config" />
     <None Include="OpenCoverUISettings.settings">

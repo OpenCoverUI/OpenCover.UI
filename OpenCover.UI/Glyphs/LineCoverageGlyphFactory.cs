@@ -42,6 +42,15 @@ namespace OpenCover.UI.Glyphs
         }
 
         /// <summary>
+        /// Disposes the factory
+        /// </summary>
+        public override void Dispose()
+        {
+            _sequencePoints = null;
+            base.Dispose();
+        }
+
+        /// <summary>
         /// Create the glyph element.
         /// </summary>
         /// <param name="line">Editor line to create the glyph for.</param>

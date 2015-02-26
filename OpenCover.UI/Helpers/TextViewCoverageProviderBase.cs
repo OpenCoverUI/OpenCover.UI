@@ -16,12 +16,12 @@ namespace OpenCover.UI.Helper
 	/// <summary>
 	/// Base class to provide coverage information for the text view.
 	/// </summary>
-	public class TextViewCoverageProviderBase 
+	public class TextViewCoverageProviderBase : IDisposable
 	{
         /// <summary>
         /// The current editor view.
         /// </summary>
-        protected readonly ITextView _textView;
+        protected ITextView _textView;
 
         /// <summary>
         /// Coverage info for spans.
@@ -66,6 +66,22 @@ namespace OpenCover.UI.Helper
 			_textView.GotAggregateFocus += SetupSelectionChangedListener;
 		}
 
+        /// <summary>
+        /// Disposes the base class
+        /// </summary>
+        public virtual void Dispose()
+        {
+            if (_textView != null) {
+                _textView.GotAggregateFocus -= SetupSelectionChangedListener;
+                _textView.LayoutChanged -= ViewLayoutChanged;
+            }
+
+            _textView = null;
+            _spanCoverage.Clear();
+            _currentSpans.Clear();
+            _codeCoverageResultsControl = null;
+        }
+
 		/// <summary>
 		/// Setups the selection changed listener.
 		/// </summary>
@@ -93,6 +109,15 @@ namespace OpenCover.UI.Helper
 				TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(e.NewSnapshot, 0, e.NewSnapshot.Length)));
 			}
 		}
+
+        /// <summary>
+        /// Tell the editor that the tags in the whole buffer changed. It will call back into GetTags().
+        /// </summary>
+        protected void RaiseAllTagsChanged()
+        {
+            if (TagsChanged != null)
+                TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(_textView.TextBuffer.CurrentSnapshot, 0, _textView.TextBuffer.CurrentSnapshot.Length)));
+        }
 
 		/// <summary>
 		/// Adds the word span.
@@ -239,6 +264,6 @@ namespace OpenCover.UI.Helper
                 return _codeCoverageResultsControl.CoverageSession.GetSequencePoints(IDEHelper.GetFileName(_textView));
             else
                 return new List<SequencePoint>();
-        }
-	}
+        }        
+    }
 }

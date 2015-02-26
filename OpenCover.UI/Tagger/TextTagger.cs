@@ -21,9 +21,9 @@ namespace OpenCover.UI.Tagger
 	/// </summary>
     public sealed class TextTagger : TextViewCoverageProviderBase, ITagger<ClassificationTag>
 	{		
-		private readonly ITextSearchService _searchService;
-		private readonly IClassificationType _coveredType;
-		private readonly IClassificationType _notCoveredType;
+		private ITextSearchService _searchService;
+		private IClassificationType _coveredType;
+		private IClassificationType _notCoveredType;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextTagger"/> class.
@@ -40,8 +40,26 @@ namespace OpenCover.UI.Tagger
 		
 			_searchService = searchService;
 			_coveredType = coveredType;
-			_notCoveredType = notCoveredType;			
+			_notCoveredType = notCoveredType;
+
+            OpenCoverUIPackage.Instance.Settings.PropertyChanged += OnSettingsChanged;   
 		}
+
+        /// <summary>
+        /// Disposes the tagger
+        /// </summary>
+        public override void Dispose()
+        {
+            if (OpenCoverUIPackage.Instance != null)
+                OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
+
+
+            _searchService = null;
+            _coveredType = null;
+            _notCoveredType = null;
+
+            base.Dispose();
+        }
 
         /// <summary>
         /// Determines whether it's allowed to get/analyze the sequence points
@@ -59,7 +77,7 @@ namespace OpenCover.UI.Tagger
 		/// <returns>Tags for the current file based on coverage information</returns>
 		public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
 		{
-			if (_currentSpans == null || _currentSpans.Count == 0)
+            if (_currentSpans == null || _currentSpans.Count == 0 || !OpenCoverUIPackage.Instance.Settings.ShowLinesColored)
 				yield break;
 
 			foreach (var span in _currentSpans)
@@ -69,5 +87,16 @@ namespace OpenCover.UI.Tagger
 				yield return new TagSpan<ClassificationTag>(span, tag);
 			}
 		}
+
+        /// <summary>
+        /// Will be called when the settings were changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ShowLinesColored")
+                RaiseAllTagsChanged();
+        }
 	}
 }
