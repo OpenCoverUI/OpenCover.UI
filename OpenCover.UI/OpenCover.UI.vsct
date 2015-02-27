@@ -48,6 +48,15 @@
 					<CommandName>OpenCover TestExplorer Toolbar</CommandName>
 				</Strings>
 			</Menu>
+      
+      <Menu guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbar" type="ToolWindowToolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>OpenCover Results Toolbar</ButtonText>
+          <CommandName>OpenCover Results Toolbar</CommandName>
+        </Strings>
+      </Menu>
+      
 		</Menus>
 		<Groups>
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUIMenuGroup" priority="0x0600">
@@ -56,10 +65,10 @@
 			<Group guid="guidOpenCoverUICmdSet" id="openCoverUITestWindowGroup" priority="0x0601">
 				<Parent guid="guidTestExplorerContextMenuCmdSet" id="testWindowsMenu"/>
 			</Group>
-			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup">
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenuGroup" priority="0x0000">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerContextMenu"/>
 			</Group>
-			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup">
+			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenuGroup" priority="0x0000">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestMenu"/>
 			</Group>
 			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroup" priority="0x0000">
@@ -68,6 +77,11 @@
 			<Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupByGroup" priority="0x0100">
 				<Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverTestExplorerToolbarGroupBy"/>
 			</Group>
+      
+      <Group guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarGroup" priority="0x0000">
+        <Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbar"/>
+      </Group>
+      
 		</Groups>
 		<!--Buttons section. -->
 		<!--This section defines the elements the user can interact with, like a menu command or a button 
@@ -161,6 +175,24 @@
 					<ButtonText>Outcome</ButtonText>
 				</Strings>
 			</Button>
+      <Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarShowLinesColoredButton" priority="0x0100" type="Button">
+        <Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarGroup"/>
+        <Icon guid="guidColoredLines" id="ShowLinesColored" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <CommandName>OpenCover.UI.ShowLinesColored</CommandName>
+          <ButtonText>Show Code Coverage Coloring</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarShowCoverageGlyphsButton" priority="0x0100" type="Button">
+        <Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarGroup"/>
+        <Icon guid="guidCoverageGlyphs" id="ShowCoverageGylphs" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <CommandName>OpenCover.UI.ShowCoverageGylphs</CommandName>
+          <ButtonText>Show Code Coverage glyphs</ButtonText>
+        </Strings>
+      </Button>
 		</Buttons>
 		<!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
 		<Bitmaps>
@@ -171,6 +203,8 @@
 						must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
 			<Bitmap guid="guidIcon" href="Resources\OpenCover.png" usedList="OpenCoverLogo"/>
 			<Bitmap guid="guidRefresh" href="Resources\Refresh.png" usedList="RefreshTestExplorer"/>
+      <Bitmap guid="guidColoredLines" href="Resources\ShowCodeCoverageColoring.png" usedList="ShowLinesColored"/>
+      <Bitmap guid="guidCoverageGlyphs" href="Resources\ShowCodeCoverageGlyphs.png" usedList="ShowCoverageGylphs"/>
 		</Bitmaps>
 
 	</Commands>
@@ -198,6 +232,12 @@
 		<GuidSymbol name="guidRefresh" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590fe}" >
 			<IDSymbol name="RefreshTestExplorer" value="1" />
 		</GuidSymbol>
+    <GuidSymbol name="guidColoredLines" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590ff}" >
+      <IDSymbol name="ShowLinesColored" value="1" />
+    </GuidSymbol>
+    <GuidSymbol name="guidCoverageGlyphs" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590af}" >
+      <IDSymbol name="ShowCoverageGylphs" value="1" />
+    </GuidSymbol>
 		<GuidSymbol name="GuidOpenCoverTestExplorerContextMenuCommandSet" value="{81F1321F-B605-47F6-AD43-FB2EC4891225}">
 			<IDSymbol name="OpenCoverTestExplorerContextMenu" value="0x1000"/>
 			<IDSymbol name="OpenCoverTestExplorerContextMenuGroup" value="0x1100"/>
@@ -214,6 +254,10 @@
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByTraitButton" value="0x1930" />
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByProjectButton" value="0x1940" />
 			<IDSymbol name="OpenCoverTestExplorerToolbarGroupByOutcomeButton" value="0x1950" />
+      <IDSymbol name="OpenCoverResultsToolbar" value="0x3000" />
+      <IDSymbol name="OpenCoverResultsToolbarGroup" value="0x3050" />
+      <IDSymbol name="OpenCoverResultsToolbarShowLinesColoredButton" value="0x3100" />
+      <IDSymbol name="OpenCoverResultsToolbarShowCoverageGlyphsButton" value="0x3110" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>

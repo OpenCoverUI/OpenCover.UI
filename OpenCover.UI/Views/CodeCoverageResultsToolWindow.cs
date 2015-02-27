@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using OpenCover.Framework.Model;
+using System.ComponentModel.Design;
 
 namespace OpenCover.UI.Views
 {
@@ -54,6 +55,8 @@ namespace OpenCover.UI.Views
 			CodeCoverageResultsControl = new CodeCoverageResultsControl();
 
 			base.Content = CodeCoverageResultsControl;
+
+            this.ToolBar = new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet, PkgCmdIDList.OpenCoverResultsToolbar);
 		}
 
 		/// <summary>

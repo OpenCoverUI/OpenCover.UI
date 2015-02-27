@@ -44,7 +44,7 @@ namespace OpenCover.UI.Tagger
 		public CoveredTextBackground()
 		{
 			DisplayName = "Covered Text Background";
-			BackgroundColor = Colors.LightGreen;
+            BackgroundColor = Color.FromRgb(207, 231, 209);	
 		}
 	}
 
@@ -64,8 +64,7 @@ namespace OpenCover.UI.Tagger
 		public NotCoveredTextBackground()
 		{
 			DisplayName = "Not Covered Text Background";
-			BackgroundColor = Color.FromRgb(205, 92, 92);
-			ForegroundColor = Colors.Black;
+            BackgroundColor = Color.FromRgb(255, 217, 217);			
 		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the MIT License; Please read license.md file for more details.
+// This source code is released under the GPL License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
@@ -7,7 +7,8 @@ using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Tagging;
-using OpenCover.Framework.Model;
+using OpenCover.UI.Glyphs;
+using OpenCover.UI.Helper;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Views;
 using System;
@@ -19,20 +20,14 @@ namespace OpenCover.UI.Tagger
 	/// <summary>
 	/// Text tagger to produce tags to change background color for covered lines
 	/// </summary>
-	public sealed class TextTagger : ITagger<ClassificationTag>
-	{
-		private readonly ITextView _textView;
-		private readonly ITextSearchService _searchService;
-		private readonly IClassificationType _coveredType;
-		private readonly IClassificationType _notCoveredType;
-		private readonly Dictionary<SnapshotSpan, bool> _spanCoverage;
-		private List<SnapshotSpan> _currentSpans;
-		private CodeCoverageResultsControl _codeCoverageResultsControl;
+    public sealed class TextTagger : TextViewCoverageProviderBase, ITagger<ClassificationTag>
+	{		
+		private ITextSearchService _searchService;
+		private IClassificationType _coveredType;
+		private IClassificationType _notCoveredType;
+        private IEnumerable<SnapshotSpan> _lineSpans;
 
-		/// <summary>
-		/// Occurs when tags are changed
-		/// </summary>
-		public event EventHandler<SnapshotSpanEventArgs> TagsChanged = delegate { };
+        static Dictionary<ITextView, TextTagger> _instances = new Dictionary<ITextView, TextTagger>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextTagger"/> class.
@@ -40,181 +35,43 @@ namespace OpenCover.UI.Tagger
 		/// <param name="view">The view.</param>
 		/// <param name="searchService">The search service.</param>
 		/// <param name="coveredType">The type.</param>
-		public TextTagger(ITextView view, ITextSearchService searchService, IClassificationType coveredType, IClassificationType notCoveredType)
+		public TextTagger(ITextView view, ITextSearchService searchService, IClassificationType coveredType, IClassificationType notCoveredType) : base(view)
 		{
 			if (OpenCoverUIPackage.Instance == null)
 			{
 				return;
 			}
-
-			_textView = view;
+		
 			_searchService = searchService;
 			_coveredType = coveredType;
 			_notCoveredType = notCoveredType;
 
-			_spanCoverage = new Dictionary<SnapshotSpan, bool>();
-			_codeCoverageResultsControl = OpenCoverUIPackage.Instance
-															.GetToolWindow<CodeCoverageResultsToolWindow>()
-															.CodeCoverageResultsControl;
+            OpenCoverUIPackage.Instance.Settings.PropertyChanged += OnSettingsChanged;
 
-			_currentSpans = GetWordSpans(_textView.TextSnapshot);
+            // Register instance of the view
+            _instances.Add(view, this);
 
-			_textView.GotAggregateFocus += SetupSelectionChangedListener;
+            view.Closed += OnViewClosed;
 		}
 
-		/// <summary>
-		/// Setups the selection changed listener.
-		/// </summary>
-		/// <param name="sender">The sender.</param>
-		/// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-		private void SetupSelectionChangedListener(object sender, EventArgs e)
-		{
-			if (_textView != null)
-			{
-				_textView.LayoutChanged += ViewLayoutChanged;
-				_textView.GotAggregateFocus -= SetupSelectionChangedListener;
-			}
-		}
+        /// <summary>
+        /// Disposes the tagger
+        /// </summary>
+        /// <param name="disposing">True for managed ressources</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (OpenCoverUIPackage.Instance != null)
+                OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
 
-		/// <summary>
-		/// Updates tags when the view layout is changed.
-		/// </summary>
-		/// <param name="sender">The sender.</param>
-		/// <param name="e">The <see cref="TextViewLayoutChangedEventArgs"/> instance containing the event data.</param>
-		private void ViewLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
-		{
-			if (e.OldSnapshot != e.NewSnapshot)
-			{
-				_currentSpans = GetWordSpans(e.NewSnapshot);
-				TagsChanged(this, new SnapshotSpanEventArgs(new SnapshotSpan(e.NewSnapshot, 0, e.NewSnapshot.Length)));
-			}
-		}
+            _textView.Closed -= OnViewClosed;
 
-		/// <summary>
-		/// Adds the word span.
-		/// </summary>
-		/// <param name="wordSpans">The word spans.</param>
-		/// <param name="snapshot">The snapshot.</param>
-		/// <param name="startColumn">The start column.</param>
-		/// <param name="totalCharacters">The total characters.</param>
-		/// <param name="covered">if set to <c>true</c> [covered].</param>
-		private void AddWordSpan(List<SnapshotSpan> wordSpans, ITextSnapshot snapshot, int startColumn, int totalCharacters, bool covered)
-		{
-			var snapshotPoint = new SnapshotSpan(snapshot, new Span(startColumn, totalCharacters));
-			wordSpans.Add(snapshotPoint);
+            _searchService = null;
+            _coveredType = null;
+            _notCoveredType = null;
 
-			if (!_spanCoverage.ContainsKey(snapshotPoint))
-			{
-				_spanCoverage.Add(snapshotPoint, covered); 
-			}
-		}
-
-		/// <summary>
-		/// Returns the word spans based on covered lines.
-		/// </summary>
-		/// <param name="snapshot">The text snapshot of file being opened.</param>
-		/// <returns>Collection of word spans</returns>
-		private List<SnapshotSpan> GetWordSpans(ITextSnapshot snapshot)
-		{
-			var wordSpans = new List<SnapshotSpan>();
-
-			// If the file was opened by CodeCoverageResultsControl,
-			if (_codeCoverageResultsControl != null && _codeCoverageResultsControl.IsFileOpening)
-			{
-				// Get covered sequence points
-				try
-				{
-					var sequencePoints = _codeCoverageResultsControl.GetActiveDocumentSequencePoints();
-
-					if (sequencePoints != null)
-					{
-						var covered = false;
-
-						foreach (var sequencePoint in sequencePoints)
-						{
-							if (sequencePoint.VisitCount == 0)
-							{
-								covered = false;
-							}
-							else
-							{
-								covered = true;
-							}
-
-							int sequencePointStartLine = sequencePoint.StartLine - 1;
-							int sequencePointEndLine = sequencePoint.EndLine - 1;
-
-							var startLine = snapshot.Lines.FirstOrDefault(line => line.LineNumber == sequencePointStartLine);
-
-							if (sequencePoint.EndLine == sequencePoint.StartLine)
-							{
-								AddWordSpan(wordSpans, snapshot,
-											startLine.Extent.Start.Position + sequencePoint.StartColumn - 1,
-											sequencePoint.EndColumn - sequencePoint.StartColumn + 1, covered);
-							}
-							else
-							{
-								// Get selected lines
-								AddWordSpansForSequencePointsCoveringMultipleLines(snapshot, wordSpans, sequencePoint,
-																					sequencePointStartLine, sequencePointEndLine, covered);
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					IDEHelper.WriteToOutputWindow(ex.Message);
-					IDEHelper.WriteToOutputWindow(ex.StackTrace);
-				}
-			}
-
-			return (wordSpans);
-		}
-
-		/// <summary>
-		/// Adds the word spans for sequence points covering multiple lines.
-		/// </summary>
-		/// <param name="snapshot">The snapshot.</param>
-		/// <param name="wordSpans">The word spans.</param>
-		/// <param name="sequencePoint">The sequence point.</param>
-		/// <param name="sequencePointStartLine">The sequence point start line.</param>
-		/// <param name="sequencePointEndLine">The sequence point end line.</param>
-		/// <param name="covered">if set to <c>true</c> [covered].</param>
-		private void AddWordSpansForSequencePointsCoveringMultipleLines(ITextSnapshot snapshot, 
-																		List<SnapshotSpan> wordSpans, 
-																		SequencePoint sequencePoint, 
-																		int sequencePointStartLine, 
-																		int sequencePointEndLine,
-																		bool covered)
-		{
-			int totalCharacters = 0;
-
-			var selectedLines = snapshot.Lines
-										.Where(line => line.LineNumber >= sequencePointStartLine &&
-														line.LineNumber <= sequencePointEndLine);
-
-			foreach (var selectedLine in selectedLines)
-			{
-				if (selectedLine.LineNumber == sequencePointStartLine)
-				{
-					totalCharacters = selectedLine.Length - sequencePoint.StartColumn + 1;
-
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position + sequencePoint.StartColumn - 1, totalCharacters, covered);
-				}
-				else if (selectedLine.LineNumber == sequencePointEndLine)
-				{
-					var temp = selectedLine.Length - (sequencePoint.EndColumn - 1);
-					totalCharacters = selectedLine.Length - temp;
-
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, totalCharacters, covered);
-				}
-				else
-				{
-					AddWordSpan(wordSpans, snapshot, selectedLine.Extent.Start.Position, selectedLine.Length, covered);
-				}
-			}
-		}
-
+            base.Dispose(disposing);
+        }
+	
 		/// <summary>
 		/// Generates tags based on Coverage information.
 		/// </summary>
@@ -222,15 +79,65 @@ namespace OpenCover.UI.Tagger
 		/// <returns>Tags for the current file based on coverage information</returns>
 		public IEnumerable<ITagSpan<ClassificationTag>> GetTags(NormalizedSnapshotSpanCollection spans)
 		{
-			if (_currentSpans == null || _currentSpans.Count == 0)
+            if (_currentSpans == null || _currentSpans.Count == 0 || (!OpenCoverUIPackage.Instance.Settings.ShowLinesColored && _lineSpans == null))
 				yield break;
 
-			foreach (var span in _currentSpans)
+            var spansToSerach = _lineSpans ?? _currentSpans;
+
+            foreach (var span in spansToSerach)
 			{
 				var covered = _spanCoverage.ContainsKey(span) ? _spanCoverage[span] : false;
 				var tag = covered ? new ClassificationTag(_coveredType) : new ClassificationTag(_notCoveredType);
 				yield return new TagSpan<ClassificationTag>(span, tag);
 			}
 		}
-	}
+
+        /// <summary>
+        /// Gets the tagger instance for the specified view.
+        /// </summary>
+        /// <param name="view">View to retrieve the tagger instance.</param>
+        /// <returns></returns>
+        public static TextTagger GetTagger(ITextView view)
+        {
+            if (_instances.ContainsKey(view))
+                return _instances[view];
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Will be called when the settings were changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "ShowLinesColored")
+                RaiseAllTagsChanged();
+        }
+
+        private void OnViewClosed(object sender, EventArgs e)
+        {
+            _instances.Remove(sender as ITextView);
+        }
+
+        /// <summary>
+        /// Show spans for line only
+        /// </summary>
+        /// <param name="line"></param>
+        internal void ShowForLine(Microsoft.VisualStudio.Text.Formatting.IWpfTextViewLine line)
+        {
+            _lineSpans = LineCoverageGlyphFactory.GetSpansForLine(line, _currentSpans);
+            RaiseAllTagsChanged();
+        }
+
+        /// <summary>
+        /// Show all spans again
+        /// </summary>
+        internal void RemoveLineRestriction()
+        {
+            _lineSpans = null;
+            RaiseAllTagsChanged();
+        }
+    }
 }
