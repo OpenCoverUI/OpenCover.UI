@@ -64,6 +64,11 @@ namespace OpenCover.UI.Views
 			}
 		}
 
+        /// <summary>
+        /// Will be raised when the code coverage process was done
+        /// </summary>
+        public event EventHandler NewCoverageDataAvailable;
+
 		/// <summary>
 		/// Gets a value indicating whether the control initiated a File Open command. If so, it will set it to false before returning true.
 		/// This should only be called by TextTagger class
@@ -115,6 +120,10 @@ namespace OpenCover.UI.Views
 				{
 					CodeCoverageResultsTreeView.Root = new CoverageNode(data);
 					IsLoading = false;
+
+                    if (NewCoverageDataAvailable != null)
+                        NewCoverageDataAvailable(this, EventArgs.Empty);
+
 				}), null);
 			}
 		}

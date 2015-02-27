@@ -5,6 +5,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text.Editor;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Commands;
 using OpenCover.UI.Helpers;
@@ -21,6 +22,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell.Settings;
 
 namespace OpenCover.UI
 {
@@ -45,6 +48,7 @@ namespace OpenCover.UI
 		Dictionary<string, string> fileList = new Dictionary<string, string>();
 		List<string> _openFiles = new List<string>();
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
+        private Settings _settings;
 
 		internal static OpenCoverUIPackage Instance
 		{
@@ -75,6 +79,14 @@ namespace OpenCover.UI
 			get;
 			private set;
 		}
+
+        /// <summary>
+        /// Gets access to the package settings
+        /// </summary>
+        internal Settings Settings
+        {
+            get { return _settings; }
+        }
 
 		/// <summary>
 		/// Default constructor of the package.
@@ -156,6 +168,8 @@ namespace OpenCover.UI
 			Instance = this;
 			DTE = (Package.GetGlobalService(typeof(EnvDTE.DTE))) as EnvDTE.DTE;
 
+            LoadSettings();
+
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
 			if (null != mcs)
@@ -181,11 +195,48 @@ namespace OpenCover.UI
 					mcs.AddCommand(command);
 				}
 
+                foreach (var command in ResultsToolbarCommands.Commands)
+                {
+                    mcs.AddCommand(command);
+                }
+
 				Commands.Add(executeSelectedTestsCommand);
 				Commands.Add(codeCoverageToolWindowCommand);
 				Commands.Add(testExplorerToolWindowCommand);
 				Commands.Add(testSettingsFileSelectorCommand);
-			}
+			}            
 		}
+
+        private void LoadSettings()
+        {
+            SettingsManager settingsManager = new ShellSettingsManager(this);
+            WritableSettingsStore configurationSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            _settings = new Settings(configurationSettingsStore);
+        }
+
+        //internal IWpfTextViewHost GetCurrentViewHost()
+        //{
+        //    // code to get access to the editor's currently selected text cribbed from
+        //    // http://msdn.microsoft.com/en-us/library/dd884850.aspx
+        //    IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
+        //    IVsTextView vTextView = null;
+        //    int mustHaveFocus = 1;
+        //    txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
+        //    IVsUserData userData = vTextView as IVsUserData;
+  
+        //    if (userData == null)
+        //    {
+        //        return null;
+        //    }
+        //    else
+        //    {
+        //        IWpfTextViewHost viewHost;
+        //        object holder;
+        //        Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
+        //        userData.GetData(ref guidViewHost, out holder);
+        //        viewHost = (IWpfTextViewHost)holder;
+        //        return viewHost;
+        //    }
+        //}
 	}
 }
