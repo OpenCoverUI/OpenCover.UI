@@ -5,7 +5,6 @@ build:
   project: OpenCover.UI.VS2013.sln
   parallel: true
   verbosity: minimal
-test: off
 artifacts:
 - path: OpenCover.UI\bin\Release\OpenCover.UI.vsix
   name: VSIX

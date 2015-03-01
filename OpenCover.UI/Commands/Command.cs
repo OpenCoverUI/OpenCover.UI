@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the GPL License; Please read license.md file for more details.
+// This source code is released under the MIT License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio.Shell;
 using System;
@@ -12,18 +12,18 @@ namespace OpenCover.UI.Commands
 	/// </summary>
 	public abstract class Command : OleMenuCommand
 	{
-		private OpenCoverUIPackage _package;
-		private CommandID _commandID;
+	    protected OpenCoverUIPackage Package { get; private set; }
+	    private CommandID _commandID;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Command" /> class.
 		/// </summary>
 		/// <param name="package">The Visual Studio extension package.</param>
 		/// <param name="commandID">The command identifier.</param>
-		public Command(OpenCoverUIPackage package, CommandID commandID)
+		protected Command(OpenCoverUIPackage package, CommandID commandID)
 			: base(CommandExecuted, commandID)
 		{
-			this._package = package;
+			this.Package = package;
 			this._commandID = commandID;
 		}
 
