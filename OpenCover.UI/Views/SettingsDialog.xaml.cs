@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +26,10 @@ namespace OpenCover.UI.Views
             InitializeComponent();
         }
 
-       
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            OpenCoverUISettings.Default.Save();
+            base.OnClosing(e);
+        }
     }
 }

@@ -24,21 +24,23 @@
     <UserControl.Style>
         <StaticResource ResourceKey="VSUserControlStyle"/>
     </UserControl.Style>
-    
+
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
-                <TextBlock Text="NUnit Path:" Width="100" HorizontalAlignment="Right" />
-                <TextBox Text="{Binding Path=NUnitExePath, Mode=TwoWay}" Width="150"/>
-                <Button Width="20" Command="{Binding ProcessSelectNUnitExe}">...</Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5">
-                <TextBlock Text="OpenCover Path:" Width="100" HorizontalAlignment="Right"/>
-                <TextBox Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" Width="150"/>
-                <Button Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10,5,10,5"/>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Margin="0,0,5,5" Grid.Row="0" Grid.Column="0" Width="100" HorizontalContentAlignment="Right" >NUnit Path:</Label>
+        <TextBox Margin="0,5,0,0" Grid.Row="0" Grid.Column="1" Text="{Binding Path=NUnitExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150"/>
+        <Button Margin="5,5,0,0" Grid.Row="0" Grid.Column="2" Width="20" Command="{Binding ProcessSelectNUnitExe}">...</Button>
+        <Label Margin="0,1,5,4" Grid.Row="1" Grid.Column="0" Width="100" HorizontalContentAlignment="Right">OpenCover Path:</Label>
+        <TextBox Margin="0,5,0,0" Grid.Row="1" Grid.Column="1" Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150" />
+        <Button Margin="5,5,0,0" Grid.Row="1" Grid.Column="2" Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
 
     </Grid>
 </UserControl>
