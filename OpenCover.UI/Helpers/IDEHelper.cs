@@ -158,6 +158,79 @@ namespace OpenCover.UI.Helpers
 
 		}
 
+        /// <summary>
+        /// Search for a class + method in the opened solution. When found, the corresponding file will
+        /// be opened, and the specified method will be shown.
+        /// </summary>
+        /// <param name="fullyQualifiedMethodName">Fully qualified method to search for.</param>
+        internal static void OpenFileByFullyQualifiedMethodName(string fullyQualifiedMethodName)
+        {
+            List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
+            
+            GetProjects(DTE.Solution.Projects, projects);
+
+            EnvDTE.CodeElement discoveredMethodElement;
+            foreach (EnvDTE.Project project in projects)
+            {
+                foreach (EnvDTE.ProjectItem projectItem in project.ProjectItems)
+                {
+                    if (projectItem.FileCodeModel == null)
+                    {
+                        continue;
+                    }
+
+                    var codeModel = (EnvDTE.FileCodeModel) projectItem.FileCodeModel;
+                    foreach (EnvDTE.CodeElement codeElement in codeModel.CodeElements)
+                    {
+                        if (FindMethodInCodeElement(codeElement, fullyQualifiedMethodName, out discoveredMethodElement))
+                        {
+                            var filepath = (string) projectItem.Properties.Item("FullPath").Value;
+
+                            WriteToOutputWindow("Method '{0}' found, opening file: '{1}'", fullyQualifiedMethodName, filepath);
+                            OpenFile(DTE, filepath);
+
+                            int methodStartLine = discoveredMethodElement.StartPoint.Line;
+                            WriteToOutputWindow("Moving to method on line: {0}", methodStartLine);
+                            GoToLine(DTE, discoveredMethodElement.StartPoint.Line);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            WriteToOutputWindow("Could not find method '{0}' in the current solution", fullyQualifiedMethodName);
+        }
+
+        private static bool FindMethodInCodeElement(EnvDTE.CodeElement codeElement, string fullyQualifiedMethodName, 
+            out EnvDTE.CodeElement discoveredMethodElement)
+        {
+            if (codeElement.Kind == EnvDTE.vsCMElement.vsCMElementClass)
+            {
+                foreach (EnvDTE.CodeElement classChildCodeElement in codeElement.Children)
+                {
+                    if (classChildCodeElement.Kind == EnvDTE.vsCMElement.vsCMElementFunction)
+                    {
+                        if (fullyQualifiedMethodName == classChildCodeElement.FullName)
+                        {
+                            discoveredMethodElement = classChildCodeElement;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            foreach (EnvDTE.CodeElement childElement in codeElement.Children)
+            {
+                if (FindMethodInCodeElement(childElement, fullyQualifiedMethodName, out discoveredMethodElement))
+                {
+                    return true;
+                }
+            }
+
+            discoveredMethodElement = null;
+            return false;
+        }
+
 		private static void GetProjects(EnvDTE.Projects projects, List<EnvDTE.Project> projectList)
 		{
 			foreach (EnvDTE.Project project in projects)
