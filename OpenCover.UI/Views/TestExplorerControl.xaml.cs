@@ -218,6 +218,28 @@ namespace OpenCover.UI.Views
 				PropertyChanged(this, new PropertyChangedEventArgs(property));
 			}
 		}
+        
+        private void TestsTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                var treeView = sender as ICSharpCode.TreeView.SharpTreeView;
+                var selectedItem = treeView.SelectedItem;
+
+                var testMethod = selectedItem as TestMethod;
+                if (testMethod != null)
+                {
+                    var fullyQualifiedMethodName = testMethod.FullyQualifiedName;
+                    IDEHelper.WriteToOutputWindow("Navigating to test method: {0}", fullyQualifiedMethodName);
+
+                    IDEHelper.OpenFileByFullyQualifiedMethodName(fullyQualifiedMethodName);
+                }
+            }
+            catch(Exception exception)
+            {
+                IDEHelper.WriteToOutputWindow(exception.Message);
+            }
+        }
 	}
 
 	public class TestResultsViewModel
