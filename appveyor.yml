@@ -1,6 +1,9 @@
 version: 1.0.{build}
 os: Windows Server 2012 R2
 configuration: Release
+shallow_clone: true
+environment:
+  DeployExtension: false
 build:
   project: OpenCover.UI.VS2013.sln
   parallel: true
@@ -8,3 +11,9 @@ build:
 artifacts:
 - path: OpenCover.UI\bin\Release\OpenCover.UI.vsix
   name: VSIX
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/737fbf46970811e6bfa7
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
