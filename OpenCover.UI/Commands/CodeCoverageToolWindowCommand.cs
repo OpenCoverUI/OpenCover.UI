@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the GPL License; Please read license.md file for more details.
+// This source code is released under the MIT License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio.Shell.Interop;
 using OpenCover.UI.Views;
@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace OpenCover.UI.Commands
 {
+    /// 
 	/// <summary>
 	/// Shows the Code Coverage Tool Window
 	/// </summary>

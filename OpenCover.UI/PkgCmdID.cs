@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the GPL License; Please read license.md file for more details.
+// This source code is released under the MIT License; Please read license.md file for more details.
 //
 using System;
 
@@ -11,6 +11,7 @@ namespace OpenCover.UI
 		public const int CmdidCodeCoverageResults = 0x101;
 		public const int CmdidCodeCoverageTestWindow = 0x102;
 		public const int OpenCoverSelectMSTestSettings = 0x103;
+        public const int OpenCoverOpenSettings = 0x104;
 		public const int CommandIDOpenCoverTestExplorerRunTestWithOpenCover = 0x1200;
 		public const int CommandIDOpenCoverTestExplorerContextMenu = 0x1000;
 		

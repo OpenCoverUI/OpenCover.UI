@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the GPL License; Please read license.md file for more details.
+// This source code is released under the MIT License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Platform.WindowManagement;
@@ -190,6 +190,9 @@ namespace OpenCover.UI
 				var testSettingsFileSelectorCommand = new MSTestSettingsFileSelectorCommand(this);
 				mcs.AddCommand(testSettingsFileSelectorCommand);
 
+                var openSettingsCommand = new OpenSettingsWindowCommand(this);
+                mcs.AddCommand(openSettingsCommand);
+
 				foreach (var command in TestsExplorerToolbarCommands.Commands)
 				{
 					mcs.AddCommand(command);
@@ -204,7 +207,8 @@ namespace OpenCover.UI
 				Commands.Add(codeCoverageToolWindowCommand);
 				Commands.Add(testExplorerToolWindowCommand);
 				Commands.Add(testSettingsFileSelectorCommand);
-			}            
+                Commands.Add(openSettingsCommand);
+			}
 		}
 
         private void LoadSettings()

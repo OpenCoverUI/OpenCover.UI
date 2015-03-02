@@ -1,5 +1,5 @@
 ﻿//
-// This source code is released under the GPL License; Please read license.md file for more details.
+// This source code is released under the MIT License; Please read license.md file for more details.
 //
 using System;
 using System.IO;
@@ -36,7 +36,8 @@ namespace OpenCover.UI.TestDiscoverer
 		{
 			if (args != null && args.Length > 0)
 			{
-				var tests = new Discoverer(args.Skip(1)).Discover();
+                var dlls = args.Skip(1);
+                var tests = new Discoverer(dlls).Discover();
 				string serialized = String.Empty;
 
 				if (tests != null)

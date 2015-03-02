@@ -239,7 +239,7 @@ namespace OpenCover.UI.Helper
 		/// <param name="covered">if set to <c>true</c> [covered].</param>
         protected void AddWordSpansForSequencePointsCoveringMultipleLines(ITextSnapshot snapshot, 
 																		List<SnapshotSpan> wordSpans, 
-																		Framework.Model.SequencePoint sequencePoint, 
+																		SequencePoint sequencePoint, 
 																		int sequencePointStartLine, 
 																		int sequencePointEndLine,
 																		bool covered)

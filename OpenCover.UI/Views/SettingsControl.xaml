@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="OpenCover.UI.Views.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converters="clr-namespace:OpenCover.UI.Converters"
+             xmlns:viewModel="clr-namespace:OpenCover.UI.Framework.ViewModel;assembly=OpenCover.UI.Framework"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModel:SettingsViewModel, IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Style.xaml" />
+                <ResourceDictionary>
+                    <converters:WidthConverter x:Key="widthConverter"/>
+                    <converters:TestExecutionResultStatusToIconConverter x:Key="testExecutionResultStatusToIconConverter"/>
+                    <converters:NullToVisibilityConverter x:Key="nullToVisibilityConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Style>
+        <StaticResource ResourceKey="VSUserControlStyle"/>
+    </UserControl.Style>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Margin="0,0,5,5" Grid.Row="0" Grid.Column="0" Width="100" HorizontalContentAlignment="Right" >NUnit Path:</Label>
+        <TextBox Margin="0,5,0,0" Grid.Row="0" Grid.Column="1" Text="{Binding Path=NUnitExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150"/>
+        <Button Margin="5,5,0,0" Grid.Row="0" Grid.Column="2" Width="20" Command="{Binding ProcessSelectNUnitExe}">...</Button>
+        <Label Margin="0,1,5,4" Grid.Row="1" Grid.Column="0" Width="100" HorizontalContentAlignment="Right">OpenCover Path:</Label>
+        <TextBox Margin="0,5,0,0" Grid.Row="1" Grid.Column="1" Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150" />
+        <Button Margin="5,5,0,0" Grid.Row="1" Grid.Column="2" Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
+
+    </Grid>
+</UserControl>

@@ -2,6 +2,8 @@
 
 # OpenCover.UI
 
+[![Join the chat at https://gitter.im/OpenCoverUI/OpenCover.UI](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/OpenCoverUI/OpenCover.UI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Visual Studio Integration to OpenCover
 
 ## Getting started
