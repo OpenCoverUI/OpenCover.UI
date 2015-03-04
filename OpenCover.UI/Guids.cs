@@ -13,6 +13,8 @@ namespace OpenCover.UI
 		public const string GuidTestExplorerToolWindowString = "E1B7D1F8-9B3C-49B1-8F4F-BFC63A88835D";
 		public const string GuidTestExplorerToolWindowContextMenu = "1E198C22-5980-4E7E-92F3-F73168D1FB63";
 
+        public const string GuidOpenCoverUIOptionPage = "D4BE3BE5-444A-4946-B6DF-CF422D3A1875";
+
 		public static readonly Guid GuidOpenCoverUICmdSet = new Guid(GuidOpenCoverUICmdSetString);
 		public static Guid GuidOpenCoverTestExplorerContextMenuCommandSet = new Guid("81F1321F-B605-47F6-AD43-FB2EC4891225");
 	};
