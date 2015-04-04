@@ -43,13 +43,24 @@ namespace OpenCover.UI.Tagger
 		/// <returns>Tagger for changing background color</returns>
 		public ITagger<T> CreateTagger<T>(ITextView textView, ITextBuffer buffer) where T : ITag
 		{
-			if (buffer != textView.TextBuffer)
-				return null;
+            if (textView == null)
+                return null;
 
-			var coveredClassType = Registry.GetClassificationType("text-background-covered");
-			var notCoveredClassType = Registry.GetClassificationType("text-background-notcovered");
-			return new TextTagger(textView, TextSearchService, coveredClassType, notCoveredClassType) as ITagger<T>;
-	
+            if (buffer != textView.TextBuffer)
+				return null;            
+
+            // does the view already have a tagger instance?
+            TextTagger instance = TextTagger.GetTagger(textView);
+
+            // create new instance
+            if (instance == null)
+            {                
+                var coveredClassType = Registry.GetClassificationType("text-background-covered");
+                var notCoveredClassType = Registry.GetClassificationType("text-background-notcovered");
+                instance = new TextTagger(textView, TextSearchService, coveredClassType, notCoveredClassType);
+            }
+   
+            return instance as ITagger<T>;	
 		}
 	}
 }

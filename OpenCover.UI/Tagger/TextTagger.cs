@@ -51,7 +51,7 @@ namespace OpenCover.UI.Tagger
             // Register instance of the view
             _instances.Add(view, this);
 
-            view.Closed += OnViewClosed;
+            view.Closed += OnViewClosed;            
 		}
 
         /// <summary>
@@ -68,6 +68,10 @@ namespace OpenCover.UI.Tagger
             _searchService = null;
             _coveredType = null;
             _notCoveredType = null;
+
+            // Unregister this instance
+            if (_instances.ContainsKey(_textView))
+                _instances.Remove(_textView);            
 
             base.Dispose(disposing);
         }
