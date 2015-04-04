@@ -24,6 +24,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
+using OpenCover.UI.Views.OptionPages;
 
 namespace OpenCover.UI
 {
@@ -42,6 +43,7 @@ namespace OpenCover.UI
 	[ProvideToolWindow(typeof(TestExplorerToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
 		Orientation = ToolWindowOrientation.Left, Window = EnvDTE.Constants.vsWindowKindClassView)]
 	[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
+    [ProvideOptionPageAttribute(typeof(OpenCoverUIOptionPage), "OpenCover.UI Options", "General", 100, 101, true, new string[] { "Change OpenCover.UI Options" })]
 	[Guid(GuidList.GuidOpenCoverUIPkgString)]
 	public sealed class OpenCoverUIPackage : Package
 	{
@@ -190,9 +192,6 @@ namespace OpenCover.UI
 				var testSettingsFileSelectorCommand = new MSTestSettingsFileSelectorCommand(this);
 				mcs.AddCommand(testSettingsFileSelectorCommand);
 
-                var openSettingsCommand = new OpenSettingsWindowCommand(this);
-                mcs.AddCommand(openSettingsCommand);
-
 				foreach (var command in TestsExplorerToolbarCommands.Commands)
 				{
 					mcs.AddCommand(command);
@@ -207,7 +206,6 @@ namespace OpenCover.UI
 				Commands.Add(codeCoverageToolWindowCommand);
 				Commands.Add(testExplorerToolWindowCommand);
 				Commands.Add(testSettingsFileSelectorCommand);
-                Commands.Add(openSettingsCommand);
 			}
 		}
 

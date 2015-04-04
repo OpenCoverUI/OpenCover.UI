@@ -11,7 +11,7 @@ namespace OpenCover.UI
 		public const int CmdidCodeCoverageResults = 0x101;
 		public const int CmdidCodeCoverageTestWindow = 0x102;
 		public const int OpenCoverSelectMSTestSettings = 0x103;
-        public const int OpenCoverOpenSettings = 0x104;
+
 		public const int CommandIDOpenCoverTestExplorerRunTestWithOpenCover = 0x1200;
 		public const int CommandIDOpenCoverTestExplorerContextMenu = 0x1000;
 		

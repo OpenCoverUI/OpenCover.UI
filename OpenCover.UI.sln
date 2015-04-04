@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.TestDiscoverer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.TestDiscoverer.TestResources", "OpenCover.UI.TestDiscoverer.TestResources\OpenCover.UI.TestDiscoverer.TestResources.csproj", "{4F2C8986-42CD-4614-8302-0A824FFE8D89}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.Framework", "OpenCover.UI.Framework\OpenCover.UI.Framework.csproj", "{A18A6310-72E0-40C8-AC3E-D5DFCA9B272B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F2C8986-42CD-4614-8302-0A824FFE8D89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A18A6310-72E0-40C8-AC3E-D5DFCA9B272B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A18A6310-72E0-40C8-AC3E-D5DFCA9B272B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A18A6310-72E0-40C8-AC3E-D5DFCA9B272B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A18A6310-72E0-40C8-AC3E-D5DFCA9B272B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

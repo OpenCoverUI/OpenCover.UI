@@ -38,7 +38,7 @@
 			<RowDefinition Height="20*" />
 		</Grid.RowDefinitions>
         <sd:SharpTreeView x:Name="TestsTreeView" ShowRootExpander="False" HorizontalAlignment="Stretch"
-						  Grid.Row="0" SelectionChanged="TestSelectionChanged">
+						  Grid.Row="0" SelectionChanged="TestSelectionChanged" MouseDoubleClick="TestsTreeView_MouseDoubleClick">
             <ListView.View>
                 <sd:SharpGridView>
                     <GridView.Columns>
