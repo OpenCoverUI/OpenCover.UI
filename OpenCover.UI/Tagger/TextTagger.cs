@@ -60,10 +60,11 @@ namespace OpenCover.UI.Tagger
         /// <param name="disposing">True for managed ressources</param>
         protected override void Dispose(bool disposing)
         {
-            if (OpenCoverUIPackage.Instance != null)
+            if (OpenCoverUIPackage.Instance != null && OpenCoverUIPackage.Instance.Settings != null)
                 OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
 
-            _textView.Closed -= OnViewClosed;
+            if (_textView != null)
+                _textView.Closed -= OnViewClosed;
 
             _searchService = null;
             _coveredType = null;
