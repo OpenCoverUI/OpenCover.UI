@@ -174,9 +174,12 @@ namespace OpenCover.UI.Processors
 			var errorMessage = errorInfo != null ? GetElementValue(errorInfo, "Message", ns) : null;
 			var stackTrace = errorInfo != null ? GetElementValue(errorInfo, "StackTrace", ns) : null;
 
+			var durationAttributeValue = GetAttributeValue(ut, "duration");
+			Decimal? executionTime = durationAttributeValue != null ? (Decimal)TimeSpan.Parse(durationAttributeValue).TotalSeconds : (Decimal?) null;
+
 			return new TestResult(null,
 								GetTestExecutionStatus(GetAttributeValue(ut, "outcome")),
-								(Decimal)TimeSpan.Parse(GetAttributeValue(ut, "duration")).TotalSeconds,
+								executionTime,
 								errorMessage,
 								stackTrace,
 								null);
