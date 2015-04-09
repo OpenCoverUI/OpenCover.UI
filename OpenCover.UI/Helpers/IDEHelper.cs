@@ -169,22 +169,42 @@ namespace OpenCover.UI.Helpers
             
             GetProjects(DTE.Solution.Projects, projects);
 
-            EnvDTE.CodeElement discoveredMethodElement;
             foreach (EnvDTE.Project project in projects)
             {
-                foreach (EnvDTE.ProjectItem projectItem in project.ProjectItems)
+                var projectItems = project.ProjectItems;
+                var found = ScanProjectItems(fullyQualifiedMethodName, projectItems);
+                if (found) 
                 {
-                    if (projectItem.FileCodeModel == null)
+                    if (Debugger.IsAttached)
                     {
-                        continue;
+                        WriteToOutputWindow("Method found, stopping solution search");
                     }
 
-                    var codeModel = (EnvDTE.FileCodeModel) projectItem.FileCodeModel;
+                    return; 
+                }
+            }
+
+            WriteToOutputWindow("Could not find method '{0}' in the current solution", fullyQualifiedMethodName);
+        }
+
+        private static bool ScanProjectItems(string fullyQualifiedMethodName, EnvDTE.ProjectItems projectItems)
+        {
+            foreach (EnvDTE.ProjectItem projectItem in projectItems)
+            {
+                if (Debugger.IsAttached)
+                {
+                    WriteToOutputWindow("Processing projectItem: {0}", projectItem.Name);
+                }
+
+                if (projectItem.FileCodeModel != null)
+                {
+                    var codeModel = (EnvDTE.FileCodeModel)projectItem.FileCodeModel;
                     foreach (EnvDTE.CodeElement codeElement in codeModel.CodeElements)
                     {
+                        EnvDTE.CodeElement discoveredMethodElement;
                         if (FindMethodInCodeElement(codeElement, fullyQualifiedMethodName, out discoveredMethodElement))
                         {
-                            var filepath = (string) projectItem.Properties.Item("FullPath").Value;
+                            var filepath = (string)projectItem.Properties.Item("FullPath").Value;
 
                             WriteToOutputWindow("Method '{0}' found, opening file: '{1}'", fullyQualifiedMethodName, filepath);
                             OpenFile(DTE, filepath);
@@ -192,13 +212,25 @@ namespace OpenCover.UI.Helpers
                             int methodStartLine = discoveredMethodElement.StartPoint.Line;
                             WriteToOutputWindow("Moving to method on line: {0}", methodStartLine);
                             GoToLine(DTE, discoveredMethodElement.StartPoint.Line);
-                            return;
+                            return true;
                         }
                     }
                 }
-            }
+                else if (projectItem.Kind == EnvDTE.Constants.vsProjectItemKindPhysicalFolder)
+                {
+                    if (Debugger.IsAttached)
+                    {
+                        WriteToOutputWindow("Scanning subfolder: {0}", projectItem.Name);
+                    }
 
-            WriteToOutputWindow("Could not find method '{0}' in the current solution", fullyQualifiedMethodName);
+                    var found = ScanProjectItems(fullyQualifiedMethodName, projectItem.ProjectItems);
+                    if (found) 
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private static bool FindMethodInCodeElement(EnvDTE.CodeElement codeElement, string fullyQualifiedMethodName, 
@@ -206,6 +238,11 @@ namespace OpenCover.UI.Helpers
         {
             if (codeElement.Kind == EnvDTE.vsCMElement.vsCMElementClass)
             {
+                if (Debugger.IsAttached)
+                {
+                    WriteToOutputWindow("Processing class: {0}", codeElement.FullName);
+                }
+
                 foreach (EnvDTE.CodeElement classChildCodeElement in codeElement.Children)
                 {
                     if (classChildCodeElement.Kind == EnvDTE.vsCMElement.vsCMElementFunction)
