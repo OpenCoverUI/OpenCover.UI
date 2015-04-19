@@ -64,15 +64,19 @@ namespace OpenCover.UI.Tagger
                 OpenCoverUIPackage.Instance.Settings.PropertyChanged -= OnSettingsChanged;
 
             if (_textView != null)
+            {
                 _textView.Closed -= OnViewClosed;
+            }
 
             _searchService = null;
             _coveredType = null;
             _notCoveredType = null;
 
             // Unregister this instance
-            if (_instances.ContainsKey(_textView))
-                _instances.Remove(_textView);            
+            if (_textView != null && _instances.ContainsKey(_textView))
+            {
+                _instances.Remove(_textView);
+            }
 
             base.Dispose(disposing);
         }
