@@ -8,7 +8,7 @@ Visual Studio Integration to OpenCover
 
 ## Getting started
 
-Please make sure you install OpenCover and it is generating report before installing the plugin.
+Please make sure you install OpenCover and it is generating report before installing the plugin. The latest OpenCover release can be found [here](https://github.com/opencover/opencover/releases).
 
 For now, the plugin assumes that OpenCover is installed at %localappdata%\Apps\OpenCover. 
 No configuration option is available yet.
