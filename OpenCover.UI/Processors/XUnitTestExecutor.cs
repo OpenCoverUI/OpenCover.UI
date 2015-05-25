@@ -15,7 +15,7 @@ namespace OpenCover.UI.Processors
 {
     internal class XUnitTestExecutor : TestExecutor
     {
-        //private string _runListFile;
+        private string _runListFile;
         private string _xUnitPath;
 
         /// <summary>
@@ -41,7 +41,8 @@ namespace OpenCover.UI.Processors
 
             SetOpenCoverResultsFilePath();
 
-            _testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));            
+            _testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));
+            _runListFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.txt", fileFormat));
 
             _commandLineArguments = String.Format(CommandlineStringFormat,
                                                     _xUnitPath,
@@ -109,7 +110,12 @@ namespace OpenCover.UI.Processors
         /// </summary>
         internal override void Cleanup()
         {
-            base.Cleanup();            
+            base.Cleanup();
+
+            if (File.Exists(_runListFile))
+            {
+                File.Delete(_runListFile);
+            }
         }
 
         private IEnumerable<DirectoryInfo> ProgramFilesFolders()
