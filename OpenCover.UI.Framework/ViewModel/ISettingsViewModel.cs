@@ -8,5 +8,6 @@ namespace OpenCover.UI.Framework.ViewModel
 
         string OpenCoverExePath { get; set; }
 
+        string XUnitExePath { get; set; }
     }
 }

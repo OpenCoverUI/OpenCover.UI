@@ -38,6 +38,20 @@ namespace OpenCoverUI.Tests.Framework.ViewModel
         }
 
         [Test]
+        public void WhenIExecute_ProcessSelectXUnitExe_ItFiresThe_SelectXunitExeEvent()
+        {
+            // arrange
+            var fired = false;
+            _model.SelectXUnitExeEvent += (sender, args) => fired = true;
+
+            // act
+            _model.ProcessSelectXUnitExe.Execute(null);
+
+            // assert
+            Assert.IsTrue(fired);
+        }
+
+        [Test]
         public void WhenIExecute_ProcessSelectOpenCoverExe_ItFiresThe_SelectOpenCoverExeEvent()
         {
             // arrange
@@ -62,6 +76,19 @@ namespace OpenCoverUI.Tests.Framework.ViewModel
 
             // assert
             Assert.AreEqual(_model.NUnitExePath, _openCoverUiSettings.NUnitPath);
+        }
+
+        [Test]
+        public void Setting_XUnitExePath_UpdatesSettings()
+        {
+            // arrange
+            Assert.AreEqual(string.Empty, _openCoverUiSettings.XUnitPath);
+
+            // act
+            _model.XUnitExePath = "1234";
+
+            // assert
+            Assert.AreEqual(_model.XUnitExePath, _openCoverUiSettings.XUnitPath);
         }
 
         [Test]

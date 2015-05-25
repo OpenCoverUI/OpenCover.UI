@@ -345,9 +345,11 @@ namespace OpenCover.UI.Processors
 			{
 				case "success":
 				case "passed":
+                case "pass":
 					return TestExecutionStatus.Successful;
 				case "failure":
 				case "failed":
+                case "fail":
 					return TestExecutionStatus.Error;
 				case "inconclusive":
 					return TestExecutionStatus.Inconclusive;
