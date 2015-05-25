@@ -4,6 +4,8 @@ configuration: Release
 shallow_clone: true
 environment:
   DeployExtension: false
+before_build:
+  - nuget restore OpenCover.UI.VS2013.sln
 build:
   project: OpenCover.UI.sln
   parallel: true
