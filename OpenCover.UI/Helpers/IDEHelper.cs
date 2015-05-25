@@ -127,6 +127,7 @@ namespace OpenCover.UI.Helpers
 		{
 			string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
 			string nunitPath = "nunit.Framework.dll";
+            string xunitPath = "xunit.core.dll";
 
 			List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
 
@@ -142,7 +143,9 @@ namespace OpenCover.UI.Helpers
 					foreach (Reference reference in vsProject2.References)
 					{
 						var referenceFile = Path.GetFileName(reference.Path);
-						if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
+						if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) 
+                            || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase)
+                            || xunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
 						{
 							isTestProject = true;
 							break;

@@ -110,22 +110,33 @@ namespace OpenCover.UI.Views
 
 					var msTests = tests.Where(tc => tc.TestType == TestType.MSTest);
 					var nUnitTests = tests.Where(tc => tc.TestType == TestType.NUnit);
+                    var xUnitTests = tests.Where(tc => tc.TestType == TestType.XUnit);
 
 					bool hasMSTests = msTests.Any();
 					bool hasNUnitTests = nUnitTests.Any();
+                    bool hasXUnitTests = xUnitTests.Any();
 
-					if (hasMSTests && hasNUnitTests)
-					{
-						TestsTreeView.Root = new ICSharpCode.TreeView.SharpTreeNode();
-						TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("MSTest", msTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.MSTest));
-						TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("NUnit Test", nUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.NUnit));
-					}
-					else
-					{
-						TestType testType = hasMSTests ? TestType.MSTest : hasNUnitTests ? TestType.NUnit : TestType.MSTest;
+                    bool hasMoreThanOneTestType = hasMSTests ? (hasNUnitTests || hasXUnitTests) : (hasNUnitTests && hasXUnitTests);
 
-						TestsTreeView.Root = new TestMethodWrapperContainer(null, tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, testType);
-					}
+                    if(hasMoreThanOneTestType)
+                    {
+                        TestsTreeView.Root = new ICSharpCode.TreeView.SharpTreeNode();
+
+                        if (hasMSTests) 
+                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("MSTest", msTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.MSTest));
+                        if(hasNUnitTests)
+                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("NUnit Test", nUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.NUnit));
+                        if(hasXUnitTests)
+                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("XUnit Test", xUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.XUnit));
+
+                    }
+                    else
+                    {
+                        TestType testType = hasMSTests ? TestType.MSTest : hasNUnitTests ? TestType.NUnit : hasXUnitTests ? TestType.XUnit : TestType.MSTest;
+
+                        TestsTreeView.Root = new TestMethodWrapperContainer(null, tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, testType);
+                    }					
+					
 
 					if (TestDiscoveryFinished != null)
 					{
@@ -135,7 +146,7 @@ namespace OpenCover.UI.Views
 					TestSelectionChanged(null, null);
 				}));
 			}
-		}
+		}        
 
 		/// <summary>
 		/// Clears the tests TreeView children.
