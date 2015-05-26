@@ -156,7 +156,8 @@ namespace OpenCover.UI.Glyphs
         /// <returns></returns>
         public static IEnumerable<SnapshotSpan> GetSpansForLine(ITextViewLine line, IEnumerable<SnapshotSpan> spanContainer)
         {
-            return spanContainer.Where(s => (s.Start >= line.Start && s.Start <= line.End) || (s.Start < line.Start && s.End >= line.Start));
+            return spanContainer.Where(s => s.Snapshot.Version == line.Snapshot.Version)
+                .Where(s => (s.Start >= line.Start && s.Start <= line.End) || (s.Start < line.Start && s.End >= line.Start));
         }    
 
         /// <summary>
