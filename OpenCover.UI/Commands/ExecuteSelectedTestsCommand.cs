@@ -24,7 +24,6 @@ namespace OpenCover.UI.Commands
 		private const string CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE = "We could not run all the tests that you selected. Please see output window for more details.";
 
 		private OpenCoverUIPackage _package;
-		private bool _isRunningCodeCoverage;
 		private TestExecutor _testExecutor;
 
 		private CodeCoverageResultsControl CodeCoverageResults { get { return _package.GetToolWindow<CodeCoverageResultsToolWindow>().CodeCoverageResultsControl; } }
@@ -39,7 +38,7 @@ namespace OpenCover.UI.Commands
 		{
 			_package = package;
 
-			base.Enabled = false;
+            DisableControl();
 
 			TestExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
 		}
@@ -49,15 +48,16 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		void OnTestDiscoveryFinished()
 		{
-			var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
-			if (hasTests & !_isRunningCodeCoverage)
-			{
-				Enabled = true;
-			}
-			else
-			{
-				Enabled = false;
-			}
+            var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
+
+            if (hasTests && (_testExecutor == null || !_testExecutor.IsExecuting))
+            {
+                EnableControl();
+            }
+            else 
+            {
+                DisableControl();
+            }
 		}
 
 		/// <summary>
@@ -123,21 +123,28 @@ namespace OpenCover.UI.Commands
 			// show tool window which shows the progress.
 			ShowCodeCoverageResultsToolWindow();
 
-			SetCommandAvailabilityStatus(false);
+            DisableControl();
+
 			_package.VSEventsHandler.BuildSucceeded += RunOpenCover;
-			_package.VSEventsHandler.BuildFailed += () => SetCommandAvailabilityStatus(false);
+            _package.VSEventsHandler.BuildFailed += () => DisableControl();
 			_package.VSEventsHandler.BuildSolution();
 		}
 
 		/// <summary>
-		/// Sets the command availability status to either true or false.
-		/// </summary>
-		/// <param name="status">if set to <c>true</c> [status].</param>
-		private void SetCommandAvailabilityStatus(bool status)
+		/// Sets the command availability status to true.
+		/// </summary>		
+		private void EnableControl()
 		{
-			Enabled = status;
-			_isRunningCodeCoverage = !status;
+			Enabled = true;
 		}
+
+        /// <summary>
+        /// Sets the command availability status to false.
+        /// </summary>
+        private void DisableControl()
+        {
+            Enabled = false;
+        }
 
 		/// <summary>
 		/// Sets the test executor based on the type of Unit Tests selected.
@@ -206,8 +213,7 @@ namespace OpenCover.UI.Commands
 					}
 					finally
 					{
-						Enabled = true;
-						_isRunningCodeCoverage = false;
+                        EnableControl();
 					}
 				});
 

@@ -131,8 +131,7 @@ namespace OpenCover.UI.Processors
 		/// Do cleanup here.
 		/// </summary>
 		internal virtual void Cleanup()
-		{ 
-		}
+		{}
 
 		/// <summary>
 		/// Starts OpenCover.Console.exe to start CodeCoverage session.
@@ -149,6 +148,8 @@ namespace OpenCover.UI.Processors
 			}
 
 			Process process = Process.Start(openCoverStartInfo);
+
+            IsExecuting = true;
 
 			var consoleOutputReaderBuilder = new StringBuilder();
 
@@ -170,6 +171,8 @@ namespace OpenCover.UI.Processors
 			IDEHelper.WriteToOutputWindow(process.StandardError.ReadToEnd());
 
 			ReadTestResults();
+
+            IsExecuting = false;
 
 			return new Tuple<string, string>(_testResultsFile, _openCoverResultsFile);
 		}
@@ -379,6 +382,8 @@ namespace OpenCover.UI.Processors
 			IDEHelper.WriteToOutputWindow(openCoverStartInfo.Arguments);
 
 			return openCoverStartInfo;
-		}
-	}
+		}              
+
+        internal bool IsExecuting { get; private set; }
+    }
 }
