@@ -54,9 +54,9 @@ namespace OpenCover.UI.Tagger
 
             // create new instance
             if (instance == null)
-            {                
-                var coveredClassType = Registry.GetClassificationType("text-background-covered");
-                var notCoveredClassType = Registry.GetClassificationType("text-background-notcovered");
+            {
+                var coveredClassType = Registry.GetClassificationType(ClassificationTypes.TextBackgroundCovered);
+                var notCoveredClassType = Registry.GetClassificationType(ClassificationTypes.TextBackgroundNotCovered);
                 instance = new TextTagger(textView, TextSearchService, coveredClassType, notCoveredClassType);
             }
    

@@ -14,7 +14,7 @@ namespace OpenCover.UI.Tagger
 	public static class CoveredTextBackgroundTypeExports
 	{
 		[Export(typeof(ClassificationTypeDefinition))]
-		[Name("text-background-covered")]
+        [Name(ClassificationTypes.TextBackgroundCovered)]
 		public static ClassificationTypeDefinition OrdinaryClassificationType;
 	}
 
@@ -24,7 +24,7 @@ namespace OpenCover.UI.Tagger
 	public static class NotCoveredTextBackgroundTypeExports
 	{
 		[Export(typeof(ClassificationTypeDefinition))]
-		[Name("text-background-notcovered")]
+        [Name(ClassificationTypes.TextBackgroundNotCovered)]
 		public static ClassificationTypeDefinition OrdinaryClassificationType;
 	}
 
@@ -32,8 +32,8 @@ namespace OpenCover.UI.Tagger
 	/// Class defining background color for covered classes
 	/// </summary>
 	[Export(typeof(EditorFormatDefinition))]
-	[ClassificationType(ClassificationTypeNames = "text-background-covered")]
-	[Name("text-background-covered")]
+    [ClassificationType(ClassificationTypeNames = ClassificationTypes.TextBackgroundCovered)]
+    [Name(ClassificationTypes.TextBackgroundCovered)]
 	[UserVisible(true)]
 	[Order(After = Priority.High)]
 	public sealed class CoveredTextBackground : ClassificationFormatDefinition
@@ -52,8 +52,8 @@ namespace OpenCover.UI.Tagger
 	/// Class defining background color for covered classes
 	/// </summary>
 	[Export(typeof(EditorFormatDefinition))]
-	[ClassificationType(ClassificationTypeNames = "text-background-notcovered")]
-	[Name("text-background-notcovered")]
+    [ClassificationType(ClassificationTypeNames = ClassificationTypes.TextBackgroundNotCovered)]
+    [Name(ClassificationTypes.TextBackgroundNotCovered)]
 	[UserVisible(true)]
 	[Order(After = Priority.High)]
 	public sealed class NotCoveredTextBackground : ClassificationFormatDefinition

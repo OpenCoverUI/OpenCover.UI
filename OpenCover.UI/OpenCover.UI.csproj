@@ -179,6 +179,7 @@
     <Compile Include="Glyphs\LineCoverageGlyphFactoryProvider.cs" />
     <Compile Include="Helpers\LineCoverageState.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Tagger\ClassificationTypes.cs" />
     <Compile Include="Tagger\LineCoverageTag.cs" />
     <Compile Include="Tagger\LineCoverageTagger.cs" />
     <Compile Include="Commands\CodeCoverageToolWindowCommand.cs" />
