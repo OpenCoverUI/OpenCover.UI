@@ -1,11 +1,6 @@
-﻿using Microsoft.VisualStudio.Settings;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.Settings;
 
 namespace OpenCover.UI
 {
@@ -29,8 +24,8 @@ namespace OpenCover.UI
         {
             _store = configurationSettingsStore;
 
-            _showLinesColored = _store.GetBoolean(SETTINGS_PATH, "ShowLinesColored", false);
-            _showCoverageGlyphs = _store.GetBoolean(SETTINGS_PATH, "ShowCoverageGlyphs", true);
+            _showLinesColored = _store.GetBoolean(SETTINGS_PATH, SettingNames.ShowLinesColored, false);
+            _showCoverageGlyphs = _store.GetBoolean(SETTINGS_PATH, SettingNames.ShowCoverageGlyphs, true);
         }
 
         /// <summary>
@@ -88,6 +83,12 @@ namespace OpenCover.UI
                 _store.CreateCollection(SETTINGS_PATH);
 
             _store.SetBoolean(SETTINGS_PATH, propertyName, value);
+        }
+
+        public static class SettingNames
+        {
+            public const string ShowLinesColored = "ShowLinesColored";
+            public const string ShowCoverageGlyphs = "ShowCoverageGlyphs";
         }
     }
 }

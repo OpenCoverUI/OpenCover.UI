@@ -1,19 +1,18 @@
 ﻿//
 // This source code is released under the GPL License; Please read license.md file for more details.
 //
-using Microsoft.VisualStudio.Shell;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Text.Tagging;
 using OpenCover.UI.Glyphs;
 using OpenCover.UI.Helper;
-using OpenCover.UI.Helpers;
-using OpenCover.UI.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace OpenCover.UI.Tagger
 {
@@ -95,7 +94,7 @@ namespace OpenCover.UI.Tagger
 
             foreach (var span in spansToSerach)
 			{
-				var covered = _spanCoverage.ContainsKey(span) ? _spanCoverage[span] : false;
+				var covered = _spanCoverage.ContainsKey(span) && _spanCoverage[span];
 				var tag = covered ? new ClassificationTag(_coveredType) : new ClassificationTag(_notCoveredType);
 				yield return new TagSpan<ClassificationTag>(span, tag);
 			}
@@ -119,22 +118,26 @@ namespace OpenCover.UI.Tagger
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OnSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ShowLinesColored")
+            if (e.PropertyName == Settings.SettingNames.ShowLinesColored)
                 RaiseAllTagsChanged();
         }
 
         private void OnViewClosed(object sender, EventArgs e)
         {
-            _instances.Remove(sender as ITextView);
+            var key = sender as ITextView;
+            if (key != null)
+            {
+                _instances.Remove(key);
+            }
         }
 
-        /// <summary>
+	    /// <summary>
         /// Show spans for line only
         /// </summary>
         /// <param name="line"></param>
-        internal void ShowForLine(Microsoft.VisualStudio.Text.Formatting.IWpfTextViewLine line)
+        internal void ShowForLine(IWpfTextViewLine line)
         {
             _lineSpans = LineCoverageGlyphFactory.GetSpansForLine(line, _currentSpans);
             RaiseAllTagsChanged();

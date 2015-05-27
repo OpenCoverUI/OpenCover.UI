@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
+using System.ComponentModel;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Tagging;
 using OpenCover.UI.Views;
 
 namespace OpenCover.UI.Tagger
@@ -91,9 +89,9 @@ namespace OpenCover.UI.Tagger
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OnSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "ShowCoverageGlyphs")
+            if (e.PropertyName == Settings.SettingNames.ShowCoverageGlyphs)
                 RaiseAllTagsChanged();
         }
 
