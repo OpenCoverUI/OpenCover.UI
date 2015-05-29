@@ -1,4 +1,4 @@
-﻿//
+//
 // This source code is released under the MIT License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio.Text.Classification;
@@ -29,7 +29,8 @@ namespace OpenCover.UI.Tagger
 	}
 
 	/// <summary>
-	/// Class defining background color for covered classes
+    /// Class defining background color for covered classes, can be customized by the user through the Text Editor settings
+    /// in Visual Studio
 	/// </summary>
 	[Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = ClassificationTypes.TextBackgroundCovered)]
@@ -43,13 +44,14 @@ namespace OpenCover.UI.Tagger
 		/// </summary>
 		public CoveredTextBackground()
 		{
-			DisplayName = "Covered Text Background";
+            DisplayName = "OpenCover.UI Covered Text Background";
             BackgroundColor = Color.FromRgb(207, 231, 209);	
 		}
 	}
 
 	/// <summary>
-	/// Class defining background color for covered classes
+	/// Class defining background color for not covered classes, can be customized by the user through the Text Editor settings
+	/// in Visual Studio
 	/// </summary>
 	[Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = ClassificationTypes.TextBackgroundNotCovered)]
@@ -63,7 +65,7 @@ namespace OpenCover.UI.Tagger
 		/// </summary>
 		public NotCoveredTextBackground()
 		{
-			DisplayName = "Not Covered Text Background";
+            DisplayName = "OpenCover.UI Not Covered Text Background";
             BackgroundColor = Color.FromRgb(255, 217, 217);			
 		}
 	}
