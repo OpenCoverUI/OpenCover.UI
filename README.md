@@ -6,6 +6,8 @@
 
 Visual Studio Integration to OpenCover
 
+The latest release can be downloaded from the VS Gallery: https://visualstudiogallery.msdn.microsoft.com/6950a046-8919-4935-8542-c6f37956f688 or using the Visual Studio extension manager.
+
 ## Getting started
 
 Please make sure you install OpenCover and it is generating report before installing the plugin. The latest OpenCover release can be found [here](https://github.com/opencover/opencover/releases).
