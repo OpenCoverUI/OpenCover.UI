@@ -133,7 +133,11 @@ namespace OpenCover.UI.Commands
 					break;
 			}
 
-			OpenCoverUIPackage.Instance.ToolWindows.OfType<TestExplorerToolWindow>().First().TestExplorerControl.ChangeGroupBy(CurrentSelectedGroupBy);
+			var testExplorerToolWindow = OpenCoverUIPackage.Instance.ToolWindows.OfType<TestExplorerToolWindow>().FirstOrDefault();
+			if (testExplorerToolWindow != null)
+			{
+				testExplorerToolWindow.TestExplorerControl.ChangeGroupBy(CurrentSelectedGroupBy);
+			}
 		}
 
 		/// <summary>
