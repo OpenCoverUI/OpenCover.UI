@@ -50,7 +50,7 @@
 			<ListView.View>
 				<sd:SharpGridView>
 					<GridView.Columns>
-						<GridViewColumn Header="Symbol" Width="700">
+						<GridViewColumn Header="Symbol" Width="600">
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
 									<sd:SharpTreeNodeView />
@@ -64,7 +64,7 @@
 								</DataTemplate>
 							</GridViewColumn.CellTemplate>
 						</GridViewColumn>
-						<GridViewColumn Header="Visited Sequence Points" Width="150">
+						<GridViewColumn Header="Visited/Total Sequence Points" Width="200">
 							<GridViewColumn.CellTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding VisitedSequencePoints}" />
