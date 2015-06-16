@@ -100,5 +100,24 @@ namespace OpenCover.UI.TestDiscoverer
                 }
             }
         }
+        
+                /// <summary>
+        /// Determines whether the assembly has a reference to the NUnit library.
+        /// </summary>
+        /// <param name="assembly">Assembly to check.</param>
+        protected static bool AssemblyHasReferenceTo(AssemblyDefinition assembly, string referenceName)
+        {
+            bool hasNUnitReference = false;
+
+            foreach (var anrRef in assembly.MainModule.AssemblyReferences)
+            {
+                if (string.Equals(anrRef.Name, referenceName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    hasNUnitReference = true;
+                    break;
+                }
+            }
+            return hasNUnitReference;
+        }
     }
 }
