@@ -34,6 +34,13 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
         /// <returns>Tests in the Assembly</returns>
         protected override List<TestClass> DiscoverTestsInAssembly(string dllPath, AssemblyDefinition assembly)
         {
+            bool hasNUnitReference = AssemblyHasReferenceTo(assembly, "nunit.framework");
+
+            if (!hasNUnitReference)
+            {
+                return new List<TestClass>();
+            }
+            
             var classes = new List<TestClass>();
             foreach (var type in assembly.MainModule.Types)
             {
