@@ -104,31 +104,46 @@ namespace OpenCover.UI.Views
 			_package = package;
 			_package.VSEventsHandler.SolutionClosing += ClearTreeView;
 			_package.VSEventsHandler.SolutionOpened += ClearTreeView;
+
+            _package.Settings.PropertyChanged += PackageSettings_PropertyChanged;
+
 		}
 
-		/// <summary>
+	    private void PackageSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+	    {
+	        if (string.Equals(e.PropertyName, "ShowUncoveredClasses"))
+	        {
+	            UpdateCoverageResults();
+	        }
+	    }
+
+	    /// <summary>
 		/// Updates the coverage results for current OpenCover run on the UI thread.
 		/// </summary>
 		/// <param name="data">The CoverageSession data.</param>
 		public void UpdateCoverageResults(CoverageSession data)
 		{
-			CoverageSession = data;
+		    CoverageSession = data;
 
-			if (CoverageSession != null)
-			{
-				Dispatcher.BeginInvoke(new Action(() =>
-				{
-					CodeCoverageResultsTreeView.Root = new CoverageNode(data);
-					IsLoading = false;
-
-                    if (NewCoverageDataAvailable != null)
-                        NewCoverageDataAvailable(this, EventArgs.Empty);
-
-				}), null);
-			}
+		    UpdateCoverageResults();
 		}
 
-		/// <summary>
+	    public void UpdateCoverageResults()
+	    {
+	        if (CoverageSession != null)
+	        {
+	            Dispatcher.BeginInvoke(new Action(() =>
+	            {
+	                CodeCoverageResultsTreeView.Root = new CoverageNode(CoverageSession);
+	                IsLoading = false;
+
+	                if (NewCoverageDataAvailable != null)
+	                    NewCoverageDataAvailable(this, EventArgs.Empty);
+	            }), null);
+	        }
+	    }
+
+	    /// <summary>
 		/// Clears the TreeView.
 		/// </summary>
 		public void ClearTreeView()

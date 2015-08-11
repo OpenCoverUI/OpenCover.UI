@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using Microsoft.Win32;
 using OpenCover.UI.Framework.ViewModel;
 

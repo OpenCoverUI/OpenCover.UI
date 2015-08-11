@@ -42,7 +42,7 @@ namespace OpenCover.Framework.Model
 			{
 				if (this.Modules != null && this.Modules.Length > 0)
 				{
-					return this.Modules.Where(c => c.Summary.SequenceCoverage > 0);
+					return this.Modules.Where(c => c.Summary.SequenceCoverage >= 0);
 				}
 
 				return null;
@@ -63,7 +63,7 @@ namespace OpenCover.Framework.Model
 		{
 			if (Modules != null)
 			{
-				return Modules.Where(module => module.Summary.SequenceCoverage > 0).SelectMany(module => module.Files);
+				return Modules.Where(module => module.Summary.SequenceCoverage >= 0).SelectMany(module => module.Files);
 			}
 
 			return null;

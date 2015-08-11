@@ -1,10 +1,9 @@
 ﻿//
 // This source code is released under the MIT License; Please read license.md file for more details.
 //
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace OpenCover.Framework.Model
@@ -82,7 +81,7 @@ namespace OpenCover.Framework.Model
 			{
 				if (this.Classes != null && this.Classes.Length > 0)
 				{
-					return this.Classes.Where(c => c.Summary.SequenceCoverage > 0);
+					return this.Classes.Where(c => c.Summary.SequenceCoverage >= 0);
 				}
 
 				return null;

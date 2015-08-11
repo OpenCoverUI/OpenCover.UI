@@ -11,6 +11,8 @@ namespace OpenCover.UI
     {
         private bool _showLinesColored;
         private bool _showCoverageGlyphs;
+        private bool _showUncoveredClasses;
+
         private WritableSettingsStore _store;
         private const string SETTINGS_PATH = "OpenCoverUI";
 
@@ -26,6 +28,7 @@ namespace OpenCover.UI
 
             _showLinesColored = _store.GetBoolean(SETTINGS_PATH, SettingNames.ShowLinesColored, false);
             _showCoverageGlyphs = _store.GetBoolean(SETTINGS_PATH, SettingNames.ShowCoverageGlyphs, true);
+            _showUncoveredClasses = _store.GetBoolean(SETTINGS_PATH, SettingNames.ShowUncoveredClasses, true);
         }
 
         /// <summary>
@@ -63,6 +66,23 @@ namespace OpenCover.UI
         }
 
         /// <summary>
+        /// Gets or sets whether classes with zero coverage should be displayed
+        /// </summary>
+        public bool ShowUncoveredClasses
+        {
+            get { return _showUncoveredClasses; }
+            set
+            {
+                if (value != _showUncoveredClasses)
+                {
+                    _showUncoveredClasses = value;
+                    RaisePropertyChanged();
+                    WriteBoolean(value);
+                }
+            }
+        }
+
+        /// <summary>
         /// Raises the PropertyChanged event
         /// </summary>
         /// <param name="propertyName"></param>
@@ -89,6 +109,7 @@ namespace OpenCover.UI
         {
             public const string ShowLinesColored = "ShowLinesColored";
             public const string ShowCoverageGlyphs = "ShowCoverageGlyphs";
+            public const string ShowUncoveredClasses = "ShowUncoveredClasses";
         }
     }
 }
