@@ -23,7 +23,7 @@ namespace OpenCover.UI.Views
 
         void SelectOpenCoverExeEvent(object sender, System.EventArgs e)
         {
-            var dialog = new OpenFileDialog { Filter = "Executables (*.exe)|*.exe" };
+            var dialog = new OpenFileDialog { Filter = "OpenCover Executable (opencover.console.exe)|opencover.console.exe" };
             if (dialog.ShowDialog() == true)
             {
                 _vm.OpenCoverExePath = dialog.FileName;
@@ -32,7 +32,7 @@ namespace OpenCover.UI.Views
 
         void SelectNunitExeEvent(object sender, System.EventArgs e)
         {
-            var dialog = new OpenFileDialog {Filter = "Executables (*.exe)|*.exe"};
+            var dialog = new OpenFileDialog { Filter = "Nunit Executable (nunit-console*.exe)|nunit-console*.exe" };
             if (dialog.ShowDialog() == true)
             {
                 _vm.NUnitExePath = dialog.FileName;

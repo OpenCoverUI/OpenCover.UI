@@ -12,18 +12,29 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        
         <Label Margin="0,0,5,5" Grid.Row="0" Grid.Column="0" Width="100" HorizontalContentAlignment="Right" >NUnit Path:</Label>
         <TextBox Margin="0,5,0,0" Grid.Row="0" Grid.Column="1" Text="{Binding Path=NUnitExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150"/>
         <Button Margin="5,5,0,0" Grid.Row="0" Grid.Column="2" Width="20" Command="{Binding ProcessSelectNUnitExe}">...</Button>
-        <Label Margin="0,1,5,4" Grid.Row="1" Grid.Column="0" Width="100" HorizontalContentAlignment="Right">OpenCover Path:</Label>
-        <TextBox Margin="0,5,0,0" Grid.Row="1" Grid.Column="1" Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150" />
-        <Button Margin="5,5,0,0" Grid.Row="1" Grid.Column="2" Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
 
+        <Label Margin="0,0,5,5" Grid.Row="1" Grid.Column="1" FontStyle="Italic" FontSize="12">
+            <TextBlock Text="Select nunit-console.exe or nunit-console-x86.exe depending on your architecture" TextWrapping="Wrap" />
+        </Label>
+
+        <Label Margin="0,1,5,4" Grid.Row="2" Grid.Column="0" Width="100" HorizontalContentAlignment="Right">OpenCover Path:</Label>
+        <TextBox Margin="0,5,0,0" Grid.Row="2" Grid.Column="1" Text="{Binding Path=OpenCoverExePath, Mode=TwoWay}" HorizontalContentAlignment="Stretch" MinWidth="150" />
+        <Button Margin="5,5,0,0" Grid.Row="2" Grid.Column="2" Width="20" Command="{Binding ProcessSelectOpenCoverExe}" >...</Button>
+
+        <Label Margin="0,0,5,5" Grid.Row="3" Grid.Column="1" FontStyle="Italic" FontSize="12">
+            <TextBlock Text="Select opencover.console.exe of your OpenCover installation" TextWrapping="Wrap" />
+        </Label>
     </Grid>
 </UserControl>
