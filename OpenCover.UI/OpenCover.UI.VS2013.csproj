@@ -283,6 +283,7 @@
       <Link>license.md</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\ShowUncoveredClasses.png" />
     <Resource Include="Resources\ShowCodeCoverageGlyphs.png" />
     <Resource Include="Resources\ShowCodeCoverageColoring.png" />
     <Resource Include="Resources\Successful.png" />

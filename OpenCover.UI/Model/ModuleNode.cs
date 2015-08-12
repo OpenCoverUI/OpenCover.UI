@@ -1,20 +1,20 @@
 ﻿//
 // This source code is released under the MIT License; Please read license.md file for more details.
 //
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using ICSharpCode.TreeView;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenCover.UI.Model
 {
 	public class CoverageNode : SharpTreeNode
 	{
-		CoverageSession _coverageSession;
+	    readonly CoverageSession _coverageSession;
 
 		public CoverageNode(CoverageSession coverageSession)
 		{
@@ -61,7 +61,7 @@ namespace OpenCover.UI.Model
 		{
 			get
 			{
-				return System.IO.Path.GetFileName(_module.FullName);
+				return Path.GetFileName(_module.FullName);
 			}
 		}
 
@@ -93,8 +93,10 @@ namespace OpenCover.UI.Model
 			_namespace = @namespace;
 
 			LazyLoading = true;
-			
-			foreach (var @class in _module.CoveredClasses
+
+
+		    var coveredClasses = _module.CoveredClasses;
+		    foreach (var @class in coveredClasses
 							 .Where(cc => cc.Namespace == _namespace))
 			{
 				_visitedSequencePoints += @class.Summary.VisitedSequencePoints;
@@ -136,7 +138,14 @@ namespace OpenCover.UI.Model
 
 		protected override void LoadChildren()
 		{
-			Children.AddRange(_module.CoveredClasses.Where(cc => cc.Namespace == _namespace).Select(@class => new ClassNode(@class)));
+		    var coveredClasses = _module.CoveredClasses;
+
+		    coveredClasses = OpenCoverUIPackage.Instance.Settings.ShowUncoveredClasses 
+                ? coveredClasses.Where(cc => cc.Namespace == _namespace) 
+                : coveredClasses.Where(cc => cc.Namespace == _namespace && cc.Summary.SequenceCoverage > 0);
+
+		    var classNodes = coveredClasses.Select(@class => new ClassNode(@class));
+		    Children.AddRange(classNodes);
 		}
 	}
 

@@ -26,5 +26,6 @@ namespace OpenCover.UI
         public const int OpenCoverResultsToolbarGroup = 0x3050;
         public const int OpenCoverResultsToolbarShowLinesColoredButton = 0x3100;
         public const int OpenCoverResultsToolbarShowCoverageGlyphsButton = 0x3110;
+        public const int OpenCoverResultsToolbarShowUncoveredClassesButton = 0x3120;
 	};
 }

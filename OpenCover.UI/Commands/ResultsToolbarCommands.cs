@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
-using OpenCover.UI.Views;
-using OpenCover.UI.Model.Test;
-using OpenCover.UI.Helpers;
 
 namespace OpenCover.UI.Commands
 {
@@ -76,6 +68,11 @@ namespace OpenCover.UI.Commands
                                     new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
                                                     (int)PkgCmdIDList.OpenCoverResultsToolbarShowCoverageGlyphsButton)) { Enabled = false, Checked = OpenCoverUIPackage.Instance.Settings.ShowCoverageGlyphs });
 
+                // Show colored lines command
+                _allCommands.Add(new OleMenuCommand((s, e) => ToggleShowUncoveredClasses((OleMenuCommand)s),
+                                    new CommandID(GuidList.GuidOpenCoverTestExplorerContextMenuCommandSet,
+                                                    (int)PkgCmdIDList.OpenCoverResultsToolbarShowUncoveredClassesButton)) { Enabled = false, Checked = OpenCoverUIPackage.Instance.Settings.ShowUncoveredClasses });
+
                 _initialized = true;
             }
         }
@@ -96,6 +93,15 @@ namespace OpenCover.UI.Commands
         {
             OpenCoverUIPackage.Instance.Settings.ShowCoverageGlyphs = !OpenCoverUIPackage.Instance.Settings.ShowCoverageGlyphs;
             command.Checked = OpenCoverUIPackage.Instance.Settings.ShowCoverageGlyphs;
+        }
+
+        /// <summary>
+        /// Action executed when user clicks on toolbar button
+        /// </summary>
+        private static void ToggleShowUncoveredClasses(OleMenuCommand command)
+        {
+            OpenCoverUIPackage.Instance.Settings.ShowUncoveredClasses = !OpenCoverUIPackage.Instance.Settings.ShowUncoveredClasses;
+            command.Checked = OpenCoverUIPackage.Instance.Settings.ShowUncoveredClasses;
         }
     }
 }

@@ -6,6 +6,7 @@
 
 	<!--This header contains the command ids for the menus provided by the shell. -->
 	<Extern href="vsshlids.h"/>
+  
 	<!--The Commands section is where we the commands, menus and menu groups are defined.
 			This section uses a Guid to identify the package that provides the command defined inside it. -->
 	<Commands package="guidOpenCoverUIPkg">
@@ -187,6 +188,15 @@
           <ButtonText>Show Code Coverage glyphs</ButtonText>
         </Strings>
       </Button>
+      <Button guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarShowUncoveredClassesButton" priority="0x0100" type="Button">
+        <Parent guid="GuidOpenCoverTestExplorerContextMenuCommandSet" id="OpenCoverResultsToolbarGroup"/>
+        <Icon guid="guidUncoveredClasses" id="ShowUncoveredClasses" />
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <CommandName>OpenCover.UI.ShowUncoveredClasses</CommandName>
+          <ButtonText>Show Uncovered Classes</ButtonText>
+        </Strings>
+      </Button>
 		</Buttons>
 		<!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
 		<Bitmaps>
@@ -199,6 +209,7 @@
 			<Bitmap guid="guidRefresh" href="Resources\Refresh.png" usedList="RefreshTestExplorer"/>
       <Bitmap guid="guidColoredLines" href="Resources\ShowCodeCoverageColoring.png" usedList="ShowLinesColored"/>
       <Bitmap guid="guidCoverageGlyphs" href="Resources\ShowCodeCoverageGlyphs.png" usedList="ShowCoverageGylphs"/>
+      <Bitmap guid="guidUncoveredClasses" href="Resources\ShowUncoveredClasses.png" usedList="ShowUncoveredClasses"/>
 		</Bitmaps>
 
 	</Commands>
@@ -231,6 +242,9 @@
     <GuidSymbol name="guidCoverageGlyphs" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590af}" >
       <IDSymbol name="ShowCoverageGylphs" value="1" />
     </GuidSymbol>
+    <GuidSymbol name="guidUncoveredClasses" value="{727b66a9-6d9a-4f06-8ee6-f25ee17590df}" >
+      <IDSymbol name="ShowUncoveredClasses" value="1" />
+    </GuidSymbol>
 		<GuidSymbol name="GuidOpenCoverTestExplorerContextMenuCommandSet" value="{81F1321F-B605-47F6-AD43-FB2EC4891225}">
 			<IDSymbol name="OpenCoverTestExplorerContextMenu" value="0x1000"/>
 			<IDSymbol name="OpenCoverTestExplorerContextMenuGroup" value="0x1100"/>
@@ -251,6 +265,7 @@
       <IDSymbol name="OpenCoverResultsToolbarGroup" value="0x3050" />
       <IDSymbol name="OpenCoverResultsToolbarShowLinesColoredButton" value="0x3100" />
       <IDSymbol name="OpenCoverResultsToolbarShowCoverageGlyphsButton" value="0x3110" />
+      <IDSymbol name="OpenCoverResultsToolbarShowUncoveredClassesButton" value="0x3120" />
 		</GuidSymbol>
 	</Symbols>
 </CommandTable>
