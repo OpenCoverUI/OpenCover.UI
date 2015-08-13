@@ -5,5 +5,7 @@
         string NUnitPath { get; set; }
 
         string OpenCoverPath { get; set; }
+
+        string XUnitPath { get; set; }
     }
 }
