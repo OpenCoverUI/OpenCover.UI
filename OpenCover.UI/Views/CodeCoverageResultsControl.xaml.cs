@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Shell;
 using OpenCover.Framework.Model;
 using OpenCover.UI.Helpers;
 using OpenCover.UI.Model;
+using OpenCover.UI.Model.ResultNodes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
