@@ -76,23 +76,18 @@ namespace OpenCover.UI.Model.ResultNodes
                 if (methodName.Contains("set_"))
                 {
                     var name = methodName.Split(new[] { "set_" }, System.StringSplitOptions.None)[1];
-                    var firstParenthesis = name.IndexOf('(');
-                    if (firstParenthesis != -1)
-                    {
-                        name.Substring(0, firstParenthesis);
-                    }
                     return name;
                 }
                 else if (methodName.Contains("get_"))
                 {
                     var type = methodName.Split(new[] { ' ' })[0];
-                    var nameParts = methodName.Split(new[] { "get_" }, System.StringSplitOptions.None);
-                    var getWithEmptyParentheses = nameParts[1];
+                    var getWithEmptyParentheses = methodName.Split(new[] { "get_" }, System.StringSplitOptions.None)[1];
 
                     var firstParenthesis = getWithEmptyParentheses.IndexOf('(');
                     var getWithoutEmptyParentheses = (firstParenthesis != -1)
                         ? getWithEmptyParentheses.Substring(0, firstParenthesis)
                         : getWithEmptyParentheses;
+
                     var name = string.Format("{0}({1})", getWithoutEmptyParentheses, type);
                     return name;
                 }
