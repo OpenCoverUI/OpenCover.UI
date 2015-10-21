@@ -196,7 +196,10 @@ namespace OpenCover.UI.Processors
 					ExecuteCoverageResultPostProcessor(_openCoverResultsFile);
 				}
 
-				System.IO.File.Delete(_openCoverResultsFile);
+                if (!System.Diagnostics.Debugger.IsAttached)
+                { 
+                    System.IO.File.Delete(_openCoverResultsFile); 
+                }
 			}
 			catch (Exception ex)
 			{
