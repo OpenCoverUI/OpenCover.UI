@@ -32,7 +32,11 @@ namespace OpenCover.UI.Views
 
         void SelectNunitExeEvent(object sender, System.EventArgs e)
         {
-            var dialog = new OpenFileDialog { Filter = "Nunit Executable (nunit-console*.exe)|nunit-console*.exe" };
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Nunit 2.x Executable (nunit-console*.exe)|nunit-console*.exe"
+                      + "|Nunit 3.x Executable|nunit3-console.exe"
+            };
             if (dialog.ShowDialog() == true)
             {
                 _vm.NUnitExePath = dialog.FileName;
