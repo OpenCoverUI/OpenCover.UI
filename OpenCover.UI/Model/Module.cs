@@ -34,9 +34,19 @@ namespace OpenCover.Framework.Model
 		public bool ShouldSerializeSummary() { return !ShouldSerializeSkippedDueTo(); }
 
 		/// <summary>
+		/// The full path name to the module.
+		/// Replaced by ModulePath in 4.6.476
+		/// </summary>
+		public string FullName
+		{
+			get { return ModulePath; }
+			set { ModulePath = value; }
+		}
+
+		/// <summary>
 		/// The full path name to the module
 		/// </summary>
-		public string FullName { get; set; }
+		public string ModulePath { get; set; }
 
 		/// <summary>
 		/// A list of aliases
