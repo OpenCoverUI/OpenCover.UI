@@ -220,8 +220,11 @@ namespace OpenCover.UI.Processors
 			if (testResults.Any())
 			{
 				var testCaseName = testResults.First();
-				testResult.MethodName = testCaseName.MethodName.Substring(0, testCaseName.MethodName.IndexOf("("));
-			}
+                var bracketPositionInUnnamedTestCase = testCaseName.MethodName.IndexOf("(");
+
+                if(bracketPositionInUnnamedTestCase > 0)
+                    testResult.MethodName = testCaseName.MethodName.Substring(0, bracketPositionInUnnamedTestCase);
+            }
 
 			return testResult;
 		}

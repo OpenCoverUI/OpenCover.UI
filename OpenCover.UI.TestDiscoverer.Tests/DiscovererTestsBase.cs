@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace OpenCover.UI.TestDiscoverer.Tests
 {
     [TestFixture]
-    public class DiscovererTestsBase
+    public abstract class DiscovererTestsBase
     {
         protected void AssertDiscoveredMethod(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod)
         {
