@@ -52,7 +52,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MSTest\RegularTestFixture.cs" />
+    <Compile Include="NUnit\TestFixtureWithoutExplicitTextFixtureAttribute.cs" />
     <Compile Include="NUnit\RegularTestFixture.cs" />
+    <Compile Include="NUnit\TestFixtureWithNamedTestCase.cs" />
+    <Compile Include="NUnit\TestFixtureWithTestCase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

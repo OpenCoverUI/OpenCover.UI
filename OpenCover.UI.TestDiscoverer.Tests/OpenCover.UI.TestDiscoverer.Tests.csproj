@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiscovererTestsBase.cs" />
     <Compile Include="MSTest\MSTestDiscovererTests.cs" />
     <Compile Include="NUnit\NUnitDiscovererTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

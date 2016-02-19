@@ -91,7 +91,12 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 				return IsNUnitTest(type.BaseType as TypeDefinition);
 			}
 
-			return false;
+            if (type.Methods.Any(method => method.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestAttribute).FullName))) 
+            {
+                return true;
+            }
+
+            return false;
 		}
 
 		/// <summary>
