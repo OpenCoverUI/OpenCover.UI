@@ -37,7 +37,7 @@ namespace OpenCover.UI.Model.ResultNodes
 		{
 			get
 			{
-				return Path.GetFileName(_module.FullName);
+				return Path.GetFileName(_module.ModulePath);
 			}
 		}
 
