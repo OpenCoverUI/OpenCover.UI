@@ -173,6 +173,13 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\ResultNodes\ClassNode.cs" />
+    <Compile Include="Model\ResultNodes\CoverageNode.cs" />
+    <Compile Include="Model\ResultNodes\MethodNode.cs" />
+    <Compile Include="Model\ResultNodes\ModuleNode.cs" />
+    <Compile Include="Model\ResultNodes\NamespaceNode.cs" />
+    <Compile Include="Model\ResultNodes\PropertyMethodNode.cs" />
+    <Compile Include="Model\ResultNodes\PropertyNode.cs" />
     <Compile Include="OpenCoverUISettings.cs" />
     <Compile Include="Commands\ResultsToolbarCommands.cs" />
     <Compile Include="Glyphs\LineCoverageGlyphFactory.cs" />
@@ -198,7 +205,6 @@
     <Compile Include="Model\InstrumentationPoint.cs" />
     <Compile Include="Model\Method.cs" />
     <Compile Include="Model\Module.cs" />
-    <Compile Include="Model\ModuleNode.cs" />
     <Compile Include="Model\SequencePoint.cs" />
     <Compile Include="Model\SkippedEntity.cs" />
     <Compile Include="Model\SkippedMethod.cs" />
