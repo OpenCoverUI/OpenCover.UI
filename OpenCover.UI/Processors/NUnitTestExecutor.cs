@@ -50,10 +50,20 @@ namespace OpenCover.UI.Processors
 			_testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));
 			_runListFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.txt", fileFormat));
 
-			_commandLineArguments = String.Format(CommandlineStringFormat,
-													_nUnitPath,
-													String.Format("{0} /runlist=\\\"{1}\\\" /nologo /noshadow /result=\\\"{2}\\\"", dllPaths, _runListFile, _testResultsFile),
-													_openCoverResultsFile);
+			if (Path.GetFileName(_nUnitPath) == "nunit3-console.exe")
+			{
+				_commandLineArguments = String.Format(CommandlineStringFormat,
+										_nUnitPath,
+										String.Format("{0} --testlist=\\\"{1}\\\" --noheader --result=\\\"{2}\\\";format=nunit2", dllPaths, _runListFile, _testResultsFile),
+										_openCoverResultsFile);
+			}
+			else
+			{
+				_commandLineArguments = String.Format(CommandlineStringFormat,
+										_nUnitPath,
+										String.Format("{0} /runlist=\\\"{1}\\\" /nologo /noshadow /result=\\\"{2}\\\"", dllPaths, _runListFile, _testResultsFile),
+										_openCoverResultsFile);
+			}
 
 			CreateRunListFile();
 		}
