@@ -5,7 +5,7 @@ shallow_clone: true
 environment:
   DeployExtension: false
 build:
-  project: OpenCover.UI.VS2013.sln
+  project: OpenCover.UI.sln
   parallel: true
   verbosity: minimal
 artifacts:
