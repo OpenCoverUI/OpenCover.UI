@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI", "OpenCover.UI\OpenCover.UI.csproj", "{81241037-056C-4515-89D6-7E906FF59DE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCover.UI.Tests", "OpenCover.UI.Tests\OpenCover.UI.Tests.csproj", "{9DABD544-1BFA-4972-89C9-B233F89E4571}"
