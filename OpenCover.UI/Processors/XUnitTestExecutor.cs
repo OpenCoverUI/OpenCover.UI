@@ -6,8 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
 
@@ -41,12 +39,12 @@ namespace OpenCover.UI.Processors
 
             SetOpenCoverResultsFilePath();
 
-            _testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));            
+            _testResultsFile = Path.Combine(_currentWorkingDirectory.FullName, String.Format("{0}.xml", fileFormat));
 
             _commandLineArguments = String.Format(CommandlineStringFormat,
                                                     _xUnitPath,
                                                     String.Format("{0} -nologo -noshadow -xml {1}", dllPaths, _testResultsFile),
-                                                    _openCoverResultsFile);            
+                                                    _openCoverResultsFile);
         }
 
         /// <summary>
@@ -102,16 +100,7 @@ namespace OpenCover.UI.Processors
                 test.TestMethod.ExecutionResult = test.Result.result;
             }
         }
-
-
-        /// <summary>
-        /// Delete temporary files created.
-        /// </summary>
-        internal override void Cleanup()
-        {
-            base.Cleanup();            
-        }
-
+        
         private IEnumerable<DirectoryInfo> ProgramFilesFolders()
         {
             var path = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);

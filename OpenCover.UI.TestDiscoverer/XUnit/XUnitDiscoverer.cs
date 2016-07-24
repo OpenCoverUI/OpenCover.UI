@@ -1,15 +1,10 @@
-﻿
+﻿using Mono.Cecil;
+using OpenCover.UI.Model.Test;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace OpenCover.UI.TestDiscoverer
 {
-    using Mono.Cecil;
-    using OpenCover.UI.Model.Test;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-    
     internal class XUnitDiscoverer : DiscovererBase
     {
         /// <summary>
@@ -18,9 +13,7 @@ namespace OpenCover.UI.TestDiscoverer
 		/// <param name="dlls">The DLLS.</param>
         public XUnitDiscoverer(IEnumerable<string> dlls)
             : base(dlls)
-		{
-
-		}
+		{}
 
         /// <summary>
         /// Discovers the tests in the Assembly.
