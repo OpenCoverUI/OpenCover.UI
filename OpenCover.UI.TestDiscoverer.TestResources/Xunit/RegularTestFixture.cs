@@ -2,11 +2,11 @@
 
 namespace OpenCover.UI.TestDiscoverer.TestResources.Xunit
 {    
-    public class RegularFacts
-    {
-        [Fact]
-        public void RegularTestMethod()
-        {
-        }
-    }
+	public class RegularFacts
+	{
+		[Fact]
+		public void RegularTestMethod()
+		{
+		}
+	}
 }

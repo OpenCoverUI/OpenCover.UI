@@ -71,30 +71,30 @@ namespace OpenCover.UI.Processors
 			_package = package;
 			_selectedTests = selectedTests;
 
-            SetOpenCoverPath();
+			SetOpenCoverPath();
 
 			_executionStatus = new Dictionary<string, IEnumerable<TestResult>>();
 		}
 
-        /// <summary>
-        /// Sets the OpenCover path.
-        /// </summary>
-        private void SetOpenCoverPath()
-        {
-            _openCoverPath = OpenCoverUISettings.Default.OpenCoverPath;
-            if (!System.IO.File.Exists(_openCoverPath))
-            {
-                MessageBox.Show("OpenCover not found. Please select the OpenCover executable",
-                    Resources.MessageBoxTitle, MessageBoxButton.OK);
-                var dialog = new OpenFileDialog { Filter = "Executables (*.exe)|*.exe" };
-                if (dialog.ShowDialog() == true)
-                {
-                    _openCoverPath = dialog.FileName;
-                    OpenCoverUISettings.Default.OpenCoverPath = _openCoverPath;
-                    OpenCoverUISettings.Default.Save();
-                }
-            }
-        }
+		/// <summary>
+		/// Sets the OpenCover path.
+		/// </summary>
+		private void SetOpenCoverPath()
+		{
+			_openCoverPath = OpenCoverUISettings.Default.OpenCoverPath;
+			if (!System.IO.File.Exists(_openCoverPath))
+			{
+				MessageBox.Show("OpenCover not found. Please select the OpenCover executable",
+					Resources.MessageBoxTitle, MessageBoxButton.OK);
+				var dialog = new OpenFileDialog { Filter = "Executables (*.exe)|*.exe" };
+				if (dialog.ShowDialog() == true)
+				{
+					_openCoverPath = dialog.FileName;
+					OpenCoverUISettings.Default.OpenCoverPath = _openCoverPath;
+					OpenCoverUISettings.Default.Save();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Validates the length of the command line arguments.
@@ -149,7 +149,7 @@ namespace OpenCover.UI.Processors
 
 			Process process = Process.Start(openCoverStartInfo);
 
-            IsExecuting = true;
+			IsExecuting = true;
 
 			var consoleOutputReaderBuilder = new StringBuilder();
 
@@ -172,7 +172,7 @@ namespace OpenCover.UI.Processors
 
 			ReadTestResults();
 
-            IsExecuting = false;
+			IsExecuting = false;
 
 			return new Tuple<string, string>(_testResultsFile, _openCoverResultsFile);
 		}
@@ -199,10 +199,10 @@ namespace OpenCover.UI.Processors
 					ExecuteCoverageResultPostProcessor(_openCoverResultsFile);
 				}
 
-                if (!System.Diagnostics.Debugger.IsAttached)
-                { 
-                    System.IO.File.Delete(_openCoverResultsFile); 
-                }
+				if (!System.Diagnostics.Debugger.IsAttached)
+				{ 
+					System.IO.File.Delete(_openCoverResultsFile); 
+				}
 			}
 			catch (Exception ex)
 			{
@@ -351,11 +351,11 @@ namespace OpenCover.UI.Processors
 			{
 				case "success":
 				case "passed":
-                case "pass":
+				case "pass":
 					return TestExecutionStatus.Successful;
 				case "failure":
 				case "failed":
-                case "fail":
+				case "fail":
 					return TestExecutionStatus.Error;
 				case "inconclusive":
 					return TestExecutionStatus.Inconclusive;
@@ -382,8 +382,8 @@ namespace OpenCover.UI.Processors
 			IDEHelper.WriteToOutputWindow(openCoverStartInfo.Arguments);
 
 			return openCoverStartInfo;
-		}              
+		}
 
-        internal bool IsExecuting { get; private set; }
-    }
+		internal bool IsExecuting { get; private set; }
+	}
 }

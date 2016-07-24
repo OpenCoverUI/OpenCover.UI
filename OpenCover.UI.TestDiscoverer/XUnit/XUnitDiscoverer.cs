@@ -5,56 +5,56 @@ using System.Linq;
 
 namespace OpenCover.UI.TestDiscoverer
 {
-    internal class XUnitDiscoverer : DiscovererBase
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XUnitDiscoverer"/> class.
+	internal class XUnitDiscoverer : DiscovererBase
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XUnitDiscoverer"/> class.
 		/// </summary>
 		/// <param name="dlls">The DLLS.</param>
-        public XUnitDiscoverer(IEnumerable<string> dlls)
-            : base(dlls)
+		public XUnitDiscoverer(IEnumerable<string> dlls)
+			: base(dlls)
 		{}
 
-        /// <summary>
-        /// Discovers the tests in the Assembly.
-        /// </summary>
-        /// <param name="dllPath">The path to the DLL.</param>
-        /// <param name="assembly">The loaded Assembly.</param>
-        /// <returns>Tests in the Assembly</returns>
-        protected override List<TestClass> DiscoverTestsInAssembly(string dll, AssemblyDefinition assembly)
-        {
-            var classes = new List<TestClass>();
-            foreach (var type in assembly.MainModule.Types)
-            {
-                bool isXunitTest = false;
+		/// <summary>
+		/// Discovers the tests in the Assembly.
+		/// </summary>
+		/// <param name="dllPath">The path to the DLL.</param>
+		/// <param name="assembly">The loaded Assembly.</param>
+		/// <returns>Tests in the Assembly</returns>
+		protected override List<TestClass> DiscoverTestsInAssembly(string dll, AssemblyDefinition assembly)
+		{
+			var classes = new List<TestClass>();
+			foreach (var type in assembly.MainModule.Types)
+			{
+				bool isXunitTest = false;
 
-                try
-                {
-                    if(type.HasMethods)
-                    {
-                        isXunitTest = type.Methods
-                            .Any(m => m.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(Xunit.FactAttribute).FullName)
-                                    || m.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(Xunit.TheoryAttribute).FullName));                      
-                    }                    
-                }
-                catch { }
+				try
+				{
+					if(type.HasMethods)
+					{
+						isXunitTest = type.Methods
+							.Any(m => m.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(Xunit.FactAttribute).FullName)
+									|| m.CustomAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(Xunit.TheoryAttribute).FullName));                      
+					}                    
+				}
+				catch { }
 
-                if (isXunitTest)
-                {
-                    var TestClass = new TestClass
-                    {
-                        DLLPath = dll,
-                        Name = type.Name,
-                        Namespace = type.Namespace,
-                        TestType = TestType.XUnit
-                    };
+				if (isXunitTest)
+				{
+					var TestClass = new TestClass
+					{
+						DLLPath = dll,
+						Name = type.Name,
+						Namespace = type.Namespace,
+						TestType = TestType.XUnit
+					};
 
-                    TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
-                    classes.Add(TestClass);
-                }
-            }
-            return classes;
-        }
+					TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+					classes.Add(TestClass);
+				}
+			}
+			return classes;
+		}
 
 		/// <summary>
 		/// Discovers the tests in class.
@@ -71,15 +71,15 @@ namespace OpenCover.UI.TestDiscoverer
 
 				try
 				{
-                    foreach (var attribute in method.CustomAttributes)
-                    {
+					foreach (var attribute in method.CustomAttributes)
+					{
 
-                        if (attribute.AttributeType.FullName == typeof(Xunit.FactAttribute).FullName
-                            || attribute.AttributeType.FullName == typeof(Xunit.TheoryAttribute).FullName)
-                        {
-                            isTestMethod = true;
-                        }
-                    }
+						if (attribute.AttributeType.FullName == typeof(Xunit.FactAttribute).FullName
+							|| attribute.AttributeType.FullName == typeof(Xunit.TheoryAttribute).FullName)
+						{
+							isTestMethod = true;
+						}
+					}
 				}
 				catch { }
 
@@ -94,5 +94,5 @@ namespace OpenCover.UI.TestDiscoverer
 
 			return tests.ToArray();
 		}
-    }
+	}
 }

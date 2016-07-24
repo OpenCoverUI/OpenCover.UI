@@ -110,33 +110,32 @@ namespace OpenCover.UI.Views
 
 					var msTests = tests.Where(tc => tc.TestType == TestType.MSTest);
 					var nUnitTests = tests.Where(tc => tc.TestType == TestType.NUnit);
-                    var xUnitTests = tests.Where(tc => tc.TestType == TestType.XUnit);
+					var xUnitTests = tests.Where(tc => tc.TestType == TestType.XUnit);
 
 					bool hasMSTests = msTests.Any();
 					bool hasNUnitTests = nUnitTests.Any();
-                    bool hasXUnitTests = xUnitTests.Any();
+					bool hasXUnitTests = xUnitTests.Any();
 
-                    bool hasMoreThanOneTestType = hasMSTests ? (hasNUnitTests || hasXUnitTests) : (hasNUnitTests && hasXUnitTests);
+					bool hasMoreThanOneTestType = hasMSTests ? (hasNUnitTests || hasXUnitTests) : (hasNUnitTests && hasXUnitTests);
 
-                    if(hasMoreThanOneTestType)
-                    {
-                        TestsTreeView.Root = new ICSharpCode.TreeView.SharpTreeNode();
+					if(hasMoreThanOneTestType)
+					{
+						TestsTreeView.Root = new ICSharpCode.TreeView.SharpTreeNode();
 
-                        if (hasMSTests) 
-                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("MSTest", msTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.MSTest));
-                        if(hasNUnitTests)
-                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("NUnit Test", nUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.NUnit));
-                        if(hasXUnitTests)
-                            TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("XUnit Test", xUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.XUnit));
+						if (hasMSTests) 
+							TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("MSTest", msTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.MSTest));
+						if(hasNUnitTests)
+							TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("NUnit Test", nUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.NUnit));
+						if(hasXUnitTests)
+							TestsTreeView.Root.Children.Add(new TestMethodWrapperContainer("XUnit Test", xUnitTests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, TestType.XUnit));
 
-                    }
-                    else
-                    {
-                        TestType testType = hasMSTests ? TestType.MSTest : hasNUnitTests ? TestType.NUnit : hasXUnitTests ? TestType.XUnit : TestType.MSTest;
+					}
+					else
+					{
+						TestType testType = hasMSTests ? TestType.MSTest : hasNUnitTests ? TestType.NUnit : hasXUnitTests ? TestType.XUnit : TestType.MSTest;
 
-                        TestsTreeView.Root = new TestMethodWrapperContainer(null, tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, testType);
-                    }					
-					
+						TestsTreeView.Root = new TestMethodWrapperContainer(null, tests.Select(test => new TestMethodWrapper(test.Name, test.TestMethods, String.Format("{0}.{1}", test.Namespace, test.Name))), _currentGroupingField, testType);
+					}
 
 					if (TestDiscoveryFinished != null)
 					{
@@ -146,7 +145,7 @@ namespace OpenCover.UI.Views
 					TestSelectionChanged(null, null);
 				}));
 			}
-		}        
+		}
 
 		/// <summary>
 		/// Clears the tests TreeView children.
@@ -229,28 +228,28 @@ namespace OpenCover.UI.Views
 				PropertyChanged(this, new PropertyChangedEventArgs(property));
 			}
 		}
-        
-        private void TestsTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            try
-            {
-                var treeView = sender as ICSharpCode.TreeView.SharpTreeView;
-                var selectedItem = treeView.SelectedItem;
+		
+		private void TestsTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			try
+			{
+				var treeView = sender as ICSharpCode.TreeView.SharpTreeView;
+				var selectedItem = treeView.SelectedItem;
 
-                var testMethod = selectedItem as TestMethod;
-                if (testMethod != null)
-                {
-                    var fullyQualifiedMethodName = testMethod.FullyQualifiedName;
-                    IDEHelper.WriteToOutputWindow("Navigating to test method: {0}", fullyQualifiedMethodName);
+				var testMethod = selectedItem as TestMethod;
+				if (testMethod != null)
+				{
+					var fullyQualifiedMethodName = testMethod.FullyQualifiedName;
+					IDEHelper.WriteToOutputWindow("Navigating to test method: {0}", fullyQualifiedMethodName);
 
-                    IDEHelper.OpenFileByFullyQualifiedMethodName(fullyQualifiedMethodName);
-                }
-            }
-            catch(Exception exception)
-            {
-                IDEHelper.WriteToOutputWindow(exception.Message);
-            }
-        }
+					IDEHelper.OpenFileByFullyQualifiedMethodName(fullyQualifiedMethodName);
+				}
+			}
+			catch(Exception exception)
+			{
+				IDEHelper.WriteToOutputWindow(exception.Message);
+			}
+		}
 	}
 
 	public class TestResultsViewModel

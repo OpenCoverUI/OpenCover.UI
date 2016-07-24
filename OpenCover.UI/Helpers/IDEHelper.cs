@@ -2,7 +2,6 @@
 // This source code is released under the MIT License; Please read license.md file for more details.
 //
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Platform.WindowManagement;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
@@ -12,9 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using VSLangProj;
 using VSLangProj80;
 
@@ -127,7 +124,7 @@ namespace OpenCover.UI.Helpers
 		{
 			string mstestPath = "Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll";
 			string nunitPath = "nunit.Framework.dll";
-            string xunitPath = "xunit.core.dll";
+			string xunitPath = "xunit.core.dll";
 
 			List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
 
@@ -144,8 +141,8 @@ namespace OpenCover.UI.Helpers
 					{
 						var referenceFile = Path.GetFileName(reference.Path);
 						if (mstestPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase) 
-                            || nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase)
-                            || xunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
+							|| nunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase)
+							|| xunitPath.Equals(referenceFile, StringComparison.InvariantCultureIgnoreCase))
 						{
 							isTestProject = true;
 							break;
@@ -161,115 +158,115 @@ namespace OpenCover.UI.Helpers
 
 		}
 
-        /// <summary>
-        /// Search for a class + method in the opened solution. When found, the corresponding file will
-        /// be opened, and the specified method will be shown.
-        /// </summary>
-        /// <param name="fullyQualifiedMethodName">Fully qualified method to search for.</param>
-        internal static void OpenFileByFullyQualifiedMethodName(string fullyQualifiedMethodName)
-        {
-            List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
-            
-            GetProjects(DTE.Solution.Projects, projects);
+		/// <summary>
+		/// Search for a class + method in the opened solution. When found, the corresponding file will
+		/// be opened, and the specified method will be shown.
+		/// </summary>
+		/// <param name="fullyQualifiedMethodName">Fully qualified method to search for.</param>
+		internal static void OpenFileByFullyQualifiedMethodName(string fullyQualifiedMethodName)
+		{
+			List<EnvDTE.Project> projects = new List<EnvDTE.Project>();
+			
+			GetProjects(DTE.Solution.Projects, projects);
 
-            foreach (EnvDTE.Project project in projects)
-            {
-                var projectItems = project.ProjectItems;
-                var found = ScanProjectItems(fullyQualifiedMethodName, projectItems);
-                if (found) 
-                {
-                    if (Debugger.IsAttached)
-                    {
-                        WriteToOutputWindow("Method found, stopping solution search");
-                    }
+			foreach (EnvDTE.Project project in projects)
+			{
+				var projectItems = project.ProjectItems;
+				var found = ScanProjectItems(fullyQualifiedMethodName, projectItems);
+				if (found) 
+				{
+					if (Debugger.IsAttached)
+					{
+						WriteToOutputWindow("Method found, stopping solution search");
+					}
 
-                    return; 
-                }
-            }
+					return; 
+				}
+			}
 
-            WriteToOutputWindow("Could not find method '{0}' in the current solution", fullyQualifiedMethodName);
-        }
+			WriteToOutputWindow("Could not find method '{0}' in the current solution", fullyQualifiedMethodName);
+		}
 
-        private static bool ScanProjectItems(string fullyQualifiedMethodName, EnvDTE.ProjectItems projectItems)
-        {
-            foreach (EnvDTE.ProjectItem projectItem in projectItems)
-            {
-                if (Debugger.IsAttached)
-                {
-                    WriteToOutputWindow("Processing projectItem: {0}", projectItem.Name);
-                }
+		private static bool ScanProjectItems(string fullyQualifiedMethodName, EnvDTE.ProjectItems projectItems)
+		{
+			foreach (EnvDTE.ProjectItem projectItem in projectItems)
+			{
+				if (Debugger.IsAttached)
+				{
+					WriteToOutputWindow("Processing projectItem: {0}", projectItem.Name);
+				}
 
-                if (projectItem.FileCodeModel != null)
-                {
-                    var codeModel = (EnvDTE.FileCodeModel)projectItem.FileCodeModel;
-                    foreach (EnvDTE.CodeElement codeElement in codeModel.CodeElements)
-                    {
-                        EnvDTE.CodeElement discoveredMethodElement;
-                        if (FindMethodInCodeElement(codeElement, fullyQualifiedMethodName, out discoveredMethodElement))
-                        {
-                            var filepath = (string)projectItem.Properties.Item("FullPath").Value;
+				if (projectItem.FileCodeModel != null)
+				{
+					var codeModel = (EnvDTE.FileCodeModel)projectItem.FileCodeModel;
+					foreach (EnvDTE.CodeElement codeElement in codeModel.CodeElements)
+					{
+						EnvDTE.CodeElement discoveredMethodElement;
+						if (FindMethodInCodeElement(codeElement, fullyQualifiedMethodName, out discoveredMethodElement))
+						{
+							var filepath = (string)projectItem.Properties.Item("FullPath").Value;
 
-                            WriteToOutputWindow("Method '{0}' found, opening file: '{1}'", fullyQualifiedMethodName, filepath);
-                            OpenFile(DTE, filepath);
+							WriteToOutputWindow("Method '{0}' found, opening file: '{1}'", fullyQualifiedMethodName, filepath);
+							OpenFile(DTE, filepath);
 
-                            int methodStartLine = discoveredMethodElement.StartPoint.Line;
-                            WriteToOutputWindow("Moving to method on line: {0}", methodStartLine);
-                            GoToLine(DTE, discoveredMethodElement.StartPoint.Line);
-                            return true;
-                        }
-                    }
-                }
-                else if (projectItem.Kind == EnvDTE.Constants.vsProjectItemKindPhysicalFolder)
-                {
-                    if (Debugger.IsAttached)
-                    {
-                        WriteToOutputWindow("Scanning subfolder: {0}", projectItem.Name);
-                    }
+							int methodStartLine = discoveredMethodElement.StartPoint.Line;
+							WriteToOutputWindow("Moving to method on line: {0}", methodStartLine);
+							GoToLine(DTE, discoveredMethodElement.StartPoint.Line);
+							return true;
+						}
+					}
+				}
+				else if (projectItem.Kind == EnvDTE.Constants.vsProjectItemKindPhysicalFolder)
+				{
+					if (Debugger.IsAttached)
+					{
+						WriteToOutputWindow("Scanning subfolder: {0}", projectItem.Name);
+					}
 
-                    var found = ScanProjectItems(fullyQualifiedMethodName, projectItem.ProjectItems);
-                    if (found) 
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
+					var found = ScanProjectItems(fullyQualifiedMethodName, projectItem.ProjectItems);
+					if (found) 
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 
-        private static bool FindMethodInCodeElement(EnvDTE.CodeElement codeElement, string fullyQualifiedMethodName, 
-            out EnvDTE.CodeElement discoveredMethodElement)
-        {
-            if (codeElement.Kind == EnvDTE.vsCMElement.vsCMElementClass)
-            {
-                if (Debugger.IsAttached)
-                {
-                    WriteToOutputWindow("Processing class: {0}", codeElement.FullName);
-                }
+		private static bool FindMethodInCodeElement(EnvDTE.CodeElement codeElement, string fullyQualifiedMethodName, 
+			out EnvDTE.CodeElement discoveredMethodElement)
+		{
+			if (codeElement.Kind == EnvDTE.vsCMElement.vsCMElementClass)
+			{
+				if (Debugger.IsAttached)
+				{
+					WriteToOutputWindow("Processing class: {0}", codeElement.FullName);
+				}
 
-                foreach (EnvDTE.CodeElement classChildCodeElement in codeElement.Children)
-                {
-                    if (classChildCodeElement.Kind == EnvDTE.vsCMElement.vsCMElementFunction)
-                    {
-                        if (fullyQualifiedMethodName == classChildCodeElement.FullName)
-                        {
-                            discoveredMethodElement = classChildCodeElement;
-                            return true;
-                        }
-                    }
-                }
-            }
+				foreach (EnvDTE.CodeElement classChildCodeElement in codeElement.Children)
+				{
+					if (classChildCodeElement.Kind == EnvDTE.vsCMElement.vsCMElementFunction)
+					{
+						if (fullyQualifiedMethodName == classChildCodeElement.FullName)
+						{
+							discoveredMethodElement = classChildCodeElement;
+							return true;
+						}
+					}
+				}
+			}
 
-            foreach (EnvDTE.CodeElement childElement in codeElement.Children)
-            {
-                if (FindMethodInCodeElement(childElement, fullyQualifiedMethodName, out discoveredMethodElement))
-                {
-                    return true;
-                }
-            }
+			foreach (EnvDTE.CodeElement childElement in codeElement.Children)
+			{
+				if (FindMethodInCodeElement(childElement, fullyQualifiedMethodName, out discoveredMethodElement))
+				{
+					return true;
+				}
+			}
 
-            discoveredMethodElement = null;
-            return false;
-        }
+			discoveredMethodElement = null;
+			return false;
+		}
 
 		private static void GetProjects(EnvDTE.Projects projects, List<EnvDTE.Project> projectList)
 		{
@@ -383,75 +380,75 @@ namespace OpenCover.UI.Helpers
 		}
 
 
-        /// <summary>
-        /// Returns the document file name of the text view.
-        /// </summary>
-        /// <param name="view">The view instance.</param>
-        /// <returns></returns>
-        internal static string GetFileName(ITextView view)
-        {
-            ITextBuffer TextBuffer = view.TextBuffer;
+		/// <summary>
+		/// Returns the document file name of the text view.
+		/// </summary>
+		/// <param name="view">The view instance.</param>
+		/// <returns></returns>
+		internal static string GetFileName(ITextView view)
+		{
+			ITextBuffer TextBuffer = view.TextBuffer;
 
-            ITextDocument TextDocument = GetTextDocument(TextBuffer);
+			ITextDocument TextDocument = GetTextDocument(TextBuffer);
 
-            if (TextDocument == null || TextDocument.FilePath == null || TextDocument.FilePath.Equals("Temp.txt"))
-            {
-                return null;
-            }
+			if (TextDocument == null || TextDocument.FilePath == null || TextDocument.FilePath.Equals("Temp.txt"))
+			{
+				return null;
+			}
 
-            return TextDocument.FilePath;
-        }
+			return TextDocument.FilePath;
+		}
 
-        /// <summary>
-        /// Retrives the ITextDocument from the text buffer.
-        /// </summary>
-        /// <param name="TextBuffer">The text buffer instance.</param>
-        /// <returns></returns>
-        private static ITextDocument GetTextDocument(ITextBuffer TextBuffer)
-        {
-            if (TextBuffer == null)
-                return null;
+		/// <summary>
+		/// Retrives the ITextDocument from the text buffer.
+		/// </summary>
+		/// <param name="TextBuffer">The text buffer instance.</param>
+		/// <returns></returns>
+		private static ITextDocument GetTextDocument(ITextBuffer TextBuffer)
+		{
+			if (TextBuffer == null)
+				return null;
 
-            ITextDocument textDoc;
-            var rc = TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDoc);
+			ITextDocument textDoc;
+			var rc = TextBuffer.Properties.TryGetProperty<ITextDocument>(typeof(ITextDocument), out textDoc);
 
-            if (rc == true)
-                return textDoc;
-            else
-                return null;
-        }
+			if (rc == true)
+				return textDoc;
+			else
+				return null;
+		}
 
-        /// Given an IWpfTextViewHost representing the currently selected editor pane,
-        /// return the ITextDocument for that view. That's useful for learning things 
-        /// like the filename of the document, its creation date, and so on.
-        internal static ITextDocument GetTextDocumentForView(IWpfTextViewHost viewHost)
-        {
-            ITextDocument document;
-            viewHost.TextView.TextDataModel.DocumentBuffer.Properties.TryGetProperty(typeof(ITextDocument), out document);
-            return document;
-        }
+		/// Given an IWpfTextViewHost representing the currently selected editor pane,
+		/// return the ITextDocument for that view. That's useful for learning things 
+		/// like the filename of the document, its creation date, and so on.
+		internal static ITextDocument GetTextDocumentForView(IWpfTextViewHost viewHost)
+		{
+			ITextDocument document;
+			viewHost.TextView.TextDataModel.DocumentBuffer.Properties.TryGetProperty(typeof(ITextDocument), out document);
+			return document;
+		}
 
-        ///// <summary>
-        ///// Refreshes/Repaints the active file in Visual Studio.
-        ///// </summary>
-        //internal static void RefreshActiveDocument(EnvDTE.DTE DTE)
-        //{
-        //    try
-        //    {                
-        //        IWpfTextViewHost host = OpenCoverUIPackage.Instance.GetCurrentViewHost();
-        //        if (host != null)
-        //        {
-        //            var doc = GetTextDocumentForView(host);
-        //            doc.UpdateDirtyState(true, DateTime.Now);
-        //        }
-                            
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine(ex.Message);
-        //    }
-        //}
+		///// <summary>
+		///// Refreshes/Repaints the active file in Visual Studio.
+		///// </summary>
+		//internal static void RefreshActiveDocument(EnvDTE.DTE DTE)
+		//{
+		//    try
+		//    {                
+		//        IWpfTextViewHost host = OpenCoverUIPackage.Instance.GetCurrentViewHost();
+		//        if (host != null)
+		//        {
+		//            var doc = GetTextDocumentForView(host);
+		//            doc.UpdateDirtyState(true, DateTime.Now);
+		//        }
+							
+		//    }
+		//    catch (Exception ex)
+		//    {
+		//        Debug.WriteLine(ex.Message);
+		//    }
+		//}
 
-       
+	   
 	}
 }

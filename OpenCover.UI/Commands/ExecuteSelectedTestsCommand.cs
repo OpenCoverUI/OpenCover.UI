@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -38,7 +37,7 @@ namespace OpenCover.UI.Commands
 		{
 			_package = package;
 
-            DisableControl();
+			DisableControl();
 
 			TestExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
 		}
@@ -48,16 +47,16 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		void OnTestDiscoveryFinished()
 		{
-            var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
+			var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
 
-            if (hasTests && (_testExecutor == null || !_testExecutor.IsExecuting))
-            {
-                EnableControl();
-            }
-            else 
-            {
-                DisableControl();
-            }
+			if (hasTests && (_testExecutor == null || !_testExecutor.IsExecuting))
+			{
+				EnableControl();
+			}
+			else 
+			{
+				DisableControl();
+			}
 		}
 
 		/// <summary>
@@ -77,24 +76,24 @@ namespace OpenCover.UI.Commands
 				}                
 				else if (container.TestType == TestType.XUnit)
 				{
-                    xUnitTests = container;
-                }
-                else
-                {
+					xUnitTests = container;
+				}
+				else
+				{
 					nUnitTests = container;
 				}
 			}
 			else
 			{
-                
+				
 				msTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.MSTest);
-                nUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.NUnit);
-                xUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.XUnit);
+				nUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.NUnit);
+				xUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.XUnit);
 			}
 
 			var selectedMSTests = msTests != null ? msTests.GetSelectedTestGroupsAndTests() : null;
 			var selectedNUnitTests = nUnitTests != null ? nUnitTests.GetSelectedTests() : null;
-            var selectedXUnitTests = xUnitTests != null ? xUnitTests.GetSelectedTests() : null;
+			var selectedXUnitTests = xUnitTests != null ? xUnitTests.GetSelectedTests() : null;
 
 			_testExecutor = null;
 
@@ -123,10 +122,10 @@ namespace OpenCover.UI.Commands
 			// show tool window which shows the progress.
 			ShowCodeCoverageResultsToolWindow();
 
-            DisableControl();
+			DisableControl();
 
 			_package.VSEventsHandler.BuildSucceeded += RunOpenCover;
-            _package.VSEventsHandler.BuildFailed += () => DisableControl();
+			_package.VSEventsHandler.BuildFailed += () => DisableControl();
 			_package.VSEventsHandler.BuildSolution();
 		}
 
@@ -138,13 +137,13 @@ namespace OpenCover.UI.Commands
 			Enabled = true;
 		}
 
-        /// <summary>
-        /// Sets the command availability status to false.
-        /// </summary>
-        private void DisableControl()
-        {
-            Enabled = false;
-        }
+		/// <summary>
+		/// Sets the command availability status to false.
+		/// </summary>
+		private void DisableControl()
+		{
+			Enabled = false;
+		}
 
 		/// <summary>
 		/// Sets the test executor based on the type of Unit Tests selected.
@@ -152,8 +151,8 @@ namespace OpenCover.UI.Commands
 		/// <param name="selectedMSTests">The selected ms tests.</param>
 		/// <param name="selectedNUnitTests">The selected n unit tests.</param>
 		private void SetTestExecutor(Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedMSTests
-            , Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests
-            , Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedXUnitTests)
+			, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests
+			, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedXUnitTests)
 		{
 			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
 			{
@@ -163,10 +162,10 @@ namespace OpenCover.UI.Commands
 			{
 				_testExecutor = new NUnitTestExecutor(_package, selectedNUnitTests);
 			}
-            else if (selectedXUnitTests != null && (selectedXUnitTests.Item2.Any() || selectedXUnitTests.Item3.Any()))
-            {
-                _testExecutor = new XUnitTestExecutor(_package, selectedXUnitTests);
-            }
+			else if (selectedXUnitTests != null && (selectedXUnitTests.Item2.Any() || selectedXUnitTests.Item3.Any()))
+			{
+				_testExecutor = new XUnitTestExecutor(_package, selectedXUnitTests);
+			}
 		}
 
 		/// <summary>
@@ -213,7 +212,7 @@ namespace OpenCover.UI.Commands
 					}
 					finally
 					{
-                        EnableControl();
+						EnableControl();
 					}
 				});
 
