@@ -21,4 +21,4 @@ notifications:
   on_build_status_changed: true
 test:
   assemblies:
-    - **\*.Tests.dll
+    - '**\*.Tests.dll'
