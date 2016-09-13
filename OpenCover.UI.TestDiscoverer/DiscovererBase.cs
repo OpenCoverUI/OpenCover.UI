@@ -90,18 +90,28 @@ namespace OpenCover.UI.TestDiscoverer
             return assembly;
         }
 
-        protected static void AddTraits(List<string> trait, CustomAttribute attribute, Type attributeType)
+        /// <summary>
+        /// Adds the traits.
+        /// </summary>
+        /// <param name="traits">The traits.</param>
+        /// <param name="attribute">The attribute.</param>
+        /// <param name="attributeType">Type of the attribute.</param>
+        protected static void AddTraits(List<string> traits, CustomAttribute attribute, Type attributeType)
         {
             if (attribute.AttributeType.FullName == attributeType.FullName)
             {
                 if (attribute.ConstructorArguments != null && attribute.ConstructorArguments.Count > 0)
                 {
-                    trait.Add(attribute.ConstructorArguments[0].Value.ToString());
+                    var trait = attribute.ConstructorArguments[0].Value.ToString();
+                    if (!traits.Contains(trait))
+                    {
+                        traits.Add(trait);
+                    }
                 }
             }
         }
-        
-                /// <summary>
+
+        /// <summary>
         /// Determines whether the assembly has a reference to the NUnit library.
         /// </summary>
         /// <param name="assembly">Assembly to check.</param>
