@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mono.Collections.Generic;
 
 namespace OpenCover.UI.TestDiscoverer.MSTest
 {
@@ -52,22 +53,46 @@ namespace OpenCover.UI.TestDiscoverer.MSTest
 
                 if (isMSTest)
                 {
-                    var TestClass = new TestClass
-                    {
-                        DLLPath = dll,
-                        Name = type.Name,
-                        Namespace = type.Namespace,
-                        TestType = TestType.MSTest
-                    };
+                    addTestClass(dll, type, classes2);
 
-                    TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
-                    classes2.Add(TestClass);
+                    if (type.HasNestedTypes) // support for nested [TestClass] element
+                    {
+                        var customAttributes = type.NestedTypes[0].CustomAttributes;
+                        if (customAttributes != null)
+                        {
+                            isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+                            if (isMSTest)
+                            {
+                                addTestClass(dll, type.NestedTypes[0], classes2);
+                            }
+                        }
+                    }
                 }
             }
             return classes2;
         }
 
-		/// <summary>
+	    private void addTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
+	    {
+	        var TestClass = new TestClass
+	        {
+	            DLLPath = dll,
+	            Name = type.Name,
+	            Namespace = type.Namespace,
+	            TestType = TestType.MSTest
+	        };
+
+	        TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+	        classes2.Add(TestClass);
+	    }
+
+	    private void AddTestClass(Collection<CustomAttribute> customAttributes, List<TestClass> classes2)
+	    {
+	        
+
+	    }
+
+	    /// <summary>
 		/// Discovers the tests in class.
 		/// </summary>
 		/// <param name="type">Type of the class.</param>

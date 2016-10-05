@@ -9,5 +9,15 @@ namespace OpenCover.UI.TestDiscoverer.TestResources.MSTest
         public void RegularTestMethod()
         {
         }
+
+        [TestClass]
+        public class SubTestClass
+        {
+            [TestMethod]
+            public void RegularSubTestClassMethod()
+            {
+            }
+
+        }
     }
 }

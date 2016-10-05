@@ -12,5 +12,11 @@ namespace OpenCover.UI.TestDiscoverer.Tests.MSTest
         {
             AssertDiscoveredMethod(testFixtureInAssemblyToDiscoverTestsIn, expectedNameOfFirstTestMethod);
         }
+
+        [TestCase(typeof(RegularTestClass.SubTestClass), "RegularSubTestClassMethod")]
+        public void Discover_Finds_Sub_Test_Fixture_And_Method(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod)
+        {
+            AssertDiscoveredMethod(testFixtureInAssemblyToDiscoverTestsIn, expectedNameOfFirstTestMethod);
+        }
     }
 }
