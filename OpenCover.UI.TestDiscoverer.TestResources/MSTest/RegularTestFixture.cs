@@ -18,6 +18,15 @@ namespace OpenCover.UI.TestDiscoverer.TestResources.MSTest
             {
             }
 
+            [TestClass]
+            public class Sub2NdTestClass
+            {
+                [TestMethod]
+                public void RegularSub2NdTestClassMethod()
+                {
+                }
+
+            }
         }
     }
 }

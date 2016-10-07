@@ -29,48 +29,53 @@ namespace OpenCover.UI.TestDiscoverer.MSTest
 		}
 
         /// <summary>
-        /// Discovers the tests in the Assembly.
+        /// Recursively loops through the typeDefinition to search for MSTest TestClassAttribute
+        /// and returns the found TestClasses in the list.
         /// </summary>
-        /// <param name="dllPath">The path to the DLL.</param>
-        /// <param name="assembly">The loaded Assembly.</param>
-        /// <returns>Tests in the Assembly</returns>
-        protected override List<TestClass> DiscoverTestsInAssembly(string dll, AssemblyDefinition assembly)
-        {
-            var classes2 = new List<TestClass>();
-            foreach (var type in assembly.MainModule.Types)
+        /// <param name="typeDefinition">A typeDefinition contains in the test assembly, can have nested types</param>
+        /// <param name="dll">the dll being worked on, just being passed through</param>
+        /// <returns></returns>
+	    public List<TestClass> FindMSTestClassInType(TypeDefinition typeDefinition, string dll)
+	    {
+	        List<TestClass> testClasses = new List<TestClass>(); 
+
+            foreach (var nestedType in typeDefinition.NestedTypes)
             {
-                bool isMSTest = false;
-
-                try
+                List<TestClass> subTestClasses = FindMSTestClassInType(nestedType, dll); // recursive call
+                if (subTestClasses != null)
                 {
-                    var customAttributes = type.CustomAttributes;
-                    if (customAttributes != null)
-                    {
-                        isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
-                    }
-                }
-                catch { }
-
-                if (isMSTest)
-                {
-                    addTestClass(dll, type, classes2);
-
-                    if (type.HasNestedTypes) // support for nested [TestClass] element
-                    {
-                        var customAttributes = type.NestedTypes[0].CustomAttributes;
-                        if (customAttributes != null)
-                        {
-                            isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
-                            if (isMSTest)
-                            {
-                                addTestClass(dll, type.NestedTypes[0], classes2);
-                            }
-                        }
-                    }
+                    testClasses.AddRange(subTestClasses);
                 }
             }
-            return classes2;
-        }
+
+	        bool isMSTest = false;
+            var customAttributes = typeDefinition.CustomAttributes;
+            if (customAttributes != null)
+            {
+                isMSTest = customAttributes.Any(attribute => attribute.AttributeType.FullName == typeof(TestClassAttribute).FullName);
+            }
+	        if (isMSTest)
+	        {
+	            addTestClass(dll, typeDefinition, testClasses);
+	        }
+	        return testClasses;
+	    }
+
+	    /// <summary>
+	    /// Discovers the tests in the Assembly.
+	    /// </summary>
+	    /// <param name="dllPath">The path to the DLL.</param>
+	    /// <param name="assembly">The loaded Assembly.</param>
+	    /// <returns>Tests in the Assembly</returns>
+	    protected override List<TestClass> DiscoverTestsInAssembly(string dll, AssemblyDefinition assembly)
+	    {
+	        var classes2 = new List<TestClass>();
+	        foreach (var type in assembly.MainModule.Types)
+	        {
+	            classes2.AddRange(FindMSTestClassInType(type, dll));
+	        }
+	        return classes2;
+	    }
 
 	    private void addTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
 	    {
@@ -84,12 +89,6 @@ namespace OpenCover.UI.TestDiscoverer.MSTest
 
 	        TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
 	        classes2.Add(TestClass);
-	    }
-
-	    private void AddTestClass(Collection<CustomAttribute> customAttributes, List<TestClass> classes2)
-	    {
-	        
-
 	    }
 
 	    /// <summary>
