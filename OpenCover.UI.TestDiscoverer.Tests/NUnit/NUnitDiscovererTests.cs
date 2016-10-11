@@ -16,7 +16,7 @@ namespace OpenCover.UI.TestDiscoverer.Tests.NUnit
             AssertDiscoveredMethod(testFixtureInAssemblyToDiscoverTestsIn, expectedNameOfFirstTestMethod, TestType.NUnit);
         }
 
-        [Ignore, TestCase(typeof(TestFixtureWithNestedTestClasses.SubTestClass), "RegularSubTestClassMethod")]
+        [TestCase(typeof(TestFixtureWithNestedTestClasses.SubTestClass), "RegularSubTestClassMethod")]
         [TestCase(typeof(TestFixtureWithNestedTestClasses.SubTestClass.Sub2NdTestClass), "RegularSub2NdTestClassMethod")]
         public void Discover_Finds_Sub_Test_Fixtures_And_Methods(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod)
         {
