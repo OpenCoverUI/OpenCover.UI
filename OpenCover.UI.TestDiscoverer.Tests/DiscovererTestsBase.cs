@@ -3,30 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using OpenCover.UI.Model.Test;
 
 namespace OpenCover.UI.TestDiscoverer.Tests
 {
     [TestFixture]
-    public abstract class DiscovererTestsBase
+    abstract class DiscovererTestsBase
     {
-        protected void AssertDiscoveredMethod(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod)
+        protected void AssertDiscoveredMethod(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod, TestType frameworkType)
         {
             // Arrange
             var discoverer = new Discoverer(new List<string> { testFixtureInAssemblyToDiscoverTestsIn.Assembly.Location });
 
             // Act
-            var discoveredTests = discoverer.Discover();
+            var discoveredTestClasses = discoverer.Discover();
 
             // Assert
-            discoveredTests.Should().NotBeNullOrEmpty();
+            discoveredTestClasses.Should().NotBeNullOrEmpty();
 
-            var discoveredTest = discoveredTests.FirstOrDefault(x => 
-                                                    x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name &&
-                                                    x.Namespace == testFixtureInAssemblyToDiscoverTestsIn.Namespace);
-            discoveredTest.Should().NotBeNull();
+            var discoveredTestClass = discoveredTestClasses
+                .FirstOrDefault(x => x.TestType == frameworkType
+                    && x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name
+                    && x.Namespace == testFixtureInAssemblyToDiscoverTestsIn.Namespace);
+            discoveredTestClass.Should().NotBeNull();
 
-            var discoveredMethod = discoveredTest.TestMethods.FirstOrDefault(x => 
-                                                    x.Name == expectedNameOfFirstTestMethod);
+            var discoveredMethod = discoveredTestClass.TestMethods
+                .FirstOrDefault(x => x.Name == expectedNameOfFirstTestMethod);
             discoveredMethod.Should().NotBeNull();
         }
     }

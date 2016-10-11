@@ -56,7 +56,7 @@ namespace OpenCover.UI.TestDiscoverer.MSTest
             }
 	        if (isMSTest)
 	        {
-	            addTestClass(dll, typeDefinition, testClasses);
+	            AddTestClass(dll, typeDefinition, testClasses);
 	        }
 	        return testClasses;
 	    }
@@ -77,13 +77,14 @@ namespace OpenCover.UI.TestDiscoverer.MSTest
 	        return classes2;
 	    }
 
-	    private void addTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
+	    private void AddTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
 	    {
-	        var TestClass = new TestClass
+            string nameSpace = GetNameSpace(type);
+            var TestClass = new TestClass
 	        {
 	            DLLPath = dll,
 	            Name = type.Name,
-	            Namespace = type.Namespace,
+	            Namespace = nameSpace,
 	            TestType = TestType.MSTest
 	        };
 

@@ -56,7 +56,7 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
             }
             if (isNunitTest)
             {
-                addTestClass(dll, typeDefinition, testClasses);
+                AddTestClass(dll, typeDefinition, testClasses);
             }
             return testClasses;
         }
@@ -72,22 +72,24 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
             return classes2;
         }
 
-        private void addTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
+        private void AddTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
         {
-            int lengthForNameSpace = type.FullName.Contains('/') ? type.FullName.IndexOf('/') : type.FullName.Length;
+            string nameSpace = GetNameSpace(type);
             var TestClass = new TestClass
             {
                 DLLPath = dll,
                 Name = type.Name,
-                // Namespace = type.Namespace, // Mono-Cecil bug namespace is empty for inner-classes
-                Namespace = type.FullName.Substring(0, lengthForNameSpace),
-                TestType = TestType.MSTest
+                Namespace = nameSpace,
+                TestType = TestType.NUnit
             };
 
             TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
             classes2.Add(TestClass);
         }
-        /// <summary>
+
+     
+
+	    /// <summary>
         /// Discovers the tests in the Assembly.
         /// </summary>
         /// <param name="dllPath">The path to the DLL.</param>
