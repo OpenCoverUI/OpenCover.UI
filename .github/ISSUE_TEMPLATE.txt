@@ -1,0 +1,8 @@
+### Issue description:
+
+
+### Versions used:
+- OpenCover exe:
+- OpenCover.UI:
+- Visual Studio (inc. SP number): 
+- MsTest/NUnit/xUnit:
