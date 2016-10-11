@@ -50,9 +50,6 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
             if (customAttributes != null)
             {
                 isNunitTest = IsNUnitTest(typeDefinition);
-                /*isNunitTest = typeDefinition.CustomAttributes != null &&
-                           typeDefinition.CustomAttributes.Any(
-                               attribute => attribute.AttributeType.FullName == typeof(TestFixtureAttribute).FullName);*/
             }
             if (isNunitTest)
             {
@@ -89,50 +86,7 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 
      
 
-	    /// <summary>
-        /// Discovers the tests in the Assembly.
-        /// </summary>
-        /// <param name="dllPath">The path to the DLL.</param>
-        /// <param name="assembly">The loaded Assembly.</param>
-        /// <returns>Tests in the Assembly</returns>
-        /* protected override List<TestClass> DiscoverTestsInAssembly(string dllPath, AssemblyDefinition assembly)
-         {
-             bool hasNUnitReference = AssemblyHasReferenceTo(assembly, "nunit.framework");
-
-             if (!hasNUnitReference)
-             {
-                 return new List<TestClass>();
-             }
-
-             var classes = new List<TestClass>();
-             foreach (var type in assembly.MainModule.Types)
-             {
-                 bool isNUnitTest = false;
-
-                 try
-                 {
-                     isNUnitTest = IsNUnitTest(type);
-                 }
-                 catch { }
-
-                 if (isNUnitTest)
-                 {
-                     var TestClass = new TestClass
-                     {
-                         DLLPath = dllPath,
-                         Name = type.Name,
-                         Namespace = type.Namespace,
-                         TestType = TestType.NUnit
-                     };
-
-                     TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
-
-                     classes.Add(TestClass);
-                 }
-             }
-             return classes;
-         }
-         */
+	    
         /// <summary>
         /// Determines whether the Type has TestFixtrue Attribute on itself or on one of its parents
         /// </summary>
