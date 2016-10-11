@@ -20,10 +20,13 @@ namespace OpenCover.UI.TestDiscoverer.Tests
             // Assert
             discoveredTests.Should().NotBeNullOrEmpty();
 
-            var discoveredTest = discoveredTests.FirstOrDefault(x => x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name);
+            var discoveredTest = discoveredTests.FirstOrDefault(x => 
+                                                    x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name &&
+                                                    x.Namespace == testFixtureInAssemblyToDiscoverTestsIn.Namespace);
             discoveredTest.Should().NotBeNull();
 
-            var discoveredMethod = discoveredTest.TestMethods.FirstOrDefault(x => x.Name == expectedNameOfFirstTestMethod);
+            var discoveredMethod = discoveredTest.TestMethods.FirstOrDefault(x => 
+                                                    x.Name == expectedNameOfFirstTestMethod);
             discoveredMethod.Should().NotBeNull();
         }
     }

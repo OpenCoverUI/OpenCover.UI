@@ -7,24 +7,31 @@ using Xunit;
 
 namespace OpenCover.UI.TestDiscoverer.TestResources.xUnit
 {
-    public class RegularTestFixture
+    public class RegularxUnitTestClass
     {
 
         [Fact]
-        public void PassingTest()
+        public void RegularTestMethod()
         {
-            Assert.Equal(4, Add(2, 2));
+
         }
 
-        [Fact]
-        public void FailingTest()
+        public class SubTestClass
         {
-            Assert.Equal(5, Add(2, 2));
-        }
+            [Fact]
+            public void RegularSubTestClassMethod()
+            {
+            }
 
-        int Add(int x, int y)
-        {
-            return x + y;
+            public class Sub2NdTestClass
+            {
+                [Fact]
+                public void RegularSub2NdTestClassMethod()
+                {
+                }
+            }
+
+
         }
     }
 }
