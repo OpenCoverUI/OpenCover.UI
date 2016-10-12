@@ -4,6 +4,8 @@ configuration: Release
 shallow_clone: true
 environment:
   DeployExtension: false
+before_build:
+- nuget restore
 build:
   project: OpenCover.UI.sln
   parallel: true
@@ -17,3 +19,6 @@ notifications:
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: true
+test:
+  assemblies:
+    - '**\*.Tests.dll'
