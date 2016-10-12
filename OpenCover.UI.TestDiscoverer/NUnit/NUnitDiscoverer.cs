@@ -25,56 +25,73 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
         {
 
         }
-
         /// <summary>
-        /// Discovers the tests in the Assembly.
+        /// Recursively loops through the typeDefinition to search for MSTest TestClassAttribute
+        /// and returns the found TestClasses in the list.
         /// </summary>
-        /// <param name="dllPath">The path to the DLL.</param>
-        /// <param name="assembly">The loaded Assembly.</param>
-        /// <returns>Tests in the Assembly</returns>
-        protected override List<TestClass> DiscoverTestsInAssembly(string dllPath, AssemblyDefinition assembly)
+        /// <param name="typeDefinition">A typeDefinition contains in the test assembly, can have nested types</param>
+        /// <param name="dll">the dll being worked on, just being passed through</param>
+        /// <returns></returns>
+        public List<TestClass> FindNunitTestClassInType(TypeDefinition typeDefinition, string dll)
         {
-            bool hasNUnitReference = AssemblyHasReferenceTo(assembly, "nunit.framework");
+            List<TestClass> testClasses = new List<TestClass>();
 
-            if (!hasNUnitReference)
+            foreach (var nestedType in typeDefinition.NestedTypes)
             {
-                return new List<TestClass>();
-            }
-            
-            var classes = new List<TestClass>();
-            foreach (var type in assembly.MainModule.Types)
-            {
-                bool isNUnitTest = false;
-
-                try
+                List<TestClass> subTestClasses = FindNunitTestClassInType(nestedType, dll); // recursive call
+                if (subTestClasses != null)
                 {
-                    isNUnitTest = IsNUnitTest(type);
-                }
-                catch { }
-
-                if (isNUnitTest)
-                {
-                    var TestClass = new TestClass
-                    {
-                        DLLPath = dllPath,
-                        Name = type.Name,
-                        Namespace = type.Namespace,
-                        TestType = TestType.NUnit
-                    };
-
-                    TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
-
-                    classes.Add(TestClass);
+                    testClasses.AddRange(subTestClasses);
                 }
             }
-            return classes;
+
+            bool isNunitTest = false;
+            var customAttributes = typeDefinition.CustomAttributes;
+            if (customAttributes != null)
+            {
+                isNunitTest = IsNUnitTest(typeDefinition);
+            }
+            if (isNunitTest)
+            {
+                AddTestClass(dll, typeDefinition, testClasses);
+            }
+            return testClasses;
         }
 
-		/// <summary>
-		/// Determines whether the Type has TestFixtrue Attribute on itself or on one of its parents
-		/// </summary>
-		/// <param name="type">The type.</param>
-		private bool IsNUnitTest(TypeDefinition type)
+
+        protected override List<TestClass> DiscoverTestsInAssembly(string dllPath, AssemblyDefinition assembly)
+	    {
+            var classes2 = new List<TestClass>();
+            foreach (var type in assembly.MainModule.Types)
+            {
+                classes2.AddRange(FindNunitTestClassInType(type, dllPath));
+            }
+            return classes2;
+        }
+
+        private void AddTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
+        {
+            string nameSpace = GetNameSpace(type);
+            var TestClass = new TestClass
+            {
+                DLLPath = dll,
+                Name = type.Name,
+                Namespace = nameSpace,
+                TestType = TestType.NUnit
+            };
+
+            TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
+            classes2.Add(TestClass);
+        }
+
+     
+
+	    
+        /// <summary>
+        /// Determines whether the Type has TestFixtrue Attribute on itself or on one of its parents
+        /// </summary>
+        /// <param name="type">The type.</param>
+        private bool IsNUnitTest(TypeDefinition type)
 		{
 			if (type == null)
 			{

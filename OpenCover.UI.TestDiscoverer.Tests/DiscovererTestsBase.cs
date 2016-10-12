@@ -23,7 +23,8 @@ namespace OpenCover.UI.TestDiscoverer.Tests
 
             var discoveredTestClass = discoveredTestClasses
                 .FirstOrDefault(x => x.TestType == frameworkType
-                    && x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name);
+                    && x.Name == testFixtureInAssemblyToDiscoverTestsIn.Name
+                    && x.Namespace == testFixtureInAssemblyToDiscoverTestsIn.Namespace);
             discoveredTestClass.Should().NotBeNull();
 
             var discoveredMethod = discoveredTestClass.TestMethods
