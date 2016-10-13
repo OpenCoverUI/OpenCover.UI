@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MSTest\RegularTestFixture.cs" />
+    <Compile Include="MSTest\TestFixtureWithTraits.cs" />
     <Compile Include="NUnit\TestFixtureWithNestedTestClasses.cs" />
     <Compile Include="NUnit\TestFixtureWithoutExplicitTextFixtureAttribute.cs" />
     <Compile Include="NUnit\RegularTestFixture.cs" />
