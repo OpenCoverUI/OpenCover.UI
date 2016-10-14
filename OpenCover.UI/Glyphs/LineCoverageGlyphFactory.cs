@@ -28,8 +28,7 @@ namespace OpenCover.UI.Glyphs
     {
         const double _glyphSize = 12.0;
         
-        //private static Brush _redBrush = new SolidColorBrush(Color.FromRgb(196, 64, 47));
-        private static Brush _redBrush = new LinearGradientBrush(Color.FromArgb(255,196, 64, 47),Color.FromArgb(50,196,64,47),0);
+        private static Brush _redBrush = new SolidColorBrush(Color.FromRgb(196, 64, 47));
         private static Brush _greenBrush = new SolidColorBrush(Color.FromRgb(88, 196, 84));
         private static Brush _orangeBrush = new SolidColorBrush(Color.FromRgb(196, 136, 41));
 
