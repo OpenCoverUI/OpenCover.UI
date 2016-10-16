@@ -4,12 +4,12 @@
 namespace OpenCover.UI.Model.Test
 {
 	/// <summary>
-	/// Represents a Test type - MSTest/NUnit
+	/// Represents a Test type - MSTest/NUnit/XUnit
 	/// </summary>
 	internal enum TestType
 	{
 		MSTest = 0,
 		NUnit = 1,
-        XUnit = 2
+		XUnit = 2
 	}
 }

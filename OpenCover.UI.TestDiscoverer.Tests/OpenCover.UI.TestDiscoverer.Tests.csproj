@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
+    </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -65,7 +65,7 @@
     <Compile Include="MSTest\MSTestDiscovererTests.cs" />
     <Compile Include="NUnit\NUnitDiscovererTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XUnit\xUnitDiscovererTests.cs" />
+    <Compile Include="XUnit\XUnitDiscovererTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />

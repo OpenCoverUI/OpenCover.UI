@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -24,7 +23,6 @@ namespace OpenCover.UI.Commands
 		private const string CODE_COVERAGE_SELECT_LESS_TESTS_MESSAGE = "We could not run all the tests that you selected. Please see output window for more details.";
 
 		private OpenCoverUIPackage _package;
-		private bool _isRunningCodeCoverage;
 		private TestExecutor _testExecutor;
 
 		private CodeCoverageResultsControl CodeCoverageResults { get { return _package.GetToolWindow<CodeCoverageResultsToolWindow>().CodeCoverageResultsControl; } }
@@ -39,7 +37,7 @@ namespace OpenCover.UI.Commands
 		{
 			_package = package;
 
-			base.Enabled = false;
+			DisableControl();
 
 			TestExplorerControl.TestDiscoveryFinished += OnTestDiscoveryFinished;
 		}
@@ -50,13 +48,14 @@ namespace OpenCover.UI.Commands
 		void OnTestDiscoveryFinished()
 		{
 			var hasTests = TestExplorer.TestsTreeView.Root != null && TestExplorer.TestsTreeView.Root.Children.Any();
-			if (hasTests & !_isRunningCodeCoverage)
+
+			if (hasTests && (_testExecutor == null || !_testExecutor.IsExecuting))
 			{
-				Enabled = true;
+				EnableControl();
 			}
-			else
+			else 
 			{
-				Enabled = false;
+				DisableControl();
 			}
 		}
 
@@ -66,7 +65,7 @@ namespace OpenCover.UI.Commands
 		protected override void OnExecute()
 		{
 			CodeCoverageResults.ClearTreeView();
-			TestMethodWrapperContainer msTests = null, nUnitTests = null;
+			TestMethodWrapperContainer msTests = null, nUnitTests = null, xUnitTests = null;
 			TestMethodWrapperContainer container = TestExplorer.TestsTreeView.Root as TestMethodWrapperContainer;
 
 			if (container != null)
@@ -74,6 +73,10 @@ namespace OpenCover.UI.Commands
 				if (container.TestType == TestType.MSTest)
 				{
 					msTests = container;
+				}                
+				else if (container.TestType == TestType.XUnit)
+				{
+					xUnitTests = container;
 				}
 				else
 				{
@@ -82,16 +85,19 @@ namespace OpenCover.UI.Commands
 			}
 			else
 			{
-				msTests = TestExplorer.TestsTreeView.Root.Children[0] as TestMethodWrapperContainer;
-				nUnitTests = TestExplorer.TestsTreeView.Root.Children[1] as TestMethodWrapperContainer;
+				
+				msTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.MSTest);
+				nUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.NUnit);
+				xUnitTests = TestExplorer.TestsTreeView.Root.Children.GetContainer(TestType.XUnit);
 			}
 
 			var selectedMSTests = msTests != null ? msTests.GetSelectedTestGroupsAndTests() : null;
 			var selectedNUnitTests = nUnitTests != null ? nUnitTests.GetSelectedTests() : null;
+			var selectedXUnitTests = xUnitTests != null ? xUnitTests.GetSelectedTests() : null;
 
 			_testExecutor = null;
 
-			SetTestExecutor(selectedMSTests, selectedNUnitTests);
+			SetTestExecutor(selectedMSTests, selectedNUnitTests, selectedXUnitTests);
 
 			if (_testExecutor == null)
 			{
@@ -116,20 +122,27 @@ namespace OpenCover.UI.Commands
 			// show tool window which shows the progress.
 			ShowCodeCoverageResultsToolWindow();
 
-			SetCommandAvailabilityStatus(false);
+			DisableControl();
+
 			_package.VSEventsHandler.BuildSucceeded += RunOpenCover;
-			_package.VSEventsHandler.BuildFailed += () => SetCommandAvailabilityStatus(false);
+			_package.VSEventsHandler.BuildFailed += () => DisableControl();
 			_package.VSEventsHandler.BuildSolution();
 		}
 
 		/// <summary>
-		/// Sets the command availability status to either true or false.
-		/// </summary>
-		/// <param name="status">if set to <c>true</c> [status].</param>
-		private void SetCommandAvailabilityStatus(bool status)
+		/// Sets the command availability status to true.
+		/// </summary>		
+		private void EnableControl()
 		{
-			Enabled = status;
-			_isRunningCodeCoverage = !status;
+			Enabled = true;
+		}
+
+		/// <summary>
+		/// Sets the command availability status to false.
+		/// </summary>
+		private void DisableControl()
+		{
+			Enabled = false;
 		}
 
 		/// <summary>
@@ -137,7 +150,9 @@ namespace OpenCover.UI.Commands
 		/// </summary>
 		/// <param name="selectedMSTests">The selected ms tests.</param>
 		/// <param name="selectedNUnitTests">The selected n unit tests.</param>
-		private void SetTestExecutor(Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedMSTests, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests)
+		private void SetTestExecutor(Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedMSTests
+			, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedNUnitTests
+			, Tuple<IEnumerable<string>, IEnumerable<string>, IEnumerable<string>> selectedXUnitTests)
 		{
 			if (selectedMSTests != null && (selectedMSTests.Item1.Any() || selectedMSTests.Item2.Any() || selectedMSTests.Item3.Any()))
 			{
@@ -146,6 +161,10 @@ namespace OpenCover.UI.Commands
 			else if (selectedNUnitTests != null && (selectedNUnitTests.Item2.Any() || selectedNUnitTests.Item3.Any()))
 			{
 				_testExecutor = new NUnitTestExecutor(_package, selectedNUnitTests);
+			}
+			else if (selectedXUnitTests != null && (selectedXUnitTests.Item2.Any() || selectedXUnitTests.Item3.Any()))
+			{
+				_testExecutor = new XUnitTestExecutor(_package, selectedXUnitTests);
 			}
 		}
 
@@ -193,8 +212,7 @@ namespace OpenCover.UI.Commands
 					}
 					finally
 					{
-						Enabled = true;
-						_isRunningCodeCoverage = false;
+						EnableControl();
 					}
 				});
 

@@ -46,5 +46,17 @@ namespace OpenCover.UI {
                 this["OpenCoverPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string XUnitPath {
+            get {
+                return ((string)(this["XUnitPath"]));
+            }
+            set {
+                this["XUnitPath"] = value;
+            }
+        }
     }
 }
