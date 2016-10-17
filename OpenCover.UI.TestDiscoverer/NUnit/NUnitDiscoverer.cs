@@ -83,7 +83,7 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
                         Name = type.Name,
                         Namespace = type.Namespace,
                         TestType = TestType.NUnit,
-                        Traits = traits.Count > 0 ? traits.ToArray() : null
+                        Traits = traits.ToArray()
                     };
 
                     TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
@@ -135,11 +135,7 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 			foreach (var method in type.Methods)
 			{
 				bool isTestMethod = false;
-                var traits = new List<string>();
-                if (@class.Traits != null && @class.Traits.Length > 0)
-                {
-                    traits.AddRange(@class.Traits);
-                }
+                var traits = @class.Traits.ToList();
 
 				try
 				{

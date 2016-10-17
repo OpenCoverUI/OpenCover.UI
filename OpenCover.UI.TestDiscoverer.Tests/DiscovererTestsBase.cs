@@ -9,7 +9,7 @@ namespace OpenCover.UI.TestDiscoverer.Tests
     [TestFixture]
     public abstract class DiscovererTestsBase
     {
-        protected void AssertDiscoveredMethod(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod)
+        protected void AssertDiscoveredMethod(Type testFixtureInAssemblyToDiscoverTestsIn, string expectedNameOfFirstTestMethod, IEnumerable<string> expectedTraits)
         {
             // Arrange
             var discoverer = new Discoverer(new List<string> { testFixtureInAssemblyToDiscoverTestsIn.Assembly.Location });
@@ -25,6 +25,15 @@ namespace OpenCover.UI.TestDiscoverer.Tests
 
             var discoveredMethod = discoveredTest.TestMethods.FirstOrDefault(x => x.Name == expectedNameOfFirstTestMethod);
             discoveredMethod.Should().NotBeNull();
+
+            if (expectedTraits != null)
+            {
+                var discoveredTraits = discoveredTest.Traits;
+                foreach (var expectedTrait in expectedTraits)
+                {
+                    discoveredTraits.Contains(expectedTrait).Should().BeTrue();
+                }
+            }
         }
     }
 }
