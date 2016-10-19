@@ -1,32 +1,39 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
 
-namespace OpenCover.UI.TestDiscoverer.TestResources.MSTest
+namespace OpenCover.UI.TestDiscoverer.TestResources.xUnit
 {
-    [TestClass]
-    public class RegularTestClass
+    public class RegularxUnitTestClass
     {
-        [TestMethod]
+
+        [Fact]
         public void RegularTestMethod()
         {
+
         }
 
-        [TestClass]
         public class SubTestClass
         {
-            [TestMethod]
+            [Fact]
             public void RegularSubTestClassMethod()
             {
             }
 
-            [TestClass]
             public class Sub2NdTestClass
             {
-                [TestMethod]
+                [Fact]
                 public void RegularSub2NdTestClassMethod()
                 {
                 }
-
             }
+
+
         }
     }
 }
+
+

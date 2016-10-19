@@ -9,6 +9,7 @@ namespace OpenCover.UI.Model.Test
 	internal enum TestType
 	{
 		MSTest = 0,
-		NUnit = 1
+		NUnit = 1,
+        XUnit = 2
 	}
 }

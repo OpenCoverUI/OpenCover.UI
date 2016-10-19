@@ -129,5 +129,23 @@ namespace OpenCover.UI.TestDiscoverer
             }
             return hasNUnitReference;
         }
+
+        /// <summary>
+        /// Retrieves the namespace for a type, will search up the tree of 
+        /// DeclaringTypes when necessary
+        /// </summary>
+        /// <param name="typeDefinition"></param>
+        /// <returns></returns>
+        protected string GetNameSpace(TypeDefinition typeDefinition)
+        {
+            TypeDefinition declaringType = typeDefinition.DeclaringType;
+            string name_space = typeDefinition.Namespace;
+            while (declaringType != null)
+            {
+                name_space = declaringType.Namespace;
+                declaringType = declaringType.DeclaringType;
+            }
+            return name_space;
+        }
     }
 }

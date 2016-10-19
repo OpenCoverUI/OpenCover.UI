@@ -1,27 +1,27 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 
-namespace OpenCover.UI.TestDiscoverer.TestResources.MSTest
+namespace OpenCover.UI.TestDiscoverer.TestResources.NUnit
 {
-    [TestClass]
-    public class RegularTestClass
+    [TestFixture]
+    public class TestFixtureWithNestedTestClasses
     {
-        [TestMethod]
+        [Test]
         public void RegularTestMethod()
         {
         }
 
-        [TestClass]
+        [TestFixture]
         public class SubTestClass
         {
-            [TestMethod]
+            [Test]
             public void RegularSubTestClassMethod()
             {
             }
 
-            [TestClass]
+            [TestFixture]
             public class Sub2NdTestClass
             {
-                [TestMethod]
+                [Test]
                 public void RegularSub2NdTestClassMethod()
                 {
                 }
