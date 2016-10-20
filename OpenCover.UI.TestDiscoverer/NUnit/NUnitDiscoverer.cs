@@ -71,13 +71,37 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 
         private void AddTestClass(string dll, TypeDefinition type, List<TestClass> classes2)
         {
+            var traits = new List<string>();
+            try
+            {
+                var currentType = type;
+                while (true)
+                {
+                    foreach (var attribute in currentType.CustomAttributes)
+                    {
+                        AddTraits(traits, attribute, typeof(CategoryAttribute));
+                    }
+
+                    if (currentType.BaseType != null)
+                    {
+                        currentType = currentType.BaseType.Resolve();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            catch { }
+
             string nameSpace = GetNameSpace(type);
             var TestClass = new TestClass
             {
                 DLLPath = dll,
                 Name = type.Name,
                 Namespace = nameSpace,
-                TestType = TestType.NUnit
+                TestType = TestType.NUnit,
+                Traits = traits.Count > 0 ? traits.ToArray() : null
             };
 
             TestClass.TestMethods = DiscoverTestsInClass(type, TestClass);
@@ -128,7 +152,11 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 			foreach (var method in type.Methods)
 			{
 				bool isTestMethod = false;
-				var trait = new List<string>();
+                var traits = new List<string>();
+                if (@class.Traits != null && @class.Traits.Length > 0)
+                {
+                    traits.AddRange(@class.Traits);
+                }
 
 				try
 				{
@@ -140,7 +168,7 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
                             isTestMethod = true;
                         }
 
-                        AddTraits(trait, attribute, typeof(CategoryAttribute));
+                        AddTraits(traits, attribute, typeof(CategoryAttribute));
                     }
 				}
 				catch { }
@@ -149,8 +177,8 @@ namespace OpenCover.UI.TestDiscoverer.NUnit
 				{
 					TestMethod testMethod = new TestMethod();
 					testMethod.Name = method.Name;
-					testMethod.Traits = trait.Count > 0 ? trait.ToArray() : new[] { "No Traits" };
-					tests.Add(testMethod);
+                    testMethod.Traits = traits.Count > 0 ? traits.ToArray() : new[] { "No Traits" };
+                    tests.Add(testMethod);
 				}
 			}
 
