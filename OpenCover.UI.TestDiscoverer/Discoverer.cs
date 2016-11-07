@@ -29,7 +29,7 @@ namespace OpenCover.UI.TestDiscoverer
 		{
             discoverers.Add(new NUnitDiscoverer(dlls));
             discoverers.Add(new MSTestDiscoverer(dlls));
-
+            discoverers.Add(new XUnitDiscoverer(dlls));
 		}
 
 		/// <summary>

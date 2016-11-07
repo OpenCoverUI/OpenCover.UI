@@ -2,14 +2,8 @@
 // This source code is released under the MIT License; Please read license.md file for more details.
 //
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Threading.Tasks;
-using VSLangProj;
-using VSLangProj80;
 using OpenCover.UI.Views;
-using OpenCover.UI.Helpers;
 using EnvDTE;
 
 namespace OpenCover.UI.Processors

@@ -180,11 +180,13 @@
     <Compile Include="Model\ResultNodes\NamespaceNode.cs" />
     <Compile Include="Model\ResultNodes\PropertyMethodNode.cs" />
     <Compile Include="Model\ResultNodes\PropertyNode.cs" />
+    <Compile Include="Helpers\TreeNodeExtensions.cs" />
     <Compile Include="OpenCoverUISettings.cs" />
     <Compile Include="Commands\ResultsToolbarCommands.cs" />
     <Compile Include="Glyphs\LineCoverageGlyphFactory.cs" />
     <Compile Include="Glyphs\LineCoverageGlyphFactoryProvider.cs" />
     <Compile Include="Helpers\LineCoverageState.cs" />
+    <Compile Include="Processors\XUnitTestExecutor.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Tagger\ClassificationTypes.cs" />
     <Compile Include="Tagger\LineCoverageTag.cs" />
@@ -293,7 +295,9 @@
     <Resource Include="Resources\ShowCodeCoverageGlyphs.png" />
     <Resource Include="Resources\ShowCodeCoverageColoring.png" />
     <Resource Include="Resources\Successful.png" />
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="OpenCoverUISettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>OpenCoverUISettings.Designer.cs</LastGenOutput>
