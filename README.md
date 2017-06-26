@@ -12,9 +12,6 @@ The latest release can be downloaded from the VS Gallery: https://visualstudioga
 
 Please make sure you install OpenCover and it is generating report before installing the plugin. The latest OpenCover release can be found [here](https://github.com/opencover/opencover/releases).
 
-For now, the plugin assumes that OpenCover is installed at %localappdata%\Apps\OpenCover. 
-No configuration option is available yet.
-
 ### Team communication
 
 Team communications can be done via [slack](http://slack.com), raise an issue to request access (include your email - obfuscated if you wish) and we will send you an invite then just visit the [team page](https://opencoverui.slack.com/) to sign up and join the conversation.
