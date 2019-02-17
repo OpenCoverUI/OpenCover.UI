@@ -27,7 +27,7 @@ namespace OpenCover.UI.Glyphs
     public class LineCoverageGlyphFactory : TextViewCoverageProviderBase, IGlyphFactory
     {
         const double _glyphSize = 12.0;
-        
+
         private static Brush _redBrush = new SolidColorBrush(Color.FromRgb(196, 64, 47));
         private static Brush _greenBrush = new SolidColorBrush(Color.FromRgb(88, 196, 84));
         private static Brush _orangeBrush = new SolidColorBrush(Color.FromRgb(196, 136, 41));
@@ -36,9 +36,9 @@ namespace OpenCover.UI.Glyphs
         /// Initializes a new instance.
         /// </summary>
         /// <param name="view">The current text editor.</param>
-        public LineCoverageGlyphFactory(IWpfTextView view) :base(view)
+        public LineCoverageGlyphFactory(IWpfTextView view) : base(view)
         {
-                       
+
         }
 
         /// <summary>
@@ -61,10 +61,11 @@ namespace OpenCover.UI.Glyphs
             if (brush == null)
                 return null;
 
-            System.Windows.Shapes.Ellipse ellipse = new Ellipse();
+            System.Windows.Shapes.Rectangle ellipse = new Rectangle();
             ellipse.Fill = brush;
-            ellipse.Height = _glyphSize;
-            ellipse.Width = _glyphSize;
+            ellipse.Height = 14;
+            ellipse.Width = 3;
+            ellipse.HorizontalAlignment = HorizontalAlignment.Right;
 
             ellipse.ToolTip = GetToolTipText(state);
 
@@ -76,7 +77,7 @@ namespace OpenCover.UI.Glyphs
             }
 
             return ellipse;
-        }            
+        }
 
         /// <summary>
         /// Determines the correct brush for the coverage state.
@@ -86,7 +87,7 @@ namespace OpenCover.UI.Glyphs
         private Brush GetBrushForState(LineCoverageState state)
         {
             switch (state)
-            {               
+            {
                 case LineCoverageState.Covered:
                     return _greenBrush;
                 case LineCoverageState.Uncovered:
@@ -127,7 +128,7 @@ namespace OpenCover.UI.Glyphs
         {
             // get cover state for all spans included in this line
             var spans = GetSpansForLine(line, _currentSpans);
-           
+
             if (spans.Any())
             {
                 IEnumerable<bool> coverageStates = spans.Select(s => _spanCoverage[s]);
@@ -144,7 +145,7 @@ namespace OpenCover.UI.Glyphs
                         return LineCoverageState.Partly;
                 }
             }
-            
+
             return LineCoverageState.Unknown;
         }
 
@@ -158,7 +159,7 @@ namespace OpenCover.UI.Glyphs
         {
             return spanContainer.Where(s => s.Snapshot.Version == line.Snapshot.Version)
                 .Where(s => (s.Start >= line.Start && s.Start <= line.End) || (s.Start < line.Start && s.End >= line.Start));
-        }    
+        }
 
         /// <summary>
         /// Hide the colored line
@@ -185,6 +186,6 @@ namespace OpenCover.UI.Glyphs
 
             if (tagger != null)
                 tagger.ShowForLine(line);
-        }    
+        }
     }
 }

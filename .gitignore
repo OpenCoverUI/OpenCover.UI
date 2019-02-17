@@ -161,3 +161,5 @@ packages
 !packages/*/build/
 /OpenCover.UI.VS2013.sln.DotSettings
 OpenCover/
+
+\.vs/
