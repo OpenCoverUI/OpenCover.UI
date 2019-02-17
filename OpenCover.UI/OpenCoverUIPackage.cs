@@ -22,9 +22,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using OpenCover.UI.Views.OptionPages;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
-using OpenCover.UI.Views.OptionPages;
 
 namespace OpenCover.UI
 {
@@ -43,14 +43,14 @@ namespace OpenCover.UI
 	[ProvideToolWindow(typeof(TestExplorerToolWindow), MultiInstances = false, Style = VsDockStyle.Tabbed,
 		Orientation = ToolWindowOrientation.Left, Window = EnvDTE.Constants.vsWindowKindClassView)]
 	[ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
-    [ProvideOptionPageAttribute(typeof(OpenCoverUIOptionPage), "OpenCover.UI Options", "General", 100, 101, true, new string[] { "Change OpenCover.UI Options" })]
+	[ProvideOptionPageAttribute(typeof(OpenCoverUIOptionPage), "OpenCover.UI Options", "General", 100, 101, true, new string[] { "Change OpenCover.UI Options" })]
 	[Guid(GuidList.GuidOpenCoverUIPkgString)]
 	public sealed class OpenCoverUIPackage : Package
 	{
 		Dictionary<string, string> fileList = new Dictionary<string, string>();
 		List<string> _openFiles = new List<string>();
 		private Dictionary<string, string> _keysDictionary = new Dictionary<string, string>();
-        private Settings _settings;
+		private Settings _settings;
 
 		internal static OpenCoverUIPackage Instance
 		{
@@ -82,13 +82,13 @@ namespace OpenCover.UI
 			private set;
 		}
 
-        /// <summary>
-        /// Gets access to the package settings
-        /// </summary>
-        internal Settings Settings
-        {
-            get { return _settings; }
-        }
+		/// <summary>
+		/// Gets access to the package settings
+		/// </summary>
+		internal Settings Settings
+		{
+			get { return _settings; }
+		}
 
 		/// <summary>
 		/// Default constructor of the package.
@@ -170,7 +170,7 @@ namespace OpenCover.UI
 			Instance = this;
 			DTE = (Package.GetGlobalService(typeof(EnvDTE.DTE))) as EnvDTE.DTE;
 
-            LoadSettings();
+			LoadSettings();
 
 			// Add our command handlers for menu (commands must exist in the .vsct file)
 			OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -197,10 +197,10 @@ namespace OpenCover.UI
 					mcs.AddCommand(command);
 				}
 
-                foreach (var command in ResultsToolbarCommands.Commands)
-                {
-                    mcs.AddCommand(command);
-                }
+				foreach (var command in ResultsToolbarCommands.Commands)
+				{
+					mcs.AddCommand(command);
+				}
 
 				Commands.Add(executeSelectedTestsCommand);
 				Commands.Add(codeCoverageToolWindowCommand);
@@ -209,36 +209,36 @@ namespace OpenCover.UI
 			}
 		}
 
-        private void LoadSettings()
-        {
-            SettingsManager settingsManager = new ShellSettingsManager(this);
-            WritableSettingsStore configurationSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
-            _settings = new Settings(configurationSettingsStore);
-        }
+		private void LoadSettings()
+		{
+			SettingsManager settingsManager = new ShellSettingsManager(this);
+			WritableSettingsStore configurationSettingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+			_settings = new Settings(configurationSettingsStore);
+		}
 
-        //internal IWpfTextViewHost GetCurrentViewHost()
-        //{
-        //    // code to get access to the editor's currently selected text cribbed from
-        //    // http://msdn.microsoft.com/en-us/library/dd884850.aspx
-        //    IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
-        //    IVsTextView vTextView = null;
-        //    int mustHaveFocus = 1;
-        //    txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
-        //    IVsUserData userData = vTextView as IVsUserData;
-  
-        //    if (userData == null)
-        //    {
-        //        return null;
-        //    }
-        //    else
-        //    {
-        //        IWpfTextViewHost viewHost;
-        //        object holder;
-        //        Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-        //        userData.GetData(ref guidViewHost, out holder);
-        //        viewHost = (IWpfTextViewHost)holder;
-        //        return viewHost;
-        //    }
-        //}
+		//internal IWpfTextViewHost GetCurrentViewHost()
+		//{
+		//    // code to get access to the editor's currently selected text cribbed from
+		//    // http://msdn.microsoft.com/en-us/library/dd884850.aspx
+		//    IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
+		//    IVsTextView vTextView = null;
+		//    int mustHaveFocus = 1;
+		//    txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
+		//    IVsUserData userData = vTextView as IVsUserData;
+
+		//    if (userData == null)
+		//    {
+		//        return null;
+		//    }
+		//    else
+		//    {
+		//        IWpfTextViewHost viewHost;
+		//        object holder;
+		//        Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
+		//        userData.GetData(ref guidViewHost, out holder);
+		//        viewHost = (IWpfTextViewHost)holder;
+		//        return viewHost;
+		//    }
+		//}
 	}
 }
